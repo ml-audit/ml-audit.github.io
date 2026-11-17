@@ -54,13 +54,374 @@
           "title": "",
           "source_heading": "## Issue 2005__accepted__v6-drukh05a__I01",
           "markdown": "\n\n**Exact location.** Theorem 39 on PDF page 21 (printed 1251), its interpretation on PDF page 22, and Lemma 41, Equation (28), on PDF pages 22–23 (printed 1252–1253). The final assembly is in Appendix A.4 on PDF pages 32–33.\n\n**Affected claim and assumptions.** The paper's third main contribution is an a priori high-probability bound on KL log-loss for its absolute-discounting estimator. Definition 37 assigns `(c_w-alpha)/m` to words with counts from 1 through `tau`, `c_w/m` to larger counts, and `alpha n_{1...tau}/(m n_0)` to unseen words. Definition 38 sets `F_x = sum_{p_w <= x} p_w` and `N_x = #{w:p_w > x}`. Theorem 39 assumes `alpha in (0,1)`, `lambda > 3`, and `tau < (lambda-sqrt(3lambda)) ln(8m/delta)`; it claims its explicit upper bound with probability at least `1-delta`. The counterexample satisfies every condition and has strictly positive, normalized estimates for every word.\n\n**Error.** The bound suppresses the ordinary sampling loss from the many words just below its probability cutoff. Lemma 41 multiplies a denominator comparison by `p_w-q_w`, which can be negative, and then multiplies a probability comparison by `p_w-c_w/m`, which can also be negative. Both displayed inequalities can reverse. This is not only a proof gap: Theorem 39 can upper-bound the true loss by less than `10^-6` on an event where the loss is greater than `10^-5`, with probability greater than `0.999999`, despite claiming success probability `0.9`.\n\n**Reproducible counterexample.** Let\n\n- `B = 10^16`, `r = 148`, `m = r B = 1480000000000000000`;\n- `R = floor(sqrt(m)) = 1216552506`;\n- the vocabulary have `B` bulk words, each with probability `(m-R)/(mB)`, and `R` rare words, each with probability `1/m`;\n- `alpha = 1/m`, `tau = 1`, `lambda = 4`, and `delta = 0.1`.\n\nThe probabilities sum exactly to one. Each bulk word has expected count `mu = r-R/B = 147.9999998783447494`. The theorem's cutoff in count units is `4 ln(80m) = 184.8824...`, so every word lies below it: `F_cutoff = 1` and `N_cutoff = 0`. Its permitted upper threshold for `tau` is `24.7695...`, which exceeds 1.\n\nDefine event `E` by three requirements: every bulk word is observed; the numbers of unseen and singleton rare words are each at least `R/8`; and the bulk empirical L1 error\n\n`D = sum_bulk |c_w/m-p_w|`\n\nis at least `1/(8 sqrt(r))`. The following elementary bounds prove\n\n`P(E) >= 1 - 128/R - 128/R^2 - B exp(-mu) - exp(-m/(128r)) > 0.9999998947`.\n\n1. For a bulk count `C ~ Bin(m,p)`, write `v = Var(C)`. Here `v >= r/4 >= 1`. Its fourth central moment is `3v^2 + v(1-6p(1-p)) <= 4v^2`. Hölder therefore gives `E|C-mp| >= sqrt(v)/2`. Summing gives `E D >= 1/(4 sqrt(r))`. A sample replacement changes `D` by at most `2/m`, so McDiarmid gives `P(D < 1/(8 sqrt(r))) <= exp(-m/(128r))`.\n2. Every bulk word is observed except with probability at most `B exp(-mu)` by a union bound.\n3. Each rare word has missing and singleton probabilities at least `1/4`. Missing indicators have nonpositive covariances, so their count has variance at most `R`. For singleton indicators, the joint-to-marginal-squared probability ratio is\n\n   `(1-2/m)^(m-2)/(1-1/m)^(2m-3) <= 1/(1-1/m)`.\n\n   Thus pair covariance is at most `2/m`, and the singleton count has variance at most `R+2`. Chebyshev bounds the two lower-tail failures by `64/R` and `64(R+2)/R^2`.\n\nOn `E`, all missing words are rare, so `M_0 <= R/m`, `R/8 <= n_0 <= R`, and `n_1 >= R/8`. Consequently the estimator is well-defined and strictly positive. Relative to empirical probabilities, discounting changes each observed bulk probability by at most `alpha/m`. Hence\n\n`||P-Q||_1 >= D - B/m^2 >= 1/(16 sqrt(r))`.\n\nPinsker's inequality, also Lemma 36 of the paper, gives\n\n`KL(P||Q) >= 1/(512r) = 0.00001319679054054... > 10^-5`.\n\nIn contrast, insert the event's inequalities into the exact Theorem 39 right-hand side. Its five terms are bounded above by\n\n`(R/m) ln(8m ln(40m))`\n\n`+ [4 ln(80m)/(1-1/m)] [sqrt(3 ln(80)/m)+R/m]`\n\n`+ (1/m)/(1-1/m)`\n\n`+ sqrt(3 ln(80)/m)`\n\n`+ 0`.\n\nTheir sum is `0.00000074520604506... < 10^-6`. The separation also follows from coarse outward bounds `sqrt(m)>1.2e9`, `ln(80m)<47`, `ln(40m)<46`, `ln(8m*46)<48`, and `ln(80)<5`; it does not rely on rounding at the displayed precision. The event probability is far above the allowed failure probability `delta = 0.1`.\n\nThe discrepancy also has unbounded asymptotic size. Keep the same construction with `B -> infinity`, `r = ceil(4 ln B)`, `m = rB`, and `R = floor(sqrt(m))`. The event probability tends to one, the proved loss lower bound is `Omega(1/ln B)`, and the claimed upper bound is `O(ln(m)/sqrt(m))`. Their ratio diverges. Thus increasing a universal constant cannot repair the bound.\n\n**Discovery method.** Traced the signed summands in Lemma 41 through the explicit theorem, then checked a bulk distribution below the cutoff. Added rare words to ensure that both unseen allocation and singleton discounting are nondegenerate, rather than relying on undefined zero-count cases.\n\n**Verification method.** Rechecked Definitions 37–38, Theorem 39, Equation (28), and Appendix A.4 on the original rendered pages. Independently bounded the event probability by binomial moments, Hölder, McDiarmid, pair-count moments and Chebyshev; used Pinsker for an exact loss lower bound. The saved script `logloss-counterexample.py` checks all finite parameters and outward inequalities at 90-digit precision, and `logloss-results.json` records the resulting values. The proof does not require simulating or enumerating the enormous vocabulary. A second reviewer independently re-derived the event and normalization bounds and saved `root-independent-check.py` and `root-independent-results.json`; its exact rational/Taylor checks give the coarser but sufficient upper bound `8.345001e-7`, without floating-point dependence.\n\n**Why rejection is warranted.** An a priori log-loss characterization is explicitly a main contribution in the abstract, introduction and Section 5. The claimed cutoff criterion permits negligible missing mass and no words above the cutoff while omitting a larger sampling loss below it. Correcting a sign or constant does not restore that characterization: the bound needs an additional contribution or a different analysis of the many below-cutoff probabilities. The counterexample invalidates the explicit advertised high-probability theorem and its stated distribution-quality interpretation. It does not refute the separate Good–Turing or leave-one-out rates.\n\n**Confidence.** High. The distribution and algorithm parameters are explicit finite rational values; the estimate is normalized and strictly positive on the stated event; rigorous uniform event bounds separate the claimed and actual loss by more than a factor of 17. The only numerical calculations evaluate elementary logarithms and conservative inequalities already separated by an order of magnitude.\n",
-          "html": "<p><strong>Exact location.</strong> Theorem 39 on PDF page 21 (printed 1251), its interpretation on PDF page 22, and Lemma 41, Equation (28), on PDF pages 22–23 (printed 1252–1253). The final assembly is in Appendix A.4 on PDF pages 32–33.</p>\n<p><strong>Affected claim and assumptions.</strong> The paper's third main contribution is an a priori high-probability bound on KL log-loss for its absolute-discounting estimator. Definition 37 assigns <code>(c_w-alpha)/m</code> to words with counts from 1 through <code>tau</code>, <code>c_w/m</code> to larger counts, and <code>alpha n_{1...tau}/(m n_0)</code> to unseen words. Definition 38 sets <code>F_x = sum_{p_w &lt;= x} p_w</code> and <code>N_x = #{w:p_w &gt; x}</code>. Theorem 39 assumes <code>alpha in (0,1)</code>, <code>lambda &gt; 3</code>, and <code>tau &lt; (lambda-sqrt(3lambda)) ln(8m/delta)</code>; it claims its explicit upper bound with probability at least <code>1-delta</code>. The counterexample satisfies every condition and has strictly positive, normalized estimates for every word.</p>\n<p><strong>Error.</strong> The bound suppresses the ordinary sampling loss from the many words just below its probability cutoff. Lemma 41 multiplies a denominator comparison by <code>p_w-q_w</code>, which can be negative, and then multiplies a probability comparison by <code>p_w-c_w/m</code>, which can also be negative. Both displayed inequalities can reverse. This is not only a proof gap: Theorem 39 can upper-bound the true loss by less than <code>10^-6</code> on an event where the loss is greater than <code>10^-5</code>, with probability greater than <code>0.999999</code>, despite claiming success probability <code>0.9</code>.</p>\n<p><strong>Reproducible counterexample.</strong> Let</p>\n<ul>\n<li><code>B = 10^16</code>, <code>r = 148</code>, <code>m = r B = 1480000000000000000</code>;</li>\n<li><code>R = floor(sqrt(m)) = 1216552506</code>;</li>\n<li>the vocabulary have <code>B</code> bulk words, each with probability <code>(m-R)/(mB)</code>, and <code>R</code> rare words, each with probability <code>1/m</code>;</li>\n<li><code>alpha = 1/m</code>, <code>tau = 1</code>, <code>lambda = 4</code>, and <code>delta = 0.1</code>.</li>\n</ul>\n<p>The probabilities sum exactly to one. Each bulk word has expected count <code>mu = r-R/B = 147.9999998783447494</code>. The theorem's cutoff in count units is <code>4 ln(80m) = 184.8824...</code>, so every word lies below it: <code>F_cutoff = 1</code> and <code>N_cutoff = 0</code>. Its permitted upper threshold for <code>tau</code> is <code>24.7695...</code>, which exceeds 1.</p>\n<p>Define event <code>E</code> by three requirements: every bulk word is observed; the numbers of unseen and singleton rare words are each at least <code>R/8</code>; and the bulk empirical L1 error</p>\n<p><code>D = sum_bulk |c_w/m-p_w|</code></p>\n<p>is at least <code>1/(8 sqrt(r))</code>. The following elementary bounds prove</p>\n<p><code>P(E) &gt;= 1 - 128/R - 128/R^2 - B exp(-mu) - exp(-m/(128r)) &gt; 0.9999998947</code>.</p>\n<ol>\n<li>\n<p>For a bulk count <code>C ~ Bin(m,p)</code>, write <code>v = Var(C)</code>. Here <code>v &gt;= r/4 &gt;= 1</code>. Its fourth central moment is <code>3v^2 + v(1-6p(1-p)) &lt;= 4v^2</code>. Hölder therefore gives <code>E|C-mp| &gt;= sqrt(v)/2</code>. Summing gives <code>E D &gt;= 1/(4 sqrt(r))</code>. A sample replacement changes <code>D</code> by at most <code>2/m</code>, so McDiarmid gives <code>P(D &lt; 1/(8 sqrt(r))) &lt;= exp(-m/(128r))</code>.</p>\n</li>\n<li>\n<p>Every bulk word is observed except with probability at most <code>B exp(-mu)</code> by a union bound.</p>\n</li>\n<li>\n<p>Each rare word has missing and singleton probabilities at least <code>1/4</code>. Missing indicators have nonpositive covariances, so their count has variance at most <code>R</code>. For singleton indicators, the joint-to-marginal-squared probability ratio is</p>\n<p><code>(1-2/m)^(m-2)/(1-1/m)^(2m-3) &lt;= 1/(1-1/m)</code>.</p>\n<p>Thus pair covariance is at most <code>2/m</code>, and the singleton count has variance at most <code>R+2</code>. Chebyshev bounds the two lower-tail failures by <code>64/R</code> and <code>64(R+2)/R^2</code>.</p>\n</li>\n</ol>\n<p>On <code>E</code>, all missing words are rare, so <code>M_0 &lt;= R/m</code>, <code>R/8 &lt;= n_0 &lt;= R</code>, and <code>n_1 &gt;= R/8</code>. Consequently the estimator is well-defined and strictly positive. Relative to empirical probabilities, discounting changes each observed bulk probability by at most <code>alpha/m</code>. Hence</p>\n<p><code>||P-Q||_1 &gt;= D - B/m^2 &gt;= 1/(16 sqrt(r))</code>.</p>\n<p>Pinsker's inequality, also Lemma 36 of the paper, gives</p>\n<p><code>KL(P||Q) &gt;= 1/(512r) = 0.00001319679054054... &gt; 10^-5</code>.</p>\n<p>In contrast, insert the event's inequalities into the exact Theorem 39 right-hand side. Its five terms are bounded above by</p>\n<p><code>(R/m) ln(8m ln(40m))</code></p>\n<p><code>+ [4 ln(80m)/(1-1/m)] [sqrt(3 ln(80)/m)+R/m]</code></p>\n<p><code>+ (1/m)/(1-1/m)</code></p>\n<p><code>+ sqrt(3 ln(80)/m)</code></p>\n<p><code>+ 0</code>.</p>\n<p>Their sum is <code>0.00000074520604506... &lt; 10^-6</code>. The separation also follows from coarse outward bounds <code>sqrt(m)&gt;1.2e9</code>, <code>ln(80m)&lt;47</code>, <code>ln(40m)&lt;46</code>, <code>ln(8m*46)&lt;48</code>, and <code>ln(80)&lt;5</code>; it does not rely on rounding at the displayed precision. The event probability is far above the allowed failure probability <code>delta = 0.1</code>.</p>\n<p>The discrepancy also has unbounded asymptotic size. Keep the same construction with <code>B -&gt; infinity</code>, <code>r = ceil(4 ln B)</code>, <code>m = rB</code>, and <code>R = floor(sqrt(m))</code>. The event probability tends to one, the proved loss lower bound is <code>Omega(1/ln B)</code>, and the claimed upper bound is <code>O(ln(m)/sqrt(m))</code>. Their ratio diverges. Thus increasing a universal constant cannot repair the bound.</p>\n<p><strong>Discovery method.</strong> Traced the signed summands in Lemma 41 through the explicit theorem, then checked a bulk distribution below the cutoff. Added rare words to ensure that both unseen allocation and singleton discounting are nondegenerate, rather than relying on undefined zero-count cases.</p>\n<p><strong>Verification method.</strong> Rechecked Definitions 37–38, Theorem 39, Equation (28), and Appendix A.4 on the original rendered pages. Independently bounded the event probability by binomial moments, Hölder, McDiarmid, pair-count moments and Chebyshev; used Pinsker for an exact loss lower bound. The saved script <code>logloss-counterexample.py</code> checks all finite parameters and outward inequalities at 90-digit precision, and <code>logloss-results.json</code> records the resulting values. The proof does not require simulating or enumerating the enormous vocabulary. A second reviewer independently re-derived the event and normalization bounds and saved <code>root-independent-check.py</code> and <code>root-independent-results.json</code>; its exact rational/Taylor checks give the coarser but sufficient upper bound <code>8.345001e-7</code>, without floating-point dependence.</p>\n<p><strong>Why rejection is warranted.</strong> An a priori log-loss characterization is explicitly a main contribution in the abstract, introduction and Section 5. The claimed cutoff criterion permits negligible missing mass and no words above the cutoff while omitting a larger sampling loss below it. Correcting a sign or constant does not restore that characterization: the bound needs an additional contribution or a different analysis of the many below-cutoff probabilities. The counterexample invalidates the explicit advertised high-probability theorem and its stated distribution-quality interpretation. It does not refute the separate Good–Turing or leave-one-out rates.</p>\n<p><strong>Confidence.</strong> High. The distribution and algorithm parameters are explicit finite rational values; the estimate is normalized and strictly positive on the stated event; rigorous uniform event bounds separate the claimed and actual loss by more than a factor of 17. The only numerical calculations evaluate elementary logarithms and conservative inequalities already separated by an order of magnitude.</p>\n",
+          "html": "<p><strong>Exact location.</strong> Theorem 39 on PDF page 21 (printed 1251), its interpretation on PDF page 22, and Lemma 41, Equation (28), on PDF pages 22–23 (printed 1252–1253). The final assembly is in Appendix A.4 on PDF pages 32–33.</p>\n<p><strong>Affected claim and assumptions.</strong> The paper's third main contribution is an a priori high-probability bound on KL log-loss for its absolute-discounting estimator. Definition 37 assigns <span class=\"source-math\">\\((c_{w}-\\alpha )/m\\)</span> to words with counts from 1 through <span class=\"source-math\">\\(\\tau\\)</span>, <span class=\"source-math\">\\(c_{w}/m\\)</span> to larger counts, and <span class=\"source-math\">\\(\\alpha  n_{1...\\tau}/(m n_{0})\\)</span> to unseen words. Definition 38 sets <span class=\"source-math\">\\(F_{x} = \\sum _{p_{w} \\le  x} p_{w}\\)</span> and <code>N_x = #{w:p_w &gt; x}</code>. Theorem 39 assumes <code>alpha in (0,1)</code>, <span class=\"source-math\">\\(\\lambda  &gt; 3\\)</span>, and <span class=\"source-math\">\\(\\tau  &lt; (\\lambda -\\operatorname{sqrt}(3\\lambda )) \\ln (8m/\\delta )\\)</span>; it claims its explicit upper bound with probability at least <span class=\"source-math\">\\(1-\\delta\\)</span>. The counterexample satisfies every condition and has strictly positive, normalized estimates for every word.</p>\n<p><strong>Error.</strong> The bound suppresses the ordinary sampling loss from the many words just below its probability cutoff. Lemma 41 multiplies a denominator comparison by <span class=\"source-math\">\\(p_{w}-q_{w}\\)</span>, which can be negative, and then multiplies a probability comparison by <span class=\"source-math\">\\(p_{w}-c_{w}/m\\)</span>, which can also be negative. Both displayed inequalities can reverse. This is not only a proof gap: Theorem 39 can upper-bound the true loss by less than <span class=\"source-math\">\\(10^{-6}\\)</span> on an event where the loss is greater than <span class=\"source-math\">\\(10^{-5}\\)</span>, with probability greater than <span class=\"source-math\">\\(0.999999\\)</span>, despite claiming success probability <span class=\"source-math\">\\(0.9\\)</span>.</p>\n<p><strong>Reproducible counterexample.</strong> Let</p>\n<ul>\n<li><span class=\"source-math\">\\(B = 10^{16}\\)</span>, <span class=\"source-math\">\\(r = 148\\)</span>, <span class=\"source-math\">\\(m = r B = 1480000000000000000\\)</span>;</li>\n<li><span class=\"source-math\">\\(R = \\operatorname{floor}(\\operatorname{sqrt}(m)) = 1216552506\\)</span>;</li>\n<li>the vocabulary have <span class=\"source-math\">\\(B\\)</span> bulk words, each with probability <code>(m-R)/(mB)</code>, and <span class=\"source-math\">\\(R\\)</span> rare words, each with probability <span class=\"source-math\">\\(\\frac{1}{m}\\)</span>;</li>\n<li><span class=\"source-math\">\\(\\alpha  = 1/m\\)</span>, <span class=\"source-math\">\\(\\tau  = 1\\)</span>, <span class=\"source-math\">\\(\\lambda  = 4\\)</span>, and <span class=\"source-math\">\\(\\delta  = 0.1\\)</span>.</li>\n</ul>\n<p>The probabilities sum exactly to one. Each bulk word has expected count <span class=\"source-math\">\\(\\mu  = r-R/B = 147.9999998783447494\\)</span>. The theorem's cutoff in count units is <span class=\"source-math\">\\(4 \\ln (80m) = 184.8824\\ldots\\)</span>, so every word lies below it: <code>F_cutoff = 1</code> and <code>N_cutoff = 0</code>. Its permitted upper threshold for <span class=\"source-math\">\\(\\tau\\)</span> is <span class=\"source-math\">\\(24.7695\\ldots\\)</span>, which exceeds 1.</p>\n<p>Define event <span class=\"source-math\">\\(E\\)</span> by three requirements: every bulk word is observed; the numbers of unseen and singleton rare words are each at least <span class=\"source-math\">\\(\\frac{R}{8}\\)</span>; and the bulk empirical L1 error</p>\n<p><code>D = sum_bulk |c_w/m-p_w|</code></p>\n<p>is at least <span class=\"source-math\">\\(1/(8 \\operatorname{sqrt}(r))\\)</span>. The following elementary bounds prove</p>\n<p><span class=\"source-math\">\\(P(E) \\ge  1 - 128/R - 128/R^{2} - B \\exp (-\\mu ) - \\exp (-m/(128r)) &gt; 0.9999998947\\)</span>.</p>\n<ol>\n<li>\n<p>For a bulk count <code>C ~ Bin(m,p)</code>, write <span class=\"source-math\">\\(v = \\operatorname{Var}(C)\\)</span>. Here <span class=\"source-math\">\\(v \\ge  r/4 \\ge  1\\)</span>. Its fourth central moment is <span class=\"source-math\">\\(3v^{2} + v(1-6p(1-p)) \\le  4v^{2}\\)</span>. Hölder therefore gives <code>E|C-mp| &gt;= sqrt(v)/2</code>. Summing gives <span class=\"source-math\">\\(E D \\ge  1/(4 \\operatorname{sqrt}(r))\\)</span>. A sample replacement changes <span class=\"source-math\">\\(D\\)</span> by at most <span class=\"source-math\">\\(\\frac{2}{m}\\)</span>, so McDiarmid gives <span class=\"source-math\">\\(P(D &lt; 1/(8 \\operatorname{sqrt}(r))) \\le  \\exp (-m/(128r))\\)</span>.</p>\n</li>\n<li>\n<p>Every bulk word is observed except with probability at most <span class=\"source-math\">\\(B \\exp (-\\mu )\\)</span> by a union bound.</p>\n</li>\n<li>\n<p>Each rare word has missing and singleton probabilities at least <span class=\"source-math\">\\(\\frac{1}{4}\\)</span>. Missing indicators have nonpositive covariances, so their count has variance at most <span class=\"source-math\">\\(R\\)</span>. For singleton indicators, the joint-to-marginal-squared probability ratio is</p>\n<p><span class=\"source-math\">\\((1-2/m)^{m-2}/(1-1/m)^{2m-3} \\le  1/(1-1/m)\\)</span>.</p>\n<p>Thus pair covariance is at most <span class=\"source-math\">\\(\\frac{2}{m}\\)</span>, and the singleton count has variance at most <span class=\"source-math\">\\(R+2\\)</span>. Chebyshev bounds the two lower-tail failures by <span class=\"source-math\">\\(\\frac{64}{R}\\)</span> and <span class=\"source-math\">\\(64(R+2)/R^{2}\\)</span>.</p>\n</li>\n</ol>\n<p>On <span class=\"source-math\">\\(E\\)</span>, all missing words are rare, so <span class=\"source-math\">\\(M_{0} \\le  R/m\\)</span>, <span class=\"source-math\">\\(R/8 \\le  n_{0} \\le  R\\)</span>, and <span class=\"source-math\">\\(n_{1} \\ge  R/8\\)</span>. Consequently the estimator is well-defined and strictly positive. Relative to empirical probabilities, discounting changes each observed bulk probability by at most <span class=\"source-math\">\\(\\alpha /m\\)</span>. Hence</p>\n<p><span class=\"source-math\">\\(\\lVert P-Q\\rVert _{1} \\ge  D - B/m^{2} \\ge  1/(16 \\operatorname{sqrt}(r))\\)</span>.</p>\n<p>Pinsker's inequality, also Lemma 36 of the paper, gives</p>\n<p><code>KL(P||Q) &gt;= 1/(512r) = 0.00001319679054054... &gt; 10^-5</code>.</p>\n<p>In contrast, insert the event's inequalities into the exact Theorem 39 right-hand side. Its five terms are bounded above by</p>\n<p><span class=\"source-math\">\\((R/m) \\ln (8m \\ln (40m))\\)</span></p>\n<p><span class=\"source-math\">\\(+ [4 \\ln (80m)/(1-1/m)] [\\operatorname{sqrt}(3 \\ln (80)/m)+R/m]\\)</span></p>\n<p><span class=\"source-math\">\\(+ (1/m)/(1-1/m)\\)</span></p>\n<p><span class=\"source-math\">\\(+ \\operatorname{sqrt}(3 \\ln (80)/m)\\)</span></p>\n<p><span class=\"source-math\">\\(+ 0\\)</span>.</p>\n<p>Their sum is <span class=\"source-math\">\\(0.00000074520604506\\ldots  &lt; 10^{-6}\\)</span>. The separation also follows from coarse outward bounds <span class=\"source-math\">\\(\\operatorname{sqrt}(m)&gt;1.2\\times10^{9}\\)</span>, <span class=\"source-math\">\\(\\ln (80m)&lt;47\\)</span>, <span class=\"source-math\">\\(\\ln (40m)&lt;46\\)</span>, <span class=\"source-math\">\\(\\ln (8m*46)&lt;48\\)</span>, and <span class=\"source-math\">\\(\\ln (80)&lt;5\\)</span>; it does not rely on rounding at the displayed precision. The event probability is far above the allowed failure probability <span class=\"source-math\">\\(\\delta  = 0.1\\)</span>.</p>\n<p>The discrepancy also has unbounded asymptotic size. Keep the same construction with <span class=\"source-math\">\\(B \\to  \\infty\\)</span>, <span class=\"source-math\">\\(r = \\operatorname{ceil}(4 \\ln  B)\\)</span>, <code>m = rB</code>, and <span class=\"source-math\">\\(R = \\operatorname{floor}(\\operatorname{sqrt}(m))\\)</span>. The event probability tends to one, the proved loss lower bound is <span class=\"source-math\">\\(\\Omega (1/\\ln  B)\\)</span>, and the claimed upper bound is <span class=\"source-math\">\\(O(\\ln (m)/\\operatorname{sqrt}(m))\\)</span>. Their ratio diverges. Thus increasing a universal constant cannot repair the bound.</p>\n<p><strong>Discovery method.</strong> Traced the signed summands in Lemma 41 through the explicit theorem, then checked a bulk distribution below the cutoff. Added rare words to ensure that both unseen allocation and singleton discounting are nondegenerate, rather than relying on undefined zero-count cases.</p>\n<p><strong>Verification method.</strong> Rechecked Definitions 37–38, Theorem 39, Equation (28), and Appendix A.4 on the original rendered pages. Independently bounded the event probability by binomial moments, Hölder, McDiarmid, pair-count moments and Chebyshev; used Pinsker for an exact loss lower bound. The saved script <code>logloss-counterexample.py</code> checks all finite parameters and outward inequalities at 90-digit precision, and <code>logloss-results.json</code> records the resulting values. The proof does not require simulating or enumerating the enormous vocabulary. A second reviewer independently re-derived the event and normalization bounds and saved <code>root-independent-check.py</code> and <code>root-independent-results.json</code>; its exact rational/Taylor checks give the coarser but sufficient upper bound <span class=\"source-math\">\\(8.345001\\times10^{-7}\\)</span>, without floating-point dependence.</p>\n<p><strong>Why rejection is warranted.</strong> An a priori log-loss characterization is explicitly a main contribution in the abstract, introduction and Section 5. The claimed cutoff criterion permits negligible missing mass and no words above the cutoff while omitting a larger sampling loss below it. Correcting a sign or constant does not restore that characterization: the bound needs an additional contribution or a different analysis of the many below-cutoff probabilities. The counterexample invalidates the explicit advertised high-probability theorem and its stated distribution-quality interpretation. It does not refute the separate Good–Turing or leave-one-out rates.</p>\n<p><strong>Confidence.</strong> High. The distribution and algorithm parameters are explicit finite rational values; the estimate is normalized and strictly positive on the stated event; rigorous uniform event bounds separate the claimed and actual loss by more than a factor of 17. The only numerical calculations evaluate elementary logarithms and conservative inequalities already separated by an order of magnitude.</p>\n",
           "source_body_sha256": "cfc911329cac72991af5eb2c055c69ac300f8a6b3446c22518dbfb8e16663e19",
           "export_text_sha256": "cfc911329cac72991af5eb2c055c69ac300f8a6b3446c22518dbfb8e16663e19",
           "private_reference_substitutions": 0,
           "display_equations": 0,
-          "inline_equations": 0,
-          "formatting_normalizations": []
+          "inline_equations": 72,
+          "formatting_normalizations": [
+            {
+              "rule": "literal_inline_notation",
+              "source": "(c_w-alpha)/m",
+              "tex": "(c_{w}-\\alpha )/m"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "tau",
+              "tex": "\\tau"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "c_w/m",
+              "tex": "c_{w}/m"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "alpha n_{1...tau}/(m n_0)",
+              "tex": "\\alpha  n_{1...\\tau}/(m n_{0})"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "F_x = sum_{p_w <= x} p_w",
+              "tex": "F_{x} = \\sum _{p_{w} \\le  x} p_{w}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "lambda > 3",
+              "tex": "\\lambda  > 3"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "tau < (lambda-sqrt(3lambda)) ln(8m/delta)",
+              "tex": "\\tau  < (\\lambda -\\operatorname{sqrt}(3\\lambda )) \\ln (8m/\\delta )"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "1-delta",
+              "tex": "1-\\delta"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "p_w-q_w",
+              "tex": "p_{w}-q_{w}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "p_w-c_w/m",
+              "tex": "p_{w}-c_{w}/m"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "10^-6",
+              "tex": "10^{-6}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "10^-5",
+              "tex": "10^{-5}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "0.999999",
+              "tex": "0.999999"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "0.9",
+              "tex": "0.9"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "B = 10^16",
+              "tex": "B = 10^{16}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "r = 148",
+              "tex": "r = 148"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "m = r B = 1480000000000000000",
+              "tex": "m = r B = 1480000000000000000"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "R = floor(sqrt(m)) = 1216552506",
+              "tex": "R = \\operatorname{floor}(\\operatorname{sqrt}(m)) = 1216552506"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "B",
+              "tex": "B"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "R",
+              "tex": "R"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "1/m",
+              "tex": "\\frac{1}{m}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "alpha = 1/m",
+              "tex": "\\alpha  = 1/m"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "tau = 1",
+              "tex": "\\tau  = 1"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "lambda = 4",
+              "tex": "\\lambda  = 4"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "delta = 0.1",
+              "tex": "\\delta  = 0.1"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "mu = r-R/B = 147.9999998783447494",
+              "tex": "\\mu  = r-R/B = 147.9999998783447494"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "4 ln(80m) = 184.8824...",
+              "tex": "4 \\ln (80m) = 184.8824\\ldots"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "tau",
+              "tex": "\\tau"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "24.7695...",
+              "tex": "24.7695\\ldots"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "E",
+              "tex": "E"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "R/8",
+              "tex": "\\frac{R}{8}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "1/(8 sqrt(r))",
+              "tex": "1/(8 \\operatorname{sqrt}(r))"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "P(E) >= 1 - 128/R - 128/R^2 - B exp(-mu) - exp(-m/(128r)) > 0.9999998947",
+              "tex": "P(E) \\ge  1 - 128/R - 128/R^{2} - B \\exp (-\\mu ) - \\exp (-m/(128r)) > 0.9999998947"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "v = Var(C)",
+              "tex": "v = \\operatorname{Var}(C)"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "v >= r/4 >= 1",
+              "tex": "v \\ge  r/4 \\ge  1"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "3v^2 + v(1-6p(1-p)) <= 4v^2",
+              "tex": "3v^{2} + v(1-6p(1-p)) \\le  4v^{2}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "E D >= 1/(4 sqrt(r))",
+              "tex": "E D \\ge  1/(4 \\operatorname{sqrt}(r))"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "D",
+              "tex": "D"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "2/m",
+              "tex": "\\frac{2}{m}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "P(D < 1/(8 sqrt(r))) <= exp(-m/(128r))",
+              "tex": "P(D < 1/(8 \\operatorname{sqrt}(r))) \\le  \\exp (-m/(128r))"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "B exp(-mu)",
+              "tex": "B \\exp (-\\mu )"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "1/4",
+              "tex": "\\frac{1}{4}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "R",
+              "tex": "R"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "(1-2/m)^(m-2)/(1-1/m)^(2m-3) <= 1/(1-1/m)",
+              "tex": "(1-2/m)^{m-2}/(1-1/m)^{2m-3} \\le  1/(1-1/m)"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "2/m",
+              "tex": "\\frac{2}{m}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "R+2",
+              "tex": "R+2"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "64/R",
+              "tex": "\\frac{64}{R}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "64(R+2)/R^2",
+              "tex": "64(R+2)/R^{2}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "E",
+              "tex": "E"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "M_0 <= R/m",
+              "tex": "M_{0} \\le  R/m"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "R/8 <= n_0 <= R",
+              "tex": "R/8 \\le  n_{0} \\le  R"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "n_1 >= R/8",
+              "tex": "n_{1} \\ge  R/8"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "alpha/m",
+              "tex": "\\alpha /m"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "||P-Q||_1 >= D - B/m^2 >= 1/(16 sqrt(r))",
+              "tex": "\\lVert P-Q\\rVert _{1} \\ge  D - B/m^{2} \\ge  1/(16 \\operatorname{sqrt}(r))"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "(R/m) ln(8m ln(40m))",
+              "tex": "(R/m) \\ln (8m \\ln (40m))"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "+ [4 ln(80m)/(1-1/m)] [sqrt(3 ln(80)/m)+R/m]",
+              "tex": "+ [4 \\ln (80m)/(1-1/m)] [\\operatorname{sqrt}(3 \\ln (80)/m)+R/m]"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "+ (1/m)/(1-1/m)",
+              "tex": "+ (1/m)/(1-1/m)"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "+ sqrt(3 ln(80)/m)",
+              "tex": "+ \\operatorname{sqrt}(3 \\ln (80)/m)"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "+ 0",
+              "tex": "+ 0"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "0.00000074520604506... < 10^-6",
+              "tex": "0.00000074520604506\\ldots  < 10^{-6}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "sqrt(m)>1.2e9",
+              "tex": "\\operatorname{sqrt}(m)>1.2\\times10^{9}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "ln(80m)<47",
+              "tex": "\\ln (80m)<47"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "ln(40m)<46",
+              "tex": "\\ln (40m)<46"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "ln(8m*46)<48",
+              "tex": "\\ln (8m*46)<48"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "ln(80)<5",
+              "tex": "\\ln (80)<5"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "delta = 0.1",
+              "tex": "\\delta  = 0.1"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "B -> infinity",
+              "tex": "B \\to  \\infty"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "r = ceil(4 ln B)",
+              "tex": "r = \\operatorname{ceil}(4 \\ln  B)"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "R = floor(sqrt(m))",
+              "tex": "R = \\operatorname{floor}(\\operatorname{sqrt}(m))"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "Omega(1/ln B)",
+              "tex": "\\Omega (1/\\ln  B)"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "O(ln(m)/sqrt(m))",
+              "tex": "O(\\ln (m)/\\operatorname{sqrt}(m))"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "8.345001e-7",
+              "tex": "8.345001\\times10^{-7}"
+            }
+          ]
         }
       ]
     },
@@ -117,13 +478,199 @@
           "title": "",
           "source_heading": "## Issue 2005__accepted__v6-markatou05a__I01",
           "markdown": "\n\n**Exact location.** PDF pages 8–11 (printed 1134–1137), Proposition 3.3, Theorem 3.1 and its explicitly stated k-fold specialization; Appendix B, Lemma B.4 on PDF pages 34–35 (printed 1160–1161), and Appendix C, equations (3)–(4) on PDF page 37 (printed 1163). The abstract and Section 5 advertise the general smooth-loss variance estimator and its extensions.\n\n**Affected claim and assumptions.** The paper proposes an approximation, with an `O(n1^-2)` remainder, to the variance of the cross-validation estimate when prediction is the training sample mean and the loss is smooth. Its assumptions on PDF pages 5–7 require identical distribution across training/test indices, finite fourth moments, four derivatives of the loss, and integrable bounds on the relevant fourth derivatives. No condition requires the expected loss derivative at the population mean to vanish. The paper expressly specializes its estimator to balanced k-fold CV: all k disjoint test folds have n/k observations, training uses each fold's complement, and the k test-error averages receive equal weight.\n\n**Error.** The covariance calculation discards terms from an observation that is tested in one split and used for training in another. These terms are of order `1/n`, the same order as the variance being estimated. For fixed k, write `L0(X) = L(mu,X)`, `d = E L'(mu,X)`, and `sigma^2 = Var(X)`. Substituting the actual k-fold overlaps into the displayed formulas gives\n\n`n V_paper -> Var(L0(X)) + sigma^2 d^2`.\n\nThe true first-order expansion of the same CV statistic is\n\n`CV_n = (1/n) sum_i [L0(X_i) + d (X_i-mu)] + O_L2(1/n)`,\n\nso instead\n\n`n Var(CV_n) -> Var(L0(X)) + sigma^2 d^2 + 2 d Cov(L0(X),X)`.\n\nThe omitted cross term generally does not vanish.\n\n**A bounded, ordinary smooth-loss counterexample.** Let `P(X=-1)=2/3`, `P(X=2)=1/3`, so `mu=0` and `sigma^2=2`, and use the nonnegative convex loss\n\n`L(t,x) = sqrt(1+(t-x)^2) - 1`.\n\nThis loss is smooth everywhere and vanishes at perfect prediction. Its fourth derivative is `3[4(t-x)^2-1]/[1+(t-x)^2]^(7/2)`, bounded in absolute value by 15; the fourth derivative of `L^2` is minus twice this derivative and is bounded by 30. Thus both the stated smoothness requirements and every needed moment condition hold, uniformly in n. Direct calculation gives\n\n`d = sqrt(2)/3 - 2 sqrt(5)/15`,\n\n`Var(L0) = 14/9 - 4 sqrt(10)/9`,\n\n`Cov(L0,X) = 2[sqrt(5)-sqrt(2)]/3`.\n\nConsequently, the printed approximation converges after multiplication by n to\n\n`(98 - 28 sqrt(10))/45 = 0.210138344784...`,\n\nwhereas the exact first-order coefficient is\n\n`Var(L0+dX) = 2/5 = 0.4`.\n\nThe missing amount is `(28 sqrt(10)-80)/45 = 0.189861655215...`. This is a leading relative error, not an allowed second-order approximation error. For a rigorous expansion, Taylor-expand each fold's loss once. The product of the centered test-fold average derivative and the independent training-fold mean has L2 norm `O(1/n)`. The quadratic Taylor remainder also has L2 norm `O(1/n)`, because the data and second derivative are bounded and the fourth moment of each training mean is `O(1/n^2)`. The equally weighted complementary training means average exactly to the full sample mean, giving the expansion above. The plug-in estimator has the same incorrect coefficient by consistency of the sample mean, variance and empirical loss moments. Exact finite two-fold binomial-count calculations independently confirm convergence: at n = 2560, n times the true variance is 0.401509614066, whereas n times the printed approximation is 0.210898493314.\n\n**An exact cancellation check.** A separate Gaussian example makes the inconsistency especially transparent. Let `X_i ~ N(0,1)` and `L_c(t,x)=(t-x-c)^2` for any fixed c. Both relevant fourth derivatives are bounded (0 for L and 24 for L squared), and all data moments exist. For every dataset and every balanced complete k-fold partition,\n\n`CV_c = CV_0 + c^2`,\n\nbecause the averaged complementary training means and the averaged held-out observations are the same full sample mean. The variance is therefore independent of c exactly. If R maps observations to held-out residuals, its eigenvalues are 0 once, 1 with multiplicity n-k, and k/(k-1) with multiplicity k-1. Gaussian quadratic-form variance gives\n\n`Var(CV_c) = 2/n + (2/n^2)[-k + k^4/(k-1)^3]`.\n\nHowever, substituting `Var(L0)=2+4c^2`, `d=-2c`, `E(L'^2)=4(1+c^2)` and `L''=2` into the paper's general k-fold formulas yields\n\n`V_paper = (2+8c^2)/n + 3k/[(k-1)n^2] + O(n^-2)`.\n\nThus `n(V_paper-Var(CV_c)) -> 8c^2`, which contradicts the claimed second-order remainder. For illustration only, at k = 5, n = 100, c = 1, the exact variance is `1341/64000 = 0.020953125`; the displayed approximation is `803/8000 = 0.100375`. The rejection does not rely on this finite comparison with an unspecified remainder. For c = 1 the leading variance coefficient is wrong by a factor of five, and the ratio is unbounded as fixed c increases. Independently sampled random splits also suffer from the same omission: the true shifted contribution for J splits is `4c^2(1/n1+1/n2)/J`, while Theorem 3.1 additionally introduces `8c^2(J-1)/(Jn)`.\n\n**Where the derivation drops the term.** If test observation i for split j belongs to the training set for j', then, already in the sample-mean setting,\n\n`E[L0(X_i) L'(X_i') (mean(S_j')-mu)] = d Cov(L0(X),X)/n1`\n\nwhen the other test index i' is distinct and outside its own training set. This is not zero. Appendix C replaces the corresponding regression expectation by a product ending in the zero mean of the fitted-parameter error and concludes that the term is zero. Lemma B.4 only establishes an `o(1)` factorization error, which cannot justify discarding a nonzero `1/n` contribution in a calculation claiming an `O(1/n^2)` remainder. The Gaussian and bounded examples directly test the final theorem independently of this proof diagnosis.\n\n**Reason for rejection.** Estimating cross-validation variance under general smooth losses, while accounting for train/test dependence, is the paper's main contribution. Its main covariance theorem and resulting proposed estimator omit a first-order dependence term even for bounded data and a standard convex smooth loss; the proposed estimate retains a nonvanishing relative bias as sample size grows. Correcting only a second-order constant, improving numerical precision, or increasing the number of CV repetitions cannot repair this. One must rederive the main covariance formula and the general estimator, or substantially narrow the advertised loss/distribution scope (for example, the cancellation `d=0` in the paper's symmetric squared-loss simulations hides the error). The hypergeometric overlap identities and the leading variance under ordinary symmetric squared loss remain unrefuted. No claim is made that all simulation values are invalid.\n\n**Discovery method.** Traced the overlap-dependent covariance calculation and its Appendix B/C factorization argument, then deliberately tested losses for which the expected derivative at the sample-mean target is nonzero.\n\n**Verification method.** Rechecked the rendered original assumptions, Proposition 3.3, Theorem 3.1, the k-fold formulas and appendix proof; derived the bounded-data influence expansion and exact radical coefficients; independently checked Gaussian residual matrices and quadratic-form variances for 36 n/k/c configurations; enumerated exact two-fold binomial-count distributions for eight sample sizes; and checked all subset-pair overlap distributions for n = 8. Root independently rederived the exact cancellation and bounded smooth-loss coefficients in `root-independent-check.json`.\n\n**Artifact/correction recheck.** The official article page was retrieved twice, the official JMLR repository lists only its PDF and metadata, and the mirror directory lists only its PDF. Targeted title/author/identifier searches found no erratum or original software. A later first-author paper, [Afendras and Markatou, arXiv:1511.02980v1](https://arxiv.org/pdf/1511.02980), PDF page 12, restates the same smooth-loss covariance approximation; it supplies no correction that resolves this counterexample. Search absence is not evidence for the mathematical finding. Historical software execution is not claimed.\n\n**Evidence.** Reproduce with `python [unpublished artifact reference omitted]` from the output directory. The directory contains `results.json`, `root-independent-check.json`, the original-page renders, official-page/repository/PDF retrievals, `artifact-conclusions.json`, and the later primary-source PDF/text.\n\n**Confidence.** High. Two independent own-assumption witnesses establish a leading-order contradiction, including a bounded-data loss with globally bounded relevant derivatives. The exact shifted-square identity holds for every dataset, and the asymptotic contradiction does not depend on simulation or finite approximation tolerances.\n",
-          "html": "<p><strong>Exact location.</strong> PDF pages 8–11 (printed 1134–1137), Proposition 3.3, Theorem 3.1 and its explicitly stated k-fold specialization; Appendix B, Lemma B.4 on PDF pages 34–35 (printed 1160–1161), and Appendix C, equations (3)–(4) on PDF page 37 (printed 1163). The abstract and Section 5 advertise the general smooth-loss variance estimator and its extensions.</p>\n<p><strong>Affected claim and assumptions.</strong> The paper proposes an approximation, with an <code>O(n1^-2)</code> remainder, to the variance of the cross-validation estimate when prediction is the training sample mean and the loss is smooth. Its assumptions on PDF pages 5–7 require identical distribution across training/test indices, finite fourth moments, four derivatives of the loss, and integrable bounds on the relevant fourth derivatives. No condition requires the expected loss derivative at the population mean to vanish. The paper expressly specializes its estimator to balanced k-fold CV: all k disjoint test folds have n/k observations, training uses each fold's complement, and the k test-error averages receive equal weight.</p>\n<p><strong>Error.</strong> The covariance calculation discards terms from an observation that is tested in one split and used for training in another. These terms are of order <code>1/n</code>, the same order as the variance being estimated. For fixed k, write <code>L0(X) = L(mu,X)</code>, <code>d = E L'(mu,X)</code>, and <code>sigma^2 = Var(X)</code>. Substituting the actual k-fold overlaps into the displayed formulas gives</p>\n<p><code>n V_paper -&gt; Var(L0(X)) + sigma^2 d^2</code>.</p>\n<p>The true first-order expansion of the same CV statistic is</p>\n<p><code>CV_n = (1/n) sum_i [L0(X_i) + d (X_i-mu)] + O_L2(1/n)</code>,</p>\n<p>so instead</p>\n<p><code>n Var(CV_n) -&gt; Var(L0(X)) + sigma^2 d^2 + 2 d Cov(L0(X),X)</code>.</p>\n<p>The omitted cross term generally does not vanish.</p>\n<p><strong>A bounded, ordinary smooth-loss counterexample.</strong> Let <code>P(X=-1)=2/3</code>, <code>P(X=2)=1/3</code>, so <code>mu=0</code> and <code>sigma^2=2</code>, and use the nonnegative convex loss</p>\n<p><code>L(t,x) = sqrt(1+(t-x)^2) - 1</code>.</p>\n<p>This loss is smooth everywhere and vanishes at perfect prediction. Its fourth derivative is <code>3[4(t-x)^2-1]/[1+(t-x)^2]^(7/2)</code>, bounded in absolute value by 15; the fourth derivative of <code>L^2</code> is minus twice this derivative and is bounded by 30. Thus both the stated smoothness requirements and every needed moment condition hold, uniformly in n. Direct calculation gives</p>\n<p><code>d = sqrt(2)/3 - 2 sqrt(5)/15</code>,</p>\n<p><code>Var(L0) = 14/9 - 4 sqrt(10)/9</code>,</p>\n<p><code>Cov(L0,X) = 2[sqrt(5)-sqrt(2)]/3</code>.</p>\n<p>Consequently, the printed approximation converges after multiplication by n to</p>\n<p><code>(98 - 28 sqrt(10))/45 = 0.210138344784...</code>,</p>\n<p>whereas the exact first-order coefficient is</p>\n<p><code>Var(L0+dX) = 2/5 = 0.4</code>.</p>\n<p>The missing amount is <code>(28 sqrt(10)-80)/45 = 0.189861655215...</code>. This is a leading relative error, not an allowed second-order approximation error. For a rigorous expansion, Taylor-expand each fold's loss once. The product of the centered test-fold average derivative and the independent training-fold mean has L2 norm <code>O(1/n)</code>. The quadratic Taylor remainder also has L2 norm <code>O(1/n)</code>, because the data and second derivative are bounded and the fourth moment of each training mean is <code>O(1/n^2)</code>. The equally weighted complementary training means average exactly to the full sample mean, giving the expansion above. The plug-in estimator has the same incorrect coefficient by consistency of the sample mean, variance and empirical loss moments. Exact finite two-fold binomial-count calculations independently confirm convergence: at n = 2560, n times the true variance is 0.401509614066, whereas n times the printed approximation is 0.210898493314.</p>\n<p><strong>An exact cancellation check.</strong> A separate Gaussian example makes the inconsistency especially transparent. Let <code>X_i ~ N(0,1)</code> and <code>L_c(t,x)=(t-x-c)^2</code> for any fixed c. Both relevant fourth derivatives are bounded (0 for L and 24 for L squared), and all data moments exist. For every dataset and every balanced complete k-fold partition,</p>\n<p><code>CV_c = CV_0 + c^2</code>,</p>\n<p>because the averaged complementary training means and the averaged held-out observations are the same full sample mean. The variance is therefore independent of c exactly. If R maps observations to held-out residuals, its eigenvalues are 0 once, 1 with multiplicity n-k, and k/(k-1) with multiplicity k-1. Gaussian quadratic-form variance gives</p>\n<p><code>Var(CV_c) = 2/n + (2/n^2)[-k + k^4/(k-1)^3]</code>.</p>\n<p>However, substituting <code>Var(L0)=2+4c^2</code>, <code>d=-2c</code>, <code>E(L'^2)=4(1+c^2)</code> and <code>L''=2</code> into the paper's general k-fold formulas yields</p>\n<p><code>V_paper = (2+8c^2)/n + 3k/[(k-1)n^2] + O(n^-2)</code>.</p>\n<p>Thus <code>n(V_paper-Var(CV_c)) -&gt; 8c^2</code>, which contradicts the claimed second-order remainder. For illustration only, at k = 5, n = 100, c = 1, the exact variance is <code>1341/64000 = 0.020953125</code>; the displayed approximation is <code>803/8000 = 0.100375</code>. The rejection does not rely on this finite comparison with an unspecified remainder. For c = 1 the leading variance coefficient is wrong by a factor of five, and the ratio is unbounded as fixed c increases. Independently sampled random splits also suffer from the same omission: the true shifted contribution for J splits is <code>4c^2(1/n1+1/n2)/J</code>, while Theorem 3.1 additionally introduces <code>8c^2(J-1)/(Jn)</code>.</p>\n<p><strong>Where the derivation drops the term.</strong> If test observation i for split j belongs to the training set for j', then, already in the sample-mean setting,</p>\n<p><code>E[L0(X_i) L'(X_i') (mean(S_j')-mu)] = d Cov(L0(X),X)/n1</code></p>\n<p>when the other test index i' is distinct and outside its own training set. This is not zero. Appendix C replaces the corresponding regression expectation by a product ending in the zero mean of the fitted-parameter error and concludes that the term is zero. Lemma B.4 only establishes an <code>o(1)</code> factorization error, which cannot justify discarding a nonzero <code>1/n</code> contribution in a calculation claiming an <code>O(1/n^2)</code> remainder. The Gaussian and bounded examples directly test the final theorem independently of this proof diagnosis.</p>\n<p><strong>Reason for rejection.</strong> Estimating cross-validation variance under general smooth losses, while accounting for train/test dependence, is the paper's main contribution. Its main covariance theorem and resulting proposed estimator omit a first-order dependence term even for bounded data and a standard convex smooth loss; the proposed estimate retains a nonvanishing relative bias as sample size grows. Correcting only a second-order constant, improving numerical precision, or increasing the number of CV repetitions cannot repair this. One must rederive the main covariance formula and the general estimator, or substantially narrow the advertised loss/distribution scope (for example, the cancellation <code>d=0</code> in the paper's symmetric squared-loss simulations hides the error). The hypergeometric overlap identities and the leading variance under ordinary symmetric squared loss remain unrefuted. No claim is made that all simulation values are invalid.</p>\n<p><strong>Discovery method.</strong> Traced the overlap-dependent covariance calculation and its Appendix B/C factorization argument, then deliberately tested losses for which the expected derivative at the sample-mean target is nonzero.</p>\n<p><strong>Verification method.</strong> Rechecked the rendered original assumptions, Proposition 3.3, Theorem 3.1, the k-fold formulas and appendix proof; derived the bounded-data influence expansion and exact radical coefficients; independently checked Gaussian residual matrices and quadratic-form variances for 36 n/k/c configurations; enumerated exact two-fold binomial-count distributions for eight sample sizes; and checked all subset-pair overlap distributions for n = 8. Root independently rederived the exact cancellation and bounded smooth-loss coefficients in <code>root-independent-check.json</code>.</p>\n<p><strong>Artifact/correction recheck.</strong> The official article page was retrieved twice, the official JMLR repository lists only its PDF and metadata, and the mirror directory lists only its PDF. Targeted title/author/identifier searches found no erratum or original software. A later first-author paper, <a href=\"https://arxiv.org/pdf/1511.02980\">Afendras and Markatou, arXiv:1511.02980v1</a>, PDF page 12, restates the same smooth-loss covariance approximation; it supplies no correction that resolves this counterexample. Search absence is not evidence for the mathematical finding. Historical software execution is not claimed.</p>\n<p><strong>Evidence.</strong> Reproduce with <code>python [unpublished artifact reference omitted]</code> from the output directory. The directory contains <code>results.json</code>, <code>root-independent-check.json</code>, the original-page renders, official-page/repository/PDF retrievals, <code>artifact-conclusions.json</code>, and the later primary-source PDF/text.</p>\n<p><strong>Confidence.</strong> High. Two independent own-assumption witnesses establish a leading-order contradiction, including a bounded-data loss with globally bounded relevant derivatives. The exact shifted-square identity holds for every dataset, and the asymptotic contradiction does not depend on simulation or finite approximation tolerances.</p>\n",
+          "html": "<p><strong>Exact location.</strong> PDF pages 8–11 (printed 1134–1137), Proposition 3.3, Theorem 3.1 and its explicitly stated k-fold specialization; Appendix B, Lemma B.4 on PDF pages 34–35 (printed 1160–1161), and Appendix C, equations (3)–(4) on PDF page 37 (printed 1163). The abstract and Section 5 advertise the general smooth-loss variance estimator and its extensions.</p>\n<p><strong>Affected claim and assumptions.</strong> The paper proposes an approximation, with an <span class=\"source-math\">\\(O(n1^{-2})\\)</span> remainder, to the variance of the cross-validation estimate when prediction is the training sample mean and the loss is smooth. Its assumptions on PDF pages 5–7 require identical distribution across training/test indices, finite fourth moments, four derivatives of the loss, and integrable bounds on the relevant fourth derivatives. No condition requires the expected loss derivative at the population mean to vanish. The paper expressly specializes its estimator to balanced k-fold CV: all k disjoint test folds have n/k observations, training uses each fold's complement, and the k test-error averages receive equal weight.</p>\n<p><strong>Error.</strong> The covariance calculation discards terms from an observation that is tested in one split and used for training in another. These terms are of order <span class=\"source-math\">\\(\\frac{1}{n}\\)</span>, the same order as the variance being estimated. For fixed k, write <span class=\"source-math\">\\(L0(X) = L(\\mu ,X)\\)</span>, <span class=\"source-math\">\\(d = E L^{\\prime}(\\mu ,X)\\)</span>, and <span class=\"source-math\">\\(\\sigma ^{2} = \\operatorname{Var}(X)\\)</span>. Substituting the actual k-fold overlaps into the displayed formulas gives</p>\n<p><code>n V_paper -&gt; Var(L0(X)) + sigma^2 d^2</code>.</p>\n<p>The true first-order expansion of the same CV statistic is</p>\n<p><span class=\"source-math\">\\(CV_{n} = (1/n) \\sum _{i} [L0(X_{i}) + d (X_{i}-\\mu )] + O_{L}2(1/n)\\)</span>,</p>\n<p>so instead</p>\n<p><span class=\"source-math\">\\(n \\operatorname{Var}(CV_{n}) \\to  \\operatorname{Var}(L0(X)) + \\sigma ^{2} d^{2} + 2 d \\operatorname{Cov}(L0(X),X)\\)</span>.</p>\n<p>The omitted cross term generally does not vanish.</p>\n<p><strong>A bounded, ordinary smooth-loss counterexample.</strong> Let <span class=\"source-math\">\\(P(X=-1)=2/3\\)</span>, <span class=\"source-math\">\\(P(X=2)=1/3\\)</span>, so <span class=\"source-math\">\\(\\mu =0\\)</span> and <span class=\"source-math\">\\(\\sigma ^{2}=2\\)</span>, and use the nonnegative convex loss</p>\n<p><span class=\"source-math\">\\(L(t,x) = \\operatorname{sqrt}(1+(t-x)^{2}) - 1\\)</span>.</p>\n<p>This loss is smooth everywhere and vanishes at perfect prediction. Its fourth derivative is <span class=\"source-math\">\\(3[4(t-x)^{2}-1]/[1+(t-x)^{2}]^{7/2}\\)</span>, bounded in absolute value by 15; the fourth derivative of <span class=\"source-math\">\\(L^{2}\\)</span> is minus twice this derivative and is bounded by 30. Thus both the stated smoothness requirements and every needed moment condition hold, uniformly in n. Direct calculation gives</p>\n<p><span class=\"source-math\">\\(d = \\operatorname{sqrt}(2)/3 - 2 \\operatorname{sqrt}(5)/15\\)</span>,</p>\n<p><span class=\"source-math\">\\(\\operatorname{Var}(L0) = 14/9 - 4 \\operatorname{sqrt}(10)/9\\)</span>,</p>\n<p><span class=\"source-math\">\\(\\operatorname{Cov}(L0,X) = 2[\\operatorname{sqrt}(5)-\\operatorname{sqrt}(2)]/3\\)</span>.</p>\n<p>Consequently, the printed approximation converges after multiplication by n to</p>\n<p><span class=\"source-math\">\\((98 - 28 \\operatorname{sqrt}(10))/45 = 0.210138344784\\ldots\\)</span>,</p>\n<p>whereas the exact first-order coefficient is</p>\n<p><code>Var(L0+dX) = 2/5 = 0.4</code>.</p>\n<p>The missing amount is <span class=\"source-math\">\\((28 \\operatorname{sqrt}(10)-80)/45 = 0.189861655215\\ldots\\)</span>. This is a leading relative error, not an allowed second-order approximation error. For a rigorous expansion, Taylor-expand each fold's loss once. The product of the centered test-fold average derivative and the independent training-fold mean has L2 norm <span class=\"source-math\">\\(O(1/n)\\)</span>. The quadratic Taylor remainder also has L2 norm <span class=\"source-math\">\\(O(1/n)\\)</span>, because the data and second derivative are bounded and the fourth moment of each training mean is <span class=\"source-math\">\\(O(1/n^{2})\\)</span>. The equally weighted complementary training means average exactly to the full sample mean, giving the expansion above. The plug-in estimator has the same incorrect coefficient by consistency of the sample mean, variance and empirical loss moments. Exact finite two-fold binomial-count calculations independently confirm convergence: at n = 2560, n times the true variance is 0.401509614066, whereas n times the printed approximation is 0.210898493314.</p>\n<p><strong>An exact cancellation check.</strong> A separate Gaussian example makes the inconsistency especially transparent. Let <span class=\"source-math\">\\(X_{i} \\sim  N(0,1)\\)</span> and <span class=\"source-math\">\\(L_{c}(t,x)=(t-x-c)^{2}\\)</span> for any fixed c. Both relevant fourth derivatives are bounded (0 for L and 24 for L squared), and all data moments exist. For every dataset and every balanced complete k-fold partition,</p>\n<p><span class=\"source-math\">\\(CV_{c} = CV_{0} + c^{2}\\)</span>,</p>\n<p>because the averaged complementary training means and the averaged held-out observations are the same full sample mean. The variance is therefore independent of c exactly. If R maps observations to held-out residuals, its eigenvalues are 0 once, 1 with multiplicity n-k, and k/(k-1) with multiplicity k-1. Gaussian quadratic-form variance gives</p>\n<p><span class=\"source-math\">\\(\\operatorname{Var}(CV_{c}) = 2/n + (2/n^{2})[-k + k^{4}/(k-1)^{3}]\\)</span>.</p>\n<p>However, substituting <span class=\"source-math\">\\(\\operatorname{Var}(L0)=2+4c^{2}\\)</span>, <span class=\"source-math\">\\(d=-2c\\)</span>, <span class=\"source-math\">\\(\\mathbb{E}\\left[(L^{\\prime})^2\\right]=4(1+c^2)\\)</span> and <span class=\"source-math\">\\(L^{\\prime\\prime}=2\\)</span> into the paper's general k-fold formulas yields</p>\n<p><code>V_paper = (2+8c^2)/n + 3k/[(k-1)n^2] + O(n^-2)</code>.</p>\n<p>Thus <code>n(V_paper-Var(CV_c)) -&gt; 8c^2</code>, which contradicts the claimed second-order remainder. For illustration only, at k = 5, n = 100, c = 1, the exact variance is <span class=\"source-math\">\\(1341/64000 = 0.020953125\\)</span>; the displayed approximation is <span class=\"source-math\">\\(803/8000 = 0.100375\\)</span>. The rejection does not rely on this finite comparison with an unspecified remainder. For c = 1 the leading variance coefficient is wrong by a factor of five, and the ratio is unbounded as fixed c increases. Independently sampled random splits also suffer from the same omission: the true shifted contribution for J splits is <span class=\"source-math\">\\(4c^{2}(1/n1+1/n2)/J\\)</span>, while Theorem 3.1 additionally introduces <code>8c^2(J-1)/(Jn)</code>.</p>\n<p><strong>Where the derivation drops the term.</strong> If test observation i for split j belongs to the training set for j', then, already in the sample-mean setting,</p>\n<p><code>E[L0(X_i) L'(X_i') (mean(S_j')-mu)] = d Cov(L0(X),X)/n1</code></p>\n<p>when the other test index i' is distinct and outside its own training set. This is not zero. Appendix C replaces the corresponding regression expectation by a product ending in the zero mean of the fitted-parameter error and concludes that the term is zero. Lemma B.4 only establishes an <span class=\"source-math\">\\(o(1)\\)</span> factorization error, which cannot justify discarding a nonzero <span class=\"source-math\">\\(\\frac{1}{n}\\)</span> contribution in a calculation claiming an <span class=\"source-math\">\\(O(1/n^{2})\\)</span> remainder. The Gaussian and bounded examples directly test the final theorem independently of this proof diagnosis.</p>\n<p><strong>Reason for rejection.</strong> Estimating cross-validation variance under general smooth losses, while accounting for train/test dependence, is the paper's main contribution. Its main covariance theorem and resulting proposed estimator omit a first-order dependence term even for bounded data and a standard convex smooth loss; the proposed estimate retains a nonvanishing relative bias as sample size grows. Correcting only a second-order constant, improving numerical precision, or increasing the number of CV repetitions cannot repair this. One must rederive the main covariance formula and the general estimator, or substantially narrow the advertised loss/distribution scope (for example, the cancellation <span class=\"source-math\">\\(d=0\\)</span> in the paper's symmetric squared-loss simulations hides the error). The hypergeometric overlap identities and the leading variance under ordinary symmetric squared loss remain unrefuted. No claim is made that all simulation values are invalid.</p>\n<p><strong>Discovery method.</strong> Traced the overlap-dependent covariance calculation and its Appendix B/C factorization argument, then deliberately tested losses for which the expected derivative at the sample-mean target is nonzero.</p>\n<p><strong>Verification method.</strong> Rechecked the rendered original assumptions, Proposition 3.3, Theorem 3.1, the k-fold formulas and appendix proof; derived the bounded-data influence expansion and exact radical coefficients; independently checked Gaussian residual matrices and quadratic-form variances for 36 n/k/c configurations; enumerated exact two-fold binomial-count distributions for eight sample sizes; and checked all subset-pair overlap distributions for n = 8. Root independently rederived the exact cancellation and bounded smooth-loss coefficients in <code>root-independent-check.json</code>.</p>\n<p><strong>Artifact/correction recheck.</strong> The official article page was retrieved twice, the official JMLR repository lists only its PDF and metadata, and the mirror directory lists only its PDF. Targeted title/author/identifier searches found no erratum or original software. A later first-author paper, <a href=\"https://arxiv.org/pdf/1511.02980\">Afendras and Markatou, arXiv:1511.02980v1</a>, PDF page 12, restates the same smooth-loss covariance approximation; it supplies no correction that resolves this counterexample. Search absence is not evidence for the mathematical finding. Historical software execution is not claimed.</p>\n<p><strong>Evidence.</strong> Reproduce with <code>python [unpublished artifact reference omitted]</code> from the output directory. The directory contains <code>results.json</code>, <code>root-independent-check.json</code>, the original-page renders, official-page/repository/PDF retrievals, <code>artifact-conclusions.json</code>, and the later primary-source PDF/text.</p>\n<p><strong>Confidence.</strong> High. Two independent own-assumption witnesses establish a leading-order contradiction, including a bounded-data loss with globally bounded relevant derivatives. The exact shifted-square identity holds for every dataset, and the asymptotic contradiction does not depend on simulation or finite approximation tolerances.</p>\n",
           "source_body_sha256": "f371ee36675566de5f61ac0d2fd340f9a9415cb97bf75c5ffa575d102f4b3b72",
           "export_text_sha256": "03a3990d062784c5123beeafc35f7a35fd4b45401e3610d6a2a9e6702cc59128",
           "private_reference_substitutions": 1,
           "display_equations": 0,
-          "inline_equations": 0,
-          "formatting_normalizations": []
+          "inline_equations": 37,
+          "formatting_normalizations": [
+            {
+              "rule": "literal_inline_notation",
+              "source": "O(n1^-2)",
+              "tex": "O(n1^{-2})"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "1/n",
+              "tex": "\\frac{1}{n}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "L0(X) = L(mu,X)",
+              "tex": "L0(X) = L(\\mu ,X)"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "d = E L'(mu,X)",
+              "tex": "d = E L^{\\prime}(\\mu ,X)"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "sigma^2 = Var(X)",
+              "tex": "\\sigma ^{2} = \\operatorname{Var}(X)"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "CV_n = (1/n) sum_i [L0(X_i) + d (X_i-mu)] + O_L2(1/n)",
+              "tex": "CV_{n} = (1/n) \\sum _{i} [L0(X_{i}) + d (X_{i}-\\mu )] + O_{L}2(1/n)"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "n Var(CV_n) -> Var(L0(X)) + sigma^2 d^2 + 2 d Cov(L0(X),X)",
+              "tex": "n \\operatorname{Var}(CV_{n}) \\to  \\operatorname{Var}(L0(X)) + \\sigma ^{2} d^{2} + 2 d \\operatorname{Cov}(L0(X),X)"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "P(X=-1)=2/3",
+              "tex": "P(X=-1)=2/3"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "P(X=2)=1/3",
+              "tex": "P(X=2)=1/3"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "mu=0",
+              "tex": "\\mu =0"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "sigma^2=2",
+              "tex": "\\sigma ^{2}=2"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "L(t,x) = sqrt(1+(t-x)^2) - 1",
+              "tex": "L(t,x) = \\operatorname{sqrt}(1+(t-x)^{2}) - 1"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "3[4(t-x)^2-1]/[1+(t-x)^2]^(7/2)",
+              "tex": "3[4(t-x)^{2}-1]/[1+(t-x)^{2}]^{7/2}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "L^2",
+              "tex": "L^{2}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "d = sqrt(2)/3 - 2 sqrt(5)/15",
+              "tex": "d = \\operatorname{sqrt}(2)/3 - 2 \\operatorname{sqrt}(5)/15"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "Var(L0) = 14/9 - 4 sqrt(10)/9",
+              "tex": "\\operatorname{Var}(L0) = 14/9 - 4 \\operatorname{sqrt}(10)/9"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "Cov(L0,X) = 2[sqrt(5)-sqrt(2)]/3",
+              "tex": "\\operatorname{Cov}(L0,X) = 2[\\operatorname{sqrt}(5)-\\operatorname{sqrt}(2)]/3"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "(98 - 28 sqrt(10))/45 = 0.210138344784...",
+              "tex": "(98 - 28 \\operatorname{sqrt}(10))/45 = 0.210138344784\\ldots"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "(28 sqrt(10)-80)/45 = 0.189861655215...",
+              "tex": "(28 \\operatorname{sqrt}(10)-80)/45 = 0.189861655215\\ldots"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "O(1/n)",
+              "tex": "O(1/n)"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "O(1/n)",
+              "tex": "O(1/n)"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "O(1/n^2)",
+              "tex": "O(1/n^{2})"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "X_i ~ N(0,1)",
+              "tex": "X_{i} \\sim  N(0,1)"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "L_c(t,x)=(t-x-c)^2",
+              "tex": "L_{c}(t,x)=(t-x-c)^{2}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "CV_c = CV_0 + c^2",
+              "tex": "CV_{c} = CV_{0} + c^{2}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "Var(CV_c) = 2/n + (2/n^2)[-k + k^4/(k-1)^3]",
+              "tex": "\\operatorname{Var}(CV_{c}) = 2/n + (2/n^{2})[-k + k^{4}/(k-1)^{3}]"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "Var(L0)=2+4c^2",
+              "tex": "\\operatorname{Var}(L0)=2+4c^{2}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "d=-2c",
+              "tex": "d=-2c"
+            },
+            {
+              "rule": "reviewed_inline_notation",
+              "source": "E(L'^2)=4(1+c^2)",
+              "tex": "\\mathbb{E}\\left[(L^{\\prime})^2\\right]=4(1+c^2)"
+            },
+            {
+              "rule": "reviewed_inline_notation",
+              "source": "L''=2",
+              "tex": "L^{\\prime\\prime}=2"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "1341/64000 = 0.020953125",
+              "tex": "1341/64000 = 0.020953125"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "803/8000 = 0.100375",
+              "tex": "803/8000 = 0.100375"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "4c^2(1/n1+1/n2)/J",
+              "tex": "4c^{2}(1/n1+1/n2)/J"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "o(1)",
+              "tex": "o(1)"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "1/n",
+              "tex": "\\frac{1}{n}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "O(1/n^2)",
+              "tex": "O(1/n^{2})"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "d=0",
+              "tex": "d=0"
+            }
+          ]
         }
       ]
     },
@@ -138,13 +685,214 @@
           "title": "",
           "source_heading": "## Issue 2005__accepted__v6-maurer05a__I01",
           "markdown": "\n\n**Exact location.** PDF page 24 (printed 990), equation (36), the advertised CP-regression transfer-risk guarantee. The invalid squared-loss range is asserted on PDF page 21 (printed 987) and used as `1/lambda` in the concentration coefficient of (36). Related ordinary ridge-stability assertions appear on PDF pages 21 and 23 (printed 987, 989). The abstract and introduction, especially PDF page 5, advertise this worked application.\n\n**Affected claim.** For the CP-regression algorithm defined in Section 6, fixed mixture parameter `mu in [0,1]`, regularization `lambda > 0`, and bounded-norm primer, equation (36) claims that, with probability at least `1-delta` over n training tasks, transfer risk is at most\n\n`empirical_meta_loss + 8mu/[lambda(n-1)] + {16mu n/[lambda(n-1)] + 1/lambda} sqrt[ln(1/delta)/(2n)] + 4/(m lambda)`.\n\n**Error.** The assertion that squared loss is bounded by `1/lambda` omits the label from the residual. Although fitted predictions shrink as regularization increases, the loss against a nonzero target persists. The claimed confidence penalty therefore eliminates task-sampling uncertainty as `lambda -> infinity`, even when the task labels remain random. This leads to a false high-confidence transfer-risk certificate under all stated input and algorithm restrictions.\n\n**Exact nonzero-input, positive-mixing counterexample.** Use the one-dimensional Hilbert space `H=R`, input space `X={1}` in its unit ball, and allowed output space `[0,1]`. The environment chooses with equal probabilities between two tasks: `D0` deterministically produces `(x,y)=(1,0)`, and `D1` deterministically produces `(1,1)`. Take\n\n`n=2, m=2, mu=1/2, lambda=10000, delta=1/10`.\n\nUse the paper's own ordinary ridge regression as primer with `lambda0=1`, and set its valid norm bound `kappa=1`. For a sample from task `Dy`, the primer is the scalar `h=y/2`, so its norm is at most one as required. This uses nonzero inputs, genuine ordinary ridge primers, positive feature mixing, positive regularization, and nonempty samples after each ordinary/meta deletion.\n\nConsider the event that both training tasks are `D0`. It has probability exactly `1/4`. Both primer vectors are then zero, so equation (35) gives the learned inner product\n\n`<a,b>_S = (1-mu)ab = ab/2`.\n\nFor any fresh deterministic task `Dy`, the final ridge prediction is\n\n`prediction(y) = [(1/2)/(lambda+1/2)] y`.\n\nIts loss is zero on `D0` and `[lambda/(lambda+1/2)]^2` on `D1`. Thus its true transfer risk, conditioned on this meta-sample, is\n\n`R = (1/2)[10000/(10000+1/2)]^2 = 200000000/400040001 = 0.499950003749...`.\n\nThe empirical meta-loss in (36) is exactly zero, since both training tasks have target zero. Substitution into the printed bound gives\n\n`B = [6 + 17 sqrt(ln(10)/4)]/10000 = 0.001889813059...`.\n\nThis is not a numerical boundary case: `ln(10)<4` proves `B<23/10000<49/100<R` using elementary rational inequalities. Consequently the claimed 90% certificate fails with probability at least 25%. Exhaustive evaluation of all four equiprobable meta-samples shows failure occurs exactly on the stated event.\n\nThe true transfer risk stays near one half as lambda increases, whereas the printed upper bound on this same event tends to zero. No universal multiplicative constant can repair this regularization dependence.\n\n**Diagnosis and repair scope.** At the zero predictor, a target-one observation has squared loss one, independently of lambda. The norm bound `||h||<=lambda^-1/2` only gives the general pointwise envelope `(1+lambda^-1/2)^2`, not `1/lambda`. The meta-loss used here is itself bounded by one, since the optimized penalized training objective is no larger than its value at the zero predictor. That valid bound would retain task-sampling uncertainty in the high-regularization limit, rather than the `1/lambda` term printed in (36).\n\nThere is also a related false ordinary stability constant in this application: the un-clipped ridge algorithm is asserted to have uniform deletion stability `2/(lambda m)`. For `lambda=1/100`, `m=10000`, a training sample of 9999 copies of `(x,y)=(1/10,1)` and one copy of `(1,0)` has fitted scalar `h=990/199`. Deleting the last example gives `h'=5`. On the allowed test point `(-1,1)`, the absolute squared-loss change is `11915/39601=0.300876240499`, greater than the claimed `1/50`. This constant failure is not needed for the counterexample to equation (36), whose nonzero-input instance has benign bounded predictions. A corrected norm/Lipschitz argument supplies `C(lambda)/m` stability and retains fixed-parameter sample-size rates; the stability slip is grouped with the same application issue rather than counted separately.\n\n**Reason for rejection.** CP regression is the paper's separately advertised and only fully worked algorithmic application. Its explicit performance guarantee can certify expected loss below 0.002 for an admissible learner whose actual transfer loss is about 0.5, with failure probability exceeding the declared confidence allowance. The erroneous dependence on regularization destroys the stated risk certificate; it is not a harmless rounding, constant-factor, or isolated proof-label error. The application needs a corrected loss range and ordinary stability analysis, changing its displayed quantitative guarantee. The general meta-learning reduction, Theorems 1 and 4–6 under correct assumptions, and the CP empirical meta-stability estimate in Corollary 10 remain unrefuted. The corrected application can retain its fixed-positive-parameter sample-size rates, but that does not validate the stated confidence/regularization guarantee.\n\n**Discovery method.** Audited the worked regression application against the bounded-loss and uniform-stability requirements of the otherwise valid transfer theorems. Tested the large-regularization limit, where predictions approach zero while target residuals and task-sampling uncertainty remain.\n\n**Verification method.** Rechecked full-resolution original PDF pages 21, 24 and 26 and all Section 6 parameter/domain restrictions; analytically solved both levels of the scalar ridge problem; exhaustively enumerated all four environment outcomes; certified a strict rational separation without relying on floating-point tolerances. Separately checked the core LOO identities in 21 exact finite cases, finite-selection concentration in 60 cases, and 500 noncommuting PSD resolvent/CP-kernel perturbation cases. Root independently inspected the original rendered equation (36) and enumerated all four cases in `root-independent-check.json`; no claim of an independent full-paper reread is made.\n\n**Artifact/correction recheck.** Retried the official article and author publication sources. The author’s directly linked [ASMLv4.pdf](http://www.andreas-maurer.eu/ASMLv4.pdf), PDF page 27, has the same equation (36), confirmed visually. The official JMLR repository lists only the paper and metadata. No erratum or original implementation was located. The cited Bousquet–Elisseeff primary paper was also retrieved to check the imported stability assertion; it does not resolve this loss-range counterexample. Missing software and search absence are not treated as findings.\n\n**Evidence.** Reproduce with `python [unpublished artifact reference omitted]` from the output directory. The directory contains `results.json`, `root-independent-check.json`, rendered originals `page_01.png` through `page_28.png`, source/artifact retrievals, the cited Bousquet–Elisseeff primary paper and `screened-notes.md` distinguishing surviving results and local corrections.\n\n**Confidence.** High. The application and environment are finite and exactly solvable; all four possible meta-samples are enumerated. The failure probability and true-risk lower bound are exact, and a rational upper certificate proves the claimed risk bound is false with a wide margin. The counterexample does not depend on missing code, approximate optimization, a zero input, zero feature mixing or the separate stability-constant error.\n",
-          "html": "<p><strong>Exact location.</strong> PDF page 24 (printed 990), equation (36), the advertised CP-regression transfer-risk guarantee. The invalid squared-loss range is asserted on PDF page 21 (printed 987) and used as <code>1/lambda</code> in the concentration coefficient of (36). Related ordinary ridge-stability assertions appear on PDF pages 21 and 23 (printed 987, 989). The abstract and introduction, especially PDF page 5, advertise this worked application.</p>\n<p><strong>Affected claim.</strong> For the CP-regression algorithm defined in Section 6, fixed mixture parameter <code>mu in [0,1]</code>, regularization <code>lambda &gt; 0</code>, and bounded-norm primer, equation (36) claims that, with probability at least <code>1-delta</code> over n training tasks, transfer risk is at most</p>\n<p><code>empirical_meta_loss + 8mu/[lambda(n-1)] + {16mu n/[lambda(n-1)] + 1/lambda} sqrt[ln(1/delta)/(2n)] + 4/(m lambda)</code>.</p>\n<p><strong>Error.</strong> The assertion that squared loss is bounded by <code>1/lambda</code> omits the label from the residual. Although fitted predictions shrink as regularization increases, the loss against a nonzero target persists. The claimed confidence penalty therefore eliminates task-sampling uncertainty as <code>lambda -&gt; infinity</code>, even when the task labels remain random. This leads to a false high-confidence transfer-risk certificate under all stated input and algorithm restrictions.</p>\n<p><strong>Exact nonzero-input, positive-mixing counterexample.</strong> Use the one-dimensional Hilbert space <code>H=R</code>, input space <code>X={1}</code> in its unit ball, and allowed output space <code>[0,1]</code>. The environment chooses with equal probabilities between two tasks: <code>D0</code> deterministically produces <code>(x,y)=(1,0)</code>, and <code>D1</code> deterministically produces <code>(1,1)</code>. Take</p>\n<p><code>n=2, m=2, mu=1/2, lambda=10000, delta=1/10</code>.</p>\n<p>Use the paper's own ordinary ridge regression as primer with <code>lambda0=1</code>, and set its valid norm bound <code>kappa=1</code>. For a sample from task <code>Dy</code>, the primer is the scalar <code>h=y/2</code>, so its norm is at most one as required. This uses nonzero inputs, genuine ordinary ridge primers, positive feature mixing, positive regularization, and nonempty samples after each ordinary/meta deletion.</p>\n<p>Consider the event that both training tasks are <code>D0</code>. It has probability exactly <code>1/4</code>. Both primer vectors are then zero, so equation (35) gives the learned inner product</p>\n<p><code>&lt;a,b&gt;_S = (1-mu)ab = ab/2</code>.</p>\n<p>For any fresh deterministic task <code>Dy</code>, the final ridge prediction is</p>\n<p><code>prediction(y) = [(1/2)/(lambda+1/2)] y</code>.</p>\n<p>Its loss is zero on <code>D0</code> and <code>[lambda/(lambda+1/2)]^2</code> on <code>D1</code>. Thus its true transfer risk, conditioned on this meta-sample, is</p>\n<p><code>R = (1/2)[10000/(10000+1/2)]^2 = 200000000/400040001 = 0.499950003749...</code>.</p>\n<p>The empirical meta-loss in (36) is exactly zero, since both training tasks have target zero. Substitution into the printed bound gives</p>\n<p><code>B = [6 + 17 sqrt(ln(10)/4)]/10000 = 0.001889813059...</code>.</p>\n<p>This is not a numerical boundary case: <code>ln(10)&lt;4</code> proves <code>B&lt;23/10000&lt;49/100&lt;R</code> using elementary rational inequalities. Consequently the claimed 90% certificate fails with probability at least 25%. Exhaustive evaluation of all four equiprobable meta-samples shows failure occurs exactly on the stated event.</p>\n<p>The true transfer risk stays near one half as lambda increases, whereas the printed upper bound on this same event tends to zero. No universal multiplicative constant can repair this regularization dependence.</p>\n<p><strong>Diagnosis and repair scope.</strong> At the zero predictor, a target-one observation has squared loss one, independently of lambda. The norm bound <code>||h||&lt;=lambda^-1/2</code> only gives the general pointwise envelope <code>(1+lambda^-1/2)^2</code>, not <code>1/lambda</code>. The meta-loss used here is itself bounded by one, since the optimized penalized training objective is no larger than its value at the zero predictor. That valid bound would retain task-sampling uncertainty in the high-regularization limit, rather than the <code>1/lambda</code> term printed in (36).</p>\n<p>There is also a related false ordinary stability constant in this application: the un-clipped ridge algorithm is asserted to have uniform deletion stability <code>2/(lambda m)</code>. For <code>lambda=1/100</code>, <code>m=10000</code>, a training sample of 9999 copies of <code>(x,y)=(1/10,1)</code> and one copy of <code>(1,0)</code> has fitted scalar <code>h=990/199</code>. Deleting the last example gives <code>h'=5</code>. On the allowed test point <code>(-1,1)</code>, the absolute squared-loss change is <code>11915/39601=0.300876240499</code>, greater than the claimed <code>1/50</code>. This constant failure is not needed for the counterexample to equation (36), whose nonzero-input instance has benign bounded predictions. A corrected norm/Lipschitz argument supplies <code>C(lambda)/m</code> stability and retains fixed-parameter sample-size rates; the stability slip is grouped with the same application issue rather than counted separately.</p>\n<p><strong>Reason for rejection.</strong> CP regression is the paper's separately advertised and only fully worked algorithmic application. Its explicit performance guarantee can certify expected loss below 0.002 for an admissible learner whose actual transfer loss is about 0.5, with failure probability exceeding the declared confidence allowance. The erroneous dependence on regularization destroys the stated risk certificate; it is not a harmless rounding, constant-factor, or isolated proof-label error. The application needs a corrected loss range and ordinary stability analysis, changing its displayed quantitative guarantee. The general meta-learning reduction, Theorems 1 and 4–6 under correct assumptions, and the CP empirical meta-stability estimate in Corollary 10 remain unrefuted. The corrected application can retain its fixed-positive-parameter sample-size rates, but that does not validate the stated confidence/regularization guarantee.</p>\n<p><strong>Discovery method.</strong> Audited the worked regression application against the bounded-loss and uniform-stability requirements of the otherwise valid transfer theorems. Tested the large-regularization limit, where predictions approach zero while target residuals and task-sampling uncertainty remain.</p>\n<p><strong>Verification method.</strong> Rechecked full-resolution original PDF pages 21, 24 and 26 and all Section 6 parameter/domain restrictions; analytically solved both levels of the scalar ridge problem; exhaustively enumerated all four environment outcomes; certified a strict rational separation without relying on floating-point tolerances. Separately checked the core LOO identities in 21 exact finite cases, finite-selection concentration in 60 cases, and 500 noncommuting PSD resolvent/CP-kernel perturbation cases. Root independently inspected the original rendered equation (36) and enumerated all four cases in <code>root-independent-check.json</code>; no claim of an independent full-paper reread is made.</p>\n<p><strong>Artifact/correction recheck.</strong> Retried the official article and author publication sources. The author’s directly linked <a href=\"http://www.andreas-maurer.eu/ASMLv4.pdf\">ASMLv4.pdf</a>, PDF page 27, has the same equation (36), confirmed visually. The official JMLR repository lists only the paper and metadata. No erratum or original implementation was located. The cited Bousquet–Elisseeff primary paper was also retrieved to check the imported stability assertion; it does not resolve this loss-range counterexample. Missing software and search absence are not treated as findings.</p>\n<p><strong>Evidence.</strong> Reproduce with <code>python [unpublished artifact reference omitted]</code> from the output directory. The directory contains <code>results.json</code>, <code>root-independent-check.json</code>, rendered originals <code>page_01.png</code> through <code>page_28.png</code>, source/artifact retrievals, the cited Bousquet–Elisseeff primary paper and <code>screened-notes.md</code> distinguishing surviving results and local corrections.</p>\n<p><strong>Confidence.</strong> High. The application and environment are finite and exactly solvable; all four possible meta-samples are enumerated. The failure probability and true-risk lower bound are exact, and a rational upper certificate proves the claimed risk bound is false with a wide margin. The counterexample does not depend on missing code, approximate optimization, a zero input, zero feature mixing or the separate stability-constant error.</p>\n",
+          "html": "<p><strong>Exact location.</strong> PDF page 24 (printed 990), equation (36), the advertised CP-regression transfer-risk guarantee. The invalid squared-loss range is asserted on PDF page 21 (printed 987) and used as <span class=\"source-math\">\\(\\frac{1}{\\lambda}\\)</span> in the concentration coefficient of (36). Related ordinary ridge-stability assertions appear on PDF pages 21 and 23 (printed 987, 989). The abstract and introduction, especially PDF page 5, advertise this worked application.</p>\n<p><strong>Affected claim.</strong> For the CP-regression algorithm defined in Section 6, fixed mixture parameter <code>mu in [0,1]</code>, regularization <span class=\"source-math\">\\(\\lambda  &gt; 0\\)</span>, and bounded-norm primer, equation (36) claims that, with probability at least <span class=\"source-math\">\\(1-\\delta\\)</span> over n training tasks, transfer risk is at most</p>\n<p><code>empirical_meta_loss + 8mu/[lambda(n-1)] + {16mu n/[lambda(n-1)] + 1/lambda} sqrt[ln(1/delta)/(2n)] + 4/(m lambda)</code>.</p>\n<p><strong>Error.</strong> The assertion that squared loss is bounded by <span class=\"source-math\">\\(\\frac{1}{\\lambda}\\)</span> omits the label from the residual. Although fitted predictions shrink as regularization increases, the loss against a nonzero target persists. The claimed confidence penalty therefore eliminates task-sampling uncertainty as <span class=\"source-math\">\\(\\lambda  \\to  \\infty\\)</span>, even when the task labels remain random. This leads to a false high-confidence transfer-risk certificate under all stated input and algorithm restrictions.</p>\n<p><strong>Exact nonzero-input, positive-mixing counterexample.</strong> Use the one-dimensional Hilbert space <span class=\"source-math\">\\(H=R\\)</span>, input space <span class=\"source-math\">\\(X=\\{1\\}\\)</span> in its unit ball, and allowed output space <span class=\"source-math\">\\([0,1]\\)</span>. The environment chooses with equal probabilities between two tasks: <span class=\"source-math\">\\(D0\\)</span> deterministically produces <span class=\"source-math\">\\((x,y)=(1,0)\\)</span>, and <span class=\"source-math\">\\(D1\\)</span> deterministically produces <span class=\"source-math\">\\((1,1)\\)</span>. Take</p>\n<p><span class=\"source-math\">\\(n=2, m=2, \\mu =1/2, \\lambda =10000, \\delta =1/10\\)</span>.</p>\n<p>Use the paper's own ordinary ridge regression as primer with <span class=\"source-math\">\\(\\lambda 0=1\\)</span>, and set its valid norm bound <span class=\"source-math\">\\(\\kappa =1\\)</span>. For a sample from task <code>Dy</code>, the primer is the scalar <span class=\"source-math\">\\(h=y/2\\)</span>, so its norm is at most one as required. This uses nonzero inputs, genuine ordinary ridge primers, positive feature mixing, positive regularization, and nonempty samples after each ordinary/meta deletion.</p>\n<p>Consider the event that both training tasks are <span class=\"source-math\">\\(D0\\)</span>. It has probability exactly <span class=\"source-math\">\\(\\frac{1}{4}\\)</span>. Both primer vectors are then zero, so equation (35) gives the learned inner product</p>\n<p><code>&lt;a,b&gt;_S = (1-mu)ab = ab/2</code>.</p>\n<p>For any fresh deterministic task <code>Dy</code>, the final ridge prediction is</p>\n<p><code>prediction(y) = [(1/2)/(lambda+1/2)] y</code>.</p>\n<p>Its loss is zero on <span class=\"source-math\">\\(D0\\)</span> and <span class=\"source-math\">\\([\\lambda /(\\lambda +1/2)]^{2}\\)</span> on <span class=\"source-math\">\\(D1\\)</span>. Thus its true transfer risk, conditioned on this meta-sample, is</p>\n<p><span class=\"source-math\">\\(R = (1/2)[10000/(10000+1/2)]^{2} = 200000000/400040001 = 0.499950003749\\ldots\\)</span>.</p>\n<p>The empirical meta-loss in (36) is exactly zero, since both training tasks have target zero. Substitution into the printed bound gives</p>\n<p><span class=\"source-math\">\\(B = [6 + 17 \\operatorname{sqrt}(\\ln (10)/4)]/10000 = 0.001889813059\\ldots\\)</span>.</p>\n<p>This is not a numerical boundary case: <span class=\"source-math\">\\(\\ln (10)&lt;4\\)</span> proves <span class=\"source-math\">\\(B&lt;23/10000&lt;49/100&lt;R\\)</span> using elementary rational inequalities. Consequently the claimed 90% certificate fails with probability at least 25%. Exhaustive evaluation of all four equiprobable meta-samples shows failure occurs exactly on the stated event.</p>\n<p>The true transfer risk stays near one half as lambda increases, whereas the printed upper bound on this same event tends to zero. No universal multiplicative constant can repair this regularization dependence.</p>\n<p><strong>Diagnosis and repair scope.</strong> At the zero predictor, a target-one observation has squared loss one, independently of lambda. The norm bound <span class=\"source-math\">\\(\\lVert h\\rVert \\le \\lambda ^{-1}/2\\)</span> only gives the general pointwise envelope <span class=\"source-math\">\\((1+\\lambda ^{-1}/2)^{2}\\)</span>, not <span class=\"source-math\">\\(\\frac{1}{\\lambda}\\)</span>. The meta-loss used here is itself bounded by one, since the optimized penalized training objective is no larger than its value at the zero predictor. That valid bound would retain task-sampling uncertainty in the high-regularization limit, rather than the <span class=\"source-math\">\\(\\frac{1}{\\lambda}\\)</span> term printed in (36).</p>\n<p>There is also a related false ordinary stability constant in this application: the un-clipped ridge algorithm is asserted to have uniform deletion stability <span class=\"source-math\">\\(2/(\\lambda  m)\\)</span>. For <span class=\"source-math\">\\(\\lambda =1/100\\)</span>, <span class=\"source-math\">\\(m=10000\\)</span>, a training sample of 9999 copies of <span class=\"source-math\">\\((x,y)=(1/10,1)\\)</span> and one copy of <span class=\"source-math\">\\((1,0)\\)</span> has fitted scalar <span class=\"source-math\">\\(h=990/199\\)</span>. Deleting the last example gives <span class=\"source-math\">\\(h^{\\prime}=5\\)</span>. On the allowed test point <span class=\"source-math\">\\((-1,1)\\)</span>, the absolute squared-loss change is <span class=\"source-math\">\\(11915/39601=0.300876240499\\)</span>, greater than the claimed <span class=\"source-math\">\\(\\frac{1}{50}\\)</span>. This constant failure is not needed for the counterexample to equation (36), whose nonzero-input instance has benign bounded predictions. A corrected norm/Lipschitz argument supplies <span class=\"source-math\">\\(C(\\lambda )/m\\)</span> stability and retains fixed-parameter sample-size rates; the stability slip is grouped with the same application issue rather than counted separately.</p>\n<p><strong>Reason for rejection.</strong> CP regression is the paper's separately advertised and only fully worked algorithmic application. Its explicit performance guarantee can certify expected loss below 0.002 for an admissible learner whose actual transfer loss is about 0.5, with failure probability exceeding the declared confidence allowance. The erroneous dependence on regularization destroys the stated risk certificate; it is not a harmless rounding, constant-factor, or isolated proof-label error. The application needs a corrected loss range and ordinary stability analysis, changing its displayed quantitative guarantee. The general meta-learning reduction, Theorems 1 and 4–6 under correct assumptions, and the CP empirical meta-stability estimate in Corollary 10 remain unrefuted. The corrected application can retain its fixed-positive-parameter sample-size rates, but that does not validate the stated confidence/regularization guarantee.</p>\n<p><strong>Discovery method.</strong> Audited the worked regression application against the bounded-loss and uniform-stability requirements of the otherwise valid transfer theorems. Tested the large-regularization limit, where predictions approach zero while target residuals and task-sampling uncertainty remain.</p>\n<p><strong>Verification method.</strong> Rechecked full-resolution original PDF pages 21, 24 and 26 and all Section 6 parameter/domain restrictions; analytically solved both levels of the scalar ridge problem; exhaustively enumerated all four environment outcomes; certified a strict rational separation without relying on floating-point tolerances. Separately checked the core LOO identities in 21 exact finite cases, finite-selection concentration in 60 cases, and 500 noncommuting PSD resolvent/CP-kernel perturbation cases. Root independently inspected the original rendered equation (36) and enumerated all four cases in <code>root-independent-check.json</code>; no claim of an independent full-paper reread is made.</p>\n<p><strong>Artifact/correction recheck.</strong> Retried the official article and author publication sources. The author’s directly linked <a href=\"http://www.andreas-maurer.eu/ASMLv4.pdf\">ASMLv4.pdf</a>, PDF page 27, has the same equation (36), confirmed visually. The official JMLR repository lists only the paper and metadata. No erratum or original implementation was located. The cited Bousquet–Elisseeff primary paper was also retrieved to check the imported stability assertion; it does not resolve this loss-range counterexample. Missing software and search absence are not treated as findings.</p>\n<p><strong>Evidence.</strong> Reproduce with <code>python [unpublished artifact reference omitted]</code> from the output directory. The directory contains <code>results.json</code>, <code>root-independent-check.json</code>, rendered originals <code>page_01.png</code> through <code>page_28.png</code>, source/artifact retrievals, the cited Bousquet–Elisseeff primary paper and <code>screened-notes.md</code> distinguishing surviving results and local corrections.</p>\n<p><strong>Confidence.</strong> High. The application and environment are finite and exactly solvable; all four possible meta-samples are enumerated. The failure probability and true-risk lower bound are exact, and a rational upper certificate proves the claimed risk bound is false with a wide margin. The counterexample does not depend on missing code, approximate optimization, a zero input, zero feature mixing or the separate stability-constant error.</p>\n",
           "source_body_sha256": "8adcf101a678a9c27657d14b9cce86c3c1f1fca5f628ffe2256d255e9a351957",
           "export_text_sha256": "23b3b8d5831a0f38e6753f1be5a4e87a6626cadfacb736ac447ea942f385a4d9",
           "private_reference_substitutions": 1,
           "display_equations": 0,
-          "inline_equations": 0,
-          "formatting_normalizations": []
+          "inline_equations": 40,
+          "formatting_normalizations": [
+            {
+              "rule": "literal_inline_notation",
+              "source": "1/lambda",
+              "tex": "\\frac{1}{\\lambda}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "lambda > 0",
+              "tex": "\\lambda  > 0"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "1-delta",
+              "tex": "1-\\delta"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "1/lambda",
+              "tex": "\\frac{1}{\\lambda}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "lambda -> infinity",
+              "tex": "\\lambda  \\to  \\infty"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "H=R",
+              "tex": "H=R"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "X={1}",
+              "tex": "X=\\{1\\}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "[0,1]",
+              "tex": "[0,1]"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "D0",
+              "tex": "D0"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "(x,y)=(1,0)",
+              "tex": "(x,y)=(1,0)"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "D1",
+              "tex": "D1"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "(1,1)",
+              "tex": "(1,1)"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "n=2, m=2, mu=1/2, lambda=10000, delta=1/10",
+              "tex": "n=2, m=2, \\mu =1/2, \\lambda =10000, \\delta =1/10"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "lambda0=1",
+              "tex": "\\lambda 0=1"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "kappa=1",
+              "tex": "\\kappa =1"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "h=y/2",
+              "tex": "h=y/2"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "D0",
+              "tex": "D0"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "1/4",
+              "tex": "\\frac{1}{4}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "D0",
+              "tex": "D0"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "[lambda/(lambda+1/2)]^2",
+              "tex": "[\\lambda /(\\lambda +1/2)]^{2}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "D1",
+              "tex": "D1"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "R = (1/2)[10000/(10000+1/2)]^2 = 200000000/400040001 = 0.499950003749...",
+              "tex": "R = (1/2)[10000/(10000+1/2)]^{2} = 200000000/400040001 = 0.499950003749\\ldots"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "B = [6 + 17 sqrt(ln(10)/4)]/10000 = 0.001889813059...",
+              "tex": "B = [6 + 17 \\operatorname{sqrt}(\\ln (10)/4)]/10000 = 0.001889813059\\ldots"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "ln(10)<4",
+              "tex": "\\ln (10)<4"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "B<23/10000<49/100<R",
+              "tex": "B<23/10000<49/100<R"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "||h||<=lambda^-1/2",
+              "tex": "\\lVert h\\rVert \\le \\lambda ^{-1}/2"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "(1+lambda^-1/2)^2",
+              "tex": "(1+\\lambda ^{-1}/2)^{2}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "1/lambda",
+              "tex": "\\frac{1}{\\lambda}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "1/lambda",
+              "tex": "\\frac{1}{\\lambda}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "2/(lambda m)",
+              "tex": "2/(\\lambda  m)"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "lambda=1/100",
+              "tex": "\\lambda =1/100"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "m=10000",
+              "tex": "m=10000"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "(x,y)=(1/10,1)",
+              "tex": "(x,y)=(1/10,1)"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "(1,0)",
+              "tex": "(1,0)"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "h=990/199",
+              "tex": "h=990/199"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "h'=5",
+              "tex": "h^{\\prime}=5"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "(-1,1)",
+              "tex": "(-1,1)"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "11915/39601=0.300876240499",
+              "tex": "11915/39601=0.300876240499"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "1/50",
+              "tex": "\\frac{1}{50}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "C(lambda)/m",
+              "tex": "C(\\lambda )/m"
+            }
+          ]
         }
       ]
     },
@@ -159,13 +907,114 @@
           "title": "",
           "source_heading": "## Issue 2005__accepted__v6-shani05a__I01",
           "markdown": "\n\n**Exact location:** PDF page 21, printed page 1285, Section 5.3: the three count definitions and Equations (29)–(33); continuation on PDF page 22, printed page 1286, Equations (34)–(36). The affected use is Section 6.1, PDF pages 23–25, printed pages 1287–1289, including the learned transition distribution used for simulation and Table 3.\n\n**Affected claim and assumptions:** The proposed online update learns the recommendation-dependent transition probabilities of the MDP from recommendations and observed user choices. Section 5.1 defines these probabilities as the probability of buying an item conditional on the state and recommendation. Equations (21)–(23) assume an item's purchase probability depends on whether it is included in the recommendation list, allowing two probabilities per state–item pair. The abstract advertises the update algorithm and commercial performance; Section 6 explicitly evaluates a model updated by this procedure for almost a year.\n\n**Error:** The update conditions on the purchase outcome instead of the recommendation exposure. The denominator `c_total(s, s·r)` is explicitly the number of times item `r` was bought in state `s`, regardless of whether it was recommended. The numerator `c_in` counts purchases of `r` when it was recommended; `c_out` counts purchases when it was not. Therefore Equations (32) and (33) estimate\n\n\\[\nP(r\\text{ recommended}\\mid r\\text{ bought},s),\\qquad\nP(r\\text{ not recommended}\\mid r\\text{ bought},s),\n\\]\n\ninstead of the required probabilities of buying `r` conditional on its recommendation status. This is also fixed unambiguously by the additive updates: `c_in + c_out` receives exactly the same new purchase count as `c_total`. It cannot be resolved by reading `c_total` as an exposure count.\n\n**Reproducible counterexample:** Fix a state and four available items. Each action recommends three items. For every list, let the probability of buying each recommended item be `6/25`, and the probability of buying the omitted item be `2/25`. The remaining probability `1/5` is no purchase. These are strictly valid stochastic rows, recommendation increases each item's purchase probability, and the independence condition (21) holds exactly. The construction remains stochastic for every subset of the four items, since even recommending all four gives purchase mass `24/25`.\n\nShow each of the four possible three-item lists on 100 visits. For each list the exact observed counts are 24 purchases of each included item, 8 purchases of the omitted item, and 20 no-purchase observations. Thus every item has\n\n\\[\nc_{in}=72,\\quad c_{out}=8,\\quad c_{total}=80.\n\\]\n\nThe printed update gives `tr_in = 9/10` and `tr_out = 1/10`. Every three-item list consequently has purported purchase probability\n\n\\[\n3(9/10)+1/10=14/5.\n\\]\n\nThe no-purchase residual is `−9/5`, rather than the true `1/5`. The correct exposure denominators are 300 visits with the item shown and 100 visits with it omitted, yielding `72/300 = 6/25` and `8/100 = 2/25`. All items and recommendation statuses have positive exposure. Repeating this batch removes any finite initialization in Equations (34)–(36); it converges to the same erroneous fractions. The failure is not caused by sparse data, a new item, insufficient exploration, or the choice of initial predictive model.\n\n**Normalization does not repair the learned decision problem:** Keep exactly the same true response model, but show the list omitting item 1 on 2700 visits and each other omission list on 100 visits. Exact counts give\n\n\\[\n\\widehat p_{in}=(1/4,87/88,87/88,87/88),\\qquad\n\\widehat p_{out}=(3/4,1/88,1/88,1/88).\n\\]\n\nThe inferred effect of recommending item 1 is now negative, although its true effect is `6/25 − 2/25 > 0`. Assign next-item values `(2,1,1,1)`. The true one-step expected value is `22/25` when item 1 is omitted, and `26/25` when it is included: the correct list includes item 1.\n\nEven if every printed purchase row is charitably divided by its sum to make it stochastic, the corresponding expected values are\n\n\\[\n\\frac{131}{109}\\quad\\text{when item 1 is omitted},\\qquad\n\\frac{219}{197}\\quad\\text{when item 1 is included}.\n\\]\n\nSince `131/109 > 219/197`, this normalized model selects the opposite list. Preserving the true common no-purchase mass `1/5` merely multiplies both values by `4/5`, leaving the reversal intact. This is an error in the target conditional probability and the resulting action values, not merely a missing row-normalization step.\n\n**Central consequence and reason for rejection:** The paper's main MDP contribution requires a transition model that reflects how recommendations affect choices. The proposed update instead learns how frequently the logging policy displayed an item among visits on which it was purchased. It can produce no MDP at all, or, after normalization, prefer an action that is strictly worse under the exact response model satisfying the paper's assumptions. Section 6 says the model used both to generate recommendations and to simulate the policy comparisons was built with these incremental updates for almost a year; the simulation samples from the resulting `tr(s,R,s·x)`. A valid repair must record exposure counts separately for recommendation inclusion and exclusion, change the fitted transition probabilities and values, and reassess the learned-model evaluation. This changes the central learned MDP and its validation, so a correction to notation or an added normalization cannot substantiate the paper as written.\n\nThis finding does not disprove the general use of MDPs for recommendation, the independent predictive-model contribution in Sections 3–4, or the possibility of real commercial gains. The constructed counts do not establish what the unreleased historical implementation actually computed, do not reconstruct the commercial data, and do not establish a corrected ranking or a cause for any reported numerical result. The conclusion is that the specified learning procedure cannot support the paper's claimed recommendation-dependent MDP and its evaluation as written.\n\n**Discovery method:** Traced the meaning of the transition function from Sections 5.1–5.2 into the purchase-count definitions and online update in Section 5.3; checked the conditional-probability direction and its dependence on the recommendation logging frequency. Constructed finite complete count tables satisfying the multiple-recommendation assumptions.\n\n**Verification method:** Read all 31 original PDF pages, including the complete later discussion and references, and inspected the original rendered PDF pages 16–18 and 21–25 at full resolution, including the count definitions and all denominators. Ran the saved exact-rational `check.py`, which generates and verifies both count tables, all stochastic true rows, the invalid printed rows, correct exposure-based estimates, the normalization-induced policy reversal, and finite-prior examples. Root independently enumerated both count constructions with exact fractions and checked the original definitions, assumptions, simulation and deployment passages on PDF pages 16–18 and 21–25; this was a targeted independent review, not a second full-paper read. Rechecked the earlier primary ICAPS 2003 paper, which repeats the same purchase-count denominator and does not supply a correction. Searched the official JMLR page/repository and author publication pages for source, errata, or a different count definition; no resolving correction or historical implementation was recovered. Missing artifacts are not the evidence for this issue.\n\n**Evidence:** `check.py`, `results.json`, `root-independent-check.json`, `page_16.png`, `page_17.png`, `page_18.png`, `page_21.png`–`page_25.png`, `icaps2003-primary.pdf`, `icaps2003-primary.txt`, `icaps2003-counts-page_07.png`, and `source-search.json`, in `[unpublished artifact reference omitted]`. The earlier paper is available from the [official ICAPS proceedings](https://cdn.aaai.org/ICAPS/2003/ICAPS03-017.pdf); the [official JMLR article page](https://jmlr.org/papers/v6/shani05a.html) identifies the audited version.\n\n**Confidence:** High. The denominator's purchase-count definition is explicit and is independently enforced by Equations (29)–(31). Both counterexamples use exact integer observations and rational arithmetic, with no model misspecification, limiting exchange, simulation uncertainty, or uncertain historical implementation assumption.\n",
-          "html": "<p><strong>Exact location:</strong> PDF page 21, printed page 1285, Section 5.3: the three count definitions and Equations (29)–(33); continuation on PDF page 22, printed page 1286, Equations (34)–(36). The affected use is Section 6.1, PDF pages 23–25, printed pages 1287–1289, including the learned transition distribution used for simulation and Table 3.</p>\n<p><strong>Affected claim and assumptions:</strong> The proposed online update learns the recommendation-dependent transition probabilities of the MDP from recommendations and observed user choices. Section 5.1 defines these probabilities as the probability of buying an item conditional on the state and recommendation. Equations (21)–(23) assume an item's purchase probability depends on whether it is included in the recommendation list, allowing two probabilities per state–item pair. The abstract advertises the update algorithm and commercial performance; Section 6 explicitly evaluates a model updated by this procedure for almost a year.</p>\n<p><strong>Error:</strong> The update conditions on the purchase outcome instead of the recommendation exposure. The denominator <code>c_total(s, s·r)</code> is explicitly the number of times item <code>r</code> was bought in state <code>s</code>, regardless of whether it was recommended. The numerator <code>c_in</code> counts purchases of <code>r</code> when it was recommended; <code>c_out</code> counts purchases when it was not. Therefore Equations (32) and (33) estimate</p>\n<div class=\"equation-block\"><div class=\"equation-content\">\\[\nP(r\\text{ recommended}\\mid r\\text{ bought},s),\\qquad\nP(r\\text{ not recommended}\\mid r\\text{ bought},s),\n\\]</div></div>\n<p>instead of the required probabilities of buying <code>r</code> conditional on its recommendation status. This is also fixed unambiguously by the additive updates: <code>c_in + c_out</code> receives exactly the same new purchase count as <code>c_total</code>. It cannot be resolved by reading <code>c_total</code> as an exposure count.</p>\n<p><strong>Reproducible counterexample:</strong> Fix a state and four available items. Each action recommends three items. For every list, let the probability of buying each recommended item be <code>6/25</code>, and the probability of buying the omitted item be <code>2/25</code>. The remaining probability <code>1/5</code> is no purchase. These are strictly valid stochastic rows, recommendation increases each item's purchase probability, and the independence condition (21) holds exactly. The construction remains stochastic for every subset of the four items, since even recommending all four gives purchase mass <code>24/25</code>.</p>\n<p>Show each of the four possible three-item lists on 100 visits. For each list the exact observed counts are 24 purchases of each included item, 8 purchases of the omitted item, and 20 no-purchase observations. Thus every item has</p>\n<div class=\"equation-block\"><div class=\"equation-content\">\\[\nc_{in}=72,\\quad c_{out}=8,\\quad c_{total}=80.\n\\]</div></div>\n<p>The printed update gives <code>tr_in = 9/10</code> and <code>tr_out = 1/10</code>. Every three-item list consequently has purported purchase probability</p>\n<div class=\"equation-block\"><div class=\"equation-content\">\\[\n3(9/10)+1/10=14/5.\n\\]</div></div>\n<p>The no-purchase residual is <code>−9/5</code>, rather than the true <code>1/5</code>. The correct exposure denominators are 300 visits with the item shown and 100 visits with it omitted, yielding <code>72/300 = 6/25</code> and <code>8/100 = 2/25</code>. All items and recommendation statuses have positive exposure. Repeating this batch removes any finite initialization in Equations (34)–(36); it converges to the same erroneous fractions. The failure is not caused by sparse data, a new item, insufficient exploration, or the choice of initial predictive model.</p>\n<p><strong>Normalization does not repair the learned decision problem:</strong> Keep exactly the same true response model, but show the list omitting item 1 on 2700 visits and each other omission list on 100 visits. Exact counts give</p>\n<div class=\"equation-block\"><div class=\"equation-content\">\\[\n\\widehat p_{in}=(1/4,87/88,87/88,87/88),\\qquad\n\\widehat p_{out}=(3/4,1/88,1/88,1/88).\n\\]</div></div>\n<p>The inferred effect of recommending item 1 is now negative, although its true effect is <code>6/25 − 2/25 &gt; 0</code>. Assign next-item values <code>(2,1,1,1)</code>. The true one-step expected value is <code>22/25</code> when item 1 is omitted, and <code>26/25</code> when it is included: the correct list includes item 1.</p>\n<p>Even if every printed purchase row is charitably divided by its sum to make it stochastic, the corresponding expected values are</p>\n<div class=\"equation-block\"><div class=\"equation-content\">\\[\n\\frac{131}{109}\\quad\\text{when item 1 is omitted},\\qquad\n\\frac{219}{197}\\quad\\text{when item 1 is included}.\n\\]</div></div>\n<p>Since <code>131/109 &gt; 219/197</code>, this normalized model selects the opposite list. Preserving the true common no-purchase mass <code>1/5</code> merely multiplies both values by <code>4/5</code>, leaving the reversal intact. This is an error in the target conditional probability and the resulting action values, not merely a missing row-normalization step.</p>\n<p><strong>Central consequence and reason for rejection:</strong> The paper's main MDP contribution requires a transition model that reflects how recommendations affect choices. The proposed update instead learns how frequently the logging policy displayed an item among visits on which it was purchased. It can produce no MDP at all, or, after normalization, prefer an action that is strictly worse under the exact response model satisfying the paper's assumptions. Section 6 says the model used both to generate recommendations and to simulate the policy comparisons was built with these incremental updates for almost a year; the simulation samples from the resulting <code>tr(s,R,s·x)</code>. A valid repair must record exposure counts separately for recommendation inclusion and exclusion, change the fitted transition probabilities and values, and reassess the learned-model evaluation. This changes the central learned MDP and its validation, so a correction to notation or an added normalization cannot substantiate the paper as written.</p>\n<p>This finding does not disprove the general use of MDPs for recommendation, the independent predictive-model contribution in Sections 3–4, or the possibility of real commercial gains. The constructed counts do not establish what the unreleased historical implementation actually computed, do not reconstruct the commercial data, and do not establish a corrected ranking or a cause for any reported numerical result. The conclusion is that the specified learning procedure cannot support the paper's claimed recommendation-dependent MDP and its evaluation as written.</p>\n<p><strong>Discovery method:</strong> Traced the meaning of the transition function from Sections 5.1–5.2 into the purchase-count definitions and online update in Section 5.3; checked the conditional-probability direction and its dependence on the recommendation logging frequency. Constructed finite complete count tables satisfying the multiple-recommendation assumptions.</p>\n<p><strong>Verification method:</strong> Read all 31 original PDF pages, including the complete later discussion and references, and inspected the original rendered PDF pages 16–18 and 21–25 at full resolution, including the count definitions and all denominators. Ran the saved exact-rational <code>check.py</code>, which generates and verifies both count tables, all stochastic true rows, the invalid printed rows, correct exposure-based estimates, the normalization-induced policy reversal, and finite-prior examples. Root independently enumerated both count constructions with exact fractions and checked the original definitions, assumptions, simulation and deployment passages on PDF pages 16–18 and 21–25; this was a targeted independent review, not a second full-paper read. Rechecked the earlier primary ICAPS 2003 paper, which repeats the same purchase-count denominator and does not supply a correction. Searched the official JMLR page/repository and author publication pages for source, errata, or a different count definition; no resolving correction or historical implementation was recovered. Missing artifacts are not the evidence for this issue.</p>\n<p><strong>Evidence:</strong> <code>check.py</code>, <code>results.json</code>, <code>root-independent-check.json</code>, <code>page_16.png</code>, <code>page_17.png</code>, <code>page_18.png</code>, <code>page_21.png</code>–<code>page_25.png</code>, <code>icaps2003-primary.pdf</code>, <code>icaps2003-primary.txt</code>, <code>icaps2003-counts-page_07.png</code>, and <code>source-search.json</code>, in <code>[unpublished artifact reference omitted]</code>. The earlier paper is available from the <a href=\"https://cdn.aaai.org/ICAPS/2003/ICAPS03-017.pdf\">official ICAPS proceedings</a>; the <a href=\"https://jmlr.org/papers/v6/shani05a.html\">official JMLR article page</a> identifies the audited version.</p>\n<p><strong>Confidence:</strong> High. The denominator's purchase-count definition is explicit and is independently enforced by Equations (29)–(31). Both counterexamples use exact integer observations and rational arithmetic, with no model misspecification, limiting exchange, simulation uncertainty, or uncertain historical implementation assumption.</p>\n",
+          "html": "<p><strong>Exact location:</strong> PDF page 21, printed page 1285, Section 5.3: the three count definitions and Equations (29)–(33); continuation on PDF page 22, printed page 1286, Equations (34)–(36). The affected use is Section 6.1, PDF pages 23–25, printed pages 1287–1289, including the learned transition distribution used for simulation and Table 3.</p>\n<p><strong>Affected claim and assumptions:</strong> The proposed online update learns the recommendation-dependent transition probabilities of the MDP from recommendations and observed user choices. Section 5.1 defines these probabilities as the probability of buying an item conditional on the state and recommendation. Equations (21)–(23) assume an item's purchase probability depends on whether it is included in the recommendation list, allowing two probabilities per state–item pair. The abstract advertises the update algorithm and commercial performance; Section 6 explicitly evaluates a model updated by this procedure for almost a year.</p>\n<p><strong>Error:</strong> The update conditions on the purchase outcome instead of the recommendation exposure. The denominator <code>c_total(s, s·r)</code> is explicitly the number of times item <span class=\"source-math\">\\(r\\)</span> was bought in state <span class=\"source-math\">\\(s\\)</span>, regardless of whether it was recommended. The numerator <code>c_in</code> counts purchases of <span class=\"source-math\">\\(r\\)</span> when it was recommended; <code>c_out</code> counts purchases when it was not. Therefore Equations (32) and (33) estimate</p>\n<div class=\"equation-block\"><div class=\"equation-content\">\\[\nP(r\\text{ recommended}\\mid r\\text{ bought},s),\\qquad\nP(r\\text{ not recommended}\\mid r\\text{ bought},s),\n\\]</div></div>\n<p>instead of the required probabilities of buying <span class=\"source-math\">\\(r\\)</span> conditional on its recommendation status. This is also fixed unambiguously by the additive updates: <code>c_in + c_out</code> receives exactly the same new purchase count as <code>c_total</code>. It cannot be resolved by reading <code>c_total</code> as an exposure count.</p>\n<p><strong>Reproducible counterexample:</strong> Fix a state and four available items. Each action recommends three items. For every list, let the probability of buying each recommended item be <span class=\"source-math\">\\(\\frac{6}{25}\\)</span>, and the probability of buying the omitted item be <span class=\"source-math\">\\(\\frac{2}{25}\\)</span>. The remaining probability <span class=\"source-math\">\\(\\frac{1}{5}\\)</span> is no purchase. These are strictly valid stochastic rows, recommendation increases each item's purchase probability, and the independence condition (21) holds exactly. The construction remains stochastic for every subset of the four items, since even recommending all four gives purchase mass <span class=\"source-math\">\\(\\frac{24}{25}\\)</span>.</p>\n<p>Show each of the four possible three-item lists on 100 visits. For each list the exact observed counts are 24 purchases of each included item, 8 purchases of the omitted item, and 20 no-purchase observations. Thus every item has</p>\n<div class=\"equation-block\"><div class=\"equation-content\">\\[\nc_{in}=72,\\quad c_{out}=8,\\quad c_{total}=80.\n\\]</div></div>\n<p>The printed update gives <code>tr_in = 9/10</code> and <code>tr_out = 1/10</code>. Every three-item list consequently has purported purchase probability</p>\n<div class=\"equation-block\"><div class=\"equation-content\">\\[\n3(9/10)+1/10=14/5.\n\\]</div></div>\n<p>The no-purchase residual is <span class=\"source-math\">\\(-9/5\\)</span>, rather than the true <span class=\"source-math\">\\(\\frac{1}{5}\\)</span>. The correct exposure denominators are 300 visits with the item shown and 100 visits with it omitted, yielding <span class=\"source-math\">\\(72/300 = 6/25\\)</span> and <span class=\"source-math\">\\(8/100 = 2/25\\)</span>. All items and recommendation statuses have positive exposure. Repeating this batch removes any finite initialization in Equations (34)–(36); it converges to the same erroneous fractions. The failure is not caused by sparse data, a new item, insufficient exploration, or the choice of initial predictive model.</p>\n<p><strong>Normalization does not repair the learned decision problem:</strong> Keep exactly the same true response model, but show the list omitting item 1 on 2700 visits and each other omission list on 100 visits. Exact counts give</p>\n<div class=\"equation-block\"><div class=\"equation-content\">\\[\n\\widehat p_{in}=(1/4,87/88,87/88,87/88),\\qquad\n\\widehat p_{out}=(3/4,1/88,1/88,1/88).\n\\]</div></div>\n<p>The inferred effect of recommending item 1 is now negative, although its true effect is <span class=\"source-math\">\\(6/25 - 2/25 &gt; 0\\)</span>. Assign next-item values <span class=\"source-math\">\\((2,1,1,1)\\)</span>. The true one-step expected value is <span class=\"source-math\">\\(\\frac{22}{25}\\)</span> when item 1 is omitted, and <span class=\"source-math\">\\(\\frac{26}{25}\\)</span> when it is included: the correct list includes item 1.</p>\n<p>Even if every printed purchase row is charitably divided by its sum to make it stochastic, the corresponding expected values are</p>\n<div class=\"equation-block\"><div class=\"equation-content\">\\[\n\\frac{131}{109}\\quad\\text{when item 1 is omitted},\\qquad\n\\frac{219}{197}\\quad\\text{when item 1 is included}.\n\\]</div></div>\n<p>Since <span class=\"source-math\">\\(131/109 &gt; 219/197\\)</span>, this normalized model selects the opposite list. Preserving the true common no-purchase mass <span class=\"source-math\">\\(\\frac{1}{5}\\)</span> merely multiplies both values by <span class=\"source-math\">\\(\\frac{4}{5}\\)</span>, leaving the reversal intact. This is an error in the target conditional probability and the resulting action values, not merely a missing row-normalization step.</p>\n<p><strong>Central consequence and reason for rejection:</strong> The paper's main MDP contribution requires a transition model that reflects how recommendations affect choices. The proposed update instead learns how frequently the logging policy displayed an item among visits on which it was purchased. It can produce no MDP at all, or, after normalization, prefer an action that is strictly worse under the exact response model satisfying the paper's assumptions. Section 6 says the model used both to generate recommendations and to simulate the policy comparisons was built with these incremental updates for almost a year; the simulation samples from the resulting <span class=\"source-math\">\\(\\operatorname{tr}(s,R,s\\cdot x)\\)</span>. A valid repair must record exposure counts separately for recommendation inclusion and exclusion, change the fitted transition probabilities and values, and reassess the learned-model evaluation. This changes the central learned MDP and its validation, so a correction to notation or an added normalization cannot substantiate the paper as written.</p>\n<p>This finding does not disprove the general use of MDPs for recommendation, the independent predictive-model contribution in Sections 3–4, or the possibility of real commercial gains. The constructed counts do not establish what the unreleased historical implementation actually computed, do not reconstruct the commercial data, and do not establish a corrected ranking or a cause for any reported numerical result. The conclusion is that the specified learning procedure cannot support the paper's claimed recommendation-dependent MDP and its evaluation as written.</p>\n<p><strong>Discovery method:</strong> Traced the meaning of the transition function from Sections 5.1–5.2 into the purchase-count definitions and online update in Section 5.3; checked the conditional-probability direction and its dependence on the recommendation logging frequency. Constructed finite complete count tables satisfying the multiple-recommendation assumptions.</p>\n<p><strong>Verification method:</strong> Read all 31 original PDF pages, including the complete later discussion and references, and inspected the original rendered PDF pages 16–18 and 21–25 at full resolution, including the count definitions and all denominators. Ran the saved exact-rational <code>check.py</code>, which generates and verifies both count tables, all stochastic true rows, the invalid printed rows, correct exposure-based estimates, the normalization-induced policy reversal, and finite-prior examples. Root independently enumerated both count constructions with exact fractions and checked the original definitions, assumptions, simulation and deployment passages on PDF pages 16–18 and 21–25; this was a targeted independent review, not a second full-paper read. Rechecked the earlier primary ICAPS 2003 paper, which repeats the same purchase-count denominator and does not supply a correction. Searched the official JMLR page/repository and author publication pages for source, errata, or a different count definition; no resolving correction or historical implementation was recovered. Missing artifacts are not the evidence for this issue.</p>\n<p><strong>Evidence:</strong> <code>check.py</code>, <code>results.json</code>, <code>root-independent-check.json</code>, <code>page_16.png</code>, <code>page_17.png</code>, <code>page_18.png</code>, <code>page_21.png</code>–<code>page_25.png</code>, <code>icaps2003-primary.pdf</code>, <code>icaps2003-primary.txt</code>, <code>icaps2003-counts-page_07.png</code>, and <code>source-search.json</code>, in <code>[unpublished artifact reference omitted]</code>. The earlier paper is available from the <a href=\"https://cdn.aaai.org/ICAPS/2003/ICAPS03-017.pdf\">official ICAPS proceedings</a>; the <a href=\"https://jmlr.org/papers/v6/shani05a.html\">official JMLR article page</a> identifies the audited version.</p>\n<p><strong>Confidence:</strong> High. The denominator's purchase-count definition is explicit and is independently enforced by Equations (29)–(31). Both counterexamples use exact integer observations and rational arithmetic, with no model misspecification, limiting exchange, simulation uncertainty, or uncertain historical implementation assumption.</p>\n",
           "source_body_sha256": "71dea22aaa5d94d3afe272ebd92c4981a6b9bed3107b1ffe6a256fb386b57d91",
           "export_text_sha256": "0a565757d67587d2fdbaf4444b6371f0ec3f55ca76fa92a935fd2094f8c03d04",
           "private_reference_substitutions": 1,
           "display_equations": 5,
-          "inline_equations": 0,
-          "formatting_normalizations": []
+          "inline_equations": 20,
+          "formatting_normalizations": [
+            {
+              "rule": "literal_inline_notation",
+              "source": "r",
+              "tex": "r"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "s",
+              "tex": "s"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "r",
+              "tex": "r"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "r",
+              "tex": "r"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "6/25",
+              "tex": "\\frac{6}{25}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "2/25",
+              "tex": "\\frac{2}{25}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "1/5",
+              "tex": "\\frac{1}{5}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "24/25",
+              "tex": "\\frac{24}{25}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "−9/5",
+              "tex": "-9/5"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "1/5",
+              "tex": "\\frac{1}{5}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "72/300 = 6/25",
+              "tex": "72/300 = 6/25"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "8/100 = 2/25",
+              "tex": "8/100 = 2/25"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "6/25 − 2/25 > 0",
+              "tex": "6/25 - 2/25 > 0"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "(2,1,1,1)",
+              "tex": "(2,1,1,1)"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "22/25",
+              "tex": "\\frac{22}{25}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "26/25",
+              "tex": "\\frac{26}{25}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "131/109 > 219/197",
+              "tex": "131/109 > 219/197"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "1/5",
+              "tex": "\\frac{1}{5}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "4/5",
+              "tex": "\\frac{4}{5}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "tr(s,R,s·x)",
+              "tex": "\\operatorname{tr}(s,R,s\\cdot x)"
+            }
+          ]
         }
       ]
     },

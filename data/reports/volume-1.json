@@ -12,13 +12,431 @@
           "title": "The EGU relative-loss premise and resulting central bounds are false",
           "source_heading": "## Issue 2001__accepted__v1-herbster01a-01 — The EGU relative-loss premise and resulting central bounds are false",
           "markdown": "\n\n**Exact location.** Lemma 12, Equation (41), PDF page 18 / printed page 298; Theorem 15, Equation (44), PDF page 19 / printed page 299; and Theorem 18, Equation (50), PDF page 21 / printed page 301. The algorithm is specified by Equations (4)–(5), PDF page 4 / printed page 284; the projection update (11), PDF page 6 / printed page 286; and Figure 1, Equations (13) and (16), PDF page 7 / printed page 287. Corollary 19 relies on Theorem 18. These are manifestations of the same missing valid EGU amortized-loss premise, counted once.\n\n**Claim.** Theorem 18 claims that the specified constrained unnormalized exponentiated-gradient algorithm, with learning rate `η=1/(3XY)` and coordinate clipping into `[α/n,n/α]^n`, satisfies\n\n\\[\nL_A\\le 3L_U+3XY\\left[\\|u_1\\|_1\\ln n+\n\\ln(n/\\alpha)V+\\alpha(\\ell-1)+\\|u_\\ell\\|_1+H(u_\\ell)+1\\right],\n\\]\n\nwhere `V=Σ(t<ℓ)||u_t−u_(t+1)||₁`, `H(u)=Σ_i u_i ln(1/u_i)`, the initial algorithm weights are all `1/n`, `x_t∈[0,X]^n`, `y_t∈[0,Y]`, and every comparator lies in `[0,n/α]^n`. Loss is the squared error `(w_t·x_t−y_t)^2`, as expressly stated before Lemmas 11–13. Theorem 15 gives a related bound for comparators inside the clipping box, without the `α(ℓ−1)` term.\n\n### Error and evidence\n\nThe algorithm clips its weights, but its linear prediction is not restricted to `[0,Y]`. Its allowed predictions can therefore be much larger than the outcome bound. Lemma 12's asserted local inequality does not hold in this situation. The resulting failure is sustained and invalidates both EGU applications; it is not an initialization penalty.\n\nTake the following fixed allowed parameters:\n\n\\[\nn=1000,\\quad X=Y=1,\\quad \\alpha=1/1000,\\quad\n\\eta=1/3,\\quad \\delta=\\alpha/n=10^{-6}.\n\\]\n\nThe clipping box is `[10⁻⁶,10⁶]^1000`. Repeat the following block `K` times, for any positive integer `K`:\n\n1. For each coordinate `i=1,…,1000`, present `(x,y)=(e_i,1)` fifty times.\n2. Present `(x,y)=(1⃗,0)` once.\n\nEach block has `50,001` trials. Use the **static sparse comparator** `u_t=0⃗` throughout.\n\nAll theorem assumptions are met:\n\n- Every instance coordinate and every outcome is either zero or one, so `X=Y=1` are valid bounds.\n- `α=0.001` is strictly between zero and one; no singular parameter endpoint is used.\n- The algorithm starts at the required `w_1=(1/1000,…,1/1000)`.\n- The exact specified gradient is `2x_i(w·x−y)` (Figure 1's caption), and coordinate clipping is performed after every gradient update.\n- The comparator `0⃗` belongs to the stated enlarged comparator box. Its shift amount, initial norm, terminal norm, and entropy all vanish. Here `H(0⃗)=0` is the continuous extension of `s ln(1/s)` at zero, which is also required by the paper's expressly permitted sparse vectors.\n- This is a deterministic finite sequence; no stochastic or realizability condition is required by either theorem.\n\n**Exact lower bound on the algorithm's loss.** During the fifty basis trials for one coordinate, its weight follows\n\n\\[\nf(z)=z\\exp\\!\\left[\\frac23(1-z)\\right].\n\\]\n\nFor `0<z≤1`, `z≤f(z)≤1`: the upper inequality follows from\n`ln z≤z−1`. Thus these training updates stay inside the box and projection does not alter them. If `z≤1/2`, then `f(z)≥z e^(1/3)`. Every block starts with each weight at least `δ`; consequently the weight reaches `1/2` within forty-two basis updates, because\n\n\\[\n\\delta e^{14}>\\frac12,\n\\qquad e^{14}>(8/3)^{14}\n=\\frac{4398046511104}{4782969}>500000.\n\\]\n\nHere `e>1+1+1/2+1/6=8/3` supplies an exact elementary bound. Once `z≥1/2`, the inequality `e^r≥1+r` gives\n\n\\[\nf(z)\\ge z+\\frac23z(1-z)\n\\ge z+\\frac13(1-z),\n\\]\n\nso the remaining gap contracts by at least a factor `2/3` per update. After fifty updates, every coordinate therefore satisfies\n\n\\[\nz\\ge1-\\frac12(2/3)^8=\\frac{6433}{6561}.\n\\]\n\nThe final all-ones trial of **each block** has prediction at least `1000·6433/6561` and label zero. Its squared loss alone is at least\n\n\\[\nB=\\left(1000\\frac{6433}{6561}\\right)^2\n=\\frac{41383489000000}{43046721}\n>961362.\n\\]\n\nAfter that trial, each weight is multiplied by `exp[−(2/3)(w·1⃗)]` and then clipped. This leaves every coordinate between `δ` and one, so the same proof applies to the next block. Initial weights also lie in this interval. Thus, including only the final trials and ignoring all other nonnegative losses,\n\n\\[\nL_A\\ge KB.\n\\]\n\n**The claimed bound is much smaller.** The zero comparator loses one on each of the `50,000` basis trials and zero on the final trial. Hence `L_U=50,000K`, `V=0`, and `ℓ=50,001K`. Equation (50) gives\n\n\\[\nL_A\\le150000K+3\\left[\\frac{50001K-1}{1000}+1\\right]\n=150150.003K+2.997.\n\\]\n\nAlready for `K=1`, the exact lower bound exceeds `961,362`, while the theorem permits only `150,153`. For larger `K`, the discrepancy grows linearly. Adding a fixed initialization-loss term cannot repair the theorem.\n\n**Theorem 15 also fails with comparators inside the constraint set.** Set every comparator coordinate to `δ=10⁻⁶` instead of zero. This static comparator is inside the original clipping box. Its per-block loss is\n\n\\[\n50000(1-10^{-6})^2+10^{-6}.\n\\]\n\nIts norm is `α`, its entropy is `α ln(10⁶)`, and its shift amount is zero. For one block, Equation (44)'s right side is approximately `150,002.7652`, still below the exact `961,362` lower bound. Thus the failure is present even before extending the comparison class to sparse vectors.\n\n**The failed proof premise can be checked directly.** In Lemma 12 take dimension one, `X=Y=x=1`, `y=0`, `w=4`, and `u=0`. Its stated update gives `w′=4e^(−4/3)`. The left side of (41) is `16/3`, while\n\n\\[\nD_{ne}(0,4)-D_{ne}(0,4e^{-4/3})\n=4(1-e^{-4/3})<4<16/3.\n\\]\n\nEvery stated assumption of that lemma holds. Halving or doubling the exponential step cannot fix this local example: its divergence decrease remains less than four. The long-sequence counterexample above uses the actual factor-two gradient in the algorithm, not an inference from the inconsistent shorthand in Lemma 12.\n\n**Independent numerical reproduction.** A 100-digit implementation of the paper's weight update and clipping gives:\n\n| Blocks | Algorithm loss | Equation (50) right side |\n|---:|---:|---:|\n| 1 | 1,009,123.9922 | 150,153.000 |\n| 2 | 2,028,608.5631 | 300,303.003 |\n| 3 | 3,048,093.1340 | 450,453.006 |\n\nThe numerical run also confirms that the dense trial's subsequent projection resets all coordinates to the lower clipping bound. The rational proof does not rely on that stronger reset observation or on floating-point computation.\n\nReproduction artifacts:\n\n- Check script [unpublished artifact reference omitted]\n- Check results [unpublished artifact reference omitted]\n- Independent verification [unpublished artifact reference omitted]\n\n### Reason for rejection\n\nThe EGU shifting guarantee and its extension to sparse comparator sequences are explicit principal applications of the paper's proposed method (Section 5 and Section 5.1), and the sparse comparison is emphasized as the setting with a potential exponential dimensional advantage over GD. The specified algorithm violates these main guarantees on allowed sequences with ordinary `X=Y=1`, including static comparators both inside and outside the original constraint box.\n\nThe same construction scales: taking `O(log n)` basis repetitions per coordinate makes the final loss per block `Ω(n²)`, while the zero-comparator loss and the claimed bound are `O(n log n)`. Thus a dimension-independent change of the numerical constant or a fixed additive initialization correction is insufficient. The application lacks the very amortized inequality required by the valid conditional general theorem. A repair must change the specified prediction/loss/update, impose a substantive prediction-magnitude restriction, or replace the claimed guarantee with one paying for the uncontrolled predictions. This invalidates a central claimed contribution as written and warrants changing an acceptance recommendation to rejection. This finding does not assert that the general conditional projection theorem or the GD result is false.\n\n### Discovery method\n\nWhile tracing Theorem 18 back to Lemma 12, the asserted `XY` loss scale appeared incompatible with the unnormalized algorithm's unrestricted linear prediction. A one-trial scaling test exposed a violation; the repeated-block construction was then developed to determine whether an initialization correction could resolve it.\n\n### Verification method\n\nRead the full paper and Appendix, checked the original rendered definitions, Figure 1, Lemma 12, and Theorems 15 and 18; derived the exact recurrence and a rational per-block lower bound; checked every interval, parameter, initialization, comparator, projection, and entropy assumption; and reproduced the full updates at 100-digit precision. A second reviewer independently checked the original rendered pages, exact rational bound, recurrence, and numerical results. The derivation and independent run agree. Other theorems and the projection algorithm were checked after identifying the issue; additional lower-threshold candidates were not counted.\n\n### Confidence\n\n**High.** The contradiction is established by explicit allowed inputs and a rational lower bound, with a large margin. It repeats indefinitely, applies to both zero and strictly positive in-box comparators, and is independently reproduced numerically and algebraically. It does not depend on PDF text extraction, unavailable artifacts, a guessed implementation, or an unproved claim that a mere proof gap makes the theorem false.\n",
-          "html": "<p><strong>Exact location.</strong> Lemma 12, Equation (41), PDF page 18 / printed page 298; Theorem 15, Equation (44), PDF page 19 / printed page 299; and Theorem 18, Equation (50), PDF page 21 / printed page 301. The algorithm is specified by Equations (4)–(5), PDF page 4 / printed page 284; the projection update (11), PDF page 6 / printed page 286; and Figure 1, Equations (13) and (16), PDF page 7 / printed page 287. Corollary 19 relies on Theorem 18. These are manifestations of the same missing valid EGU amortized-loss premise, counted once.</p>\n<p><strong>Claim.</strong> Theorem 18 claims that the specified constrained unnormalized exponentiated-gradient algorithm, with learning rate <code>η=1/(3XY)</code> and coordinate clipping into <code>[α/n,n/α]^n</code>, satisfies</p>\n<div class=\"equation-block\"><div class=\"equation-content\">\\[\nL_A\\le 3L_U+3XY\\left[\\|u_1\\|_1\\ln n+\n\\ln(n/\\alpha)V+\\alpha(\\ell-1)+\\|u_\\ell\\|_1+H(u_\\ell)+1\\right],\n\\]</div></div>\n<p>where <code>V=Σ(t&lt;ℓ)||u_t−u_(t+1)||₁</code>, <code>H(u)=Σ_i u_i ln(1/u_i)</code>, the initial algorithm weights are all <code>1/n</code>, <code>x_t∈[0,X]^n</code>, <code>y_t∈[0,Y]</code>, and every comparator lies in <code>[0,n/α]^n</code>. Loss is the squared error <code>(w_t·x_t−y_t)^2</code>, as expressly stated before Lemmas 11–13. Theorem 15 gives a related bound for comparators inside the clipping box, without the <code>α(ℓ−1)</code> term.</p>\n<h4>Error and evidence</h4>\n<p>The algorithm clips its weights, but its linear prediction is not restricted to <code>[0,Y]</code>. Its allowed predictions can therefore be much larger than the outcome bound. Lemma 12's asserted local inequality does not hold in this situation. The resulting failure is sustained and invalidates both EGU applications; it is not an initialization penalty.</p>\n<p>Take the following fixed allowed parameters:</p>\n<div class=\"equation-block\"><div class=\"equation-content\">\\[\nn=1000,\\quad X=Y=1,\\quad \\alpha=1/1000,\\quad\n\\eta=1/3,\\quad \\delta=\\alpha/n=10^{-6}.\n\\]</div></div>\n<p>The clipping box is <code>[10⁻⁶,10⁶]^1000</code>. Repeat the following block <code>K</code> times, for any positive integer <code>K</code>:</p>\n<ol>\n<li>For each coordinate <code>i=1,…,1000</code>, present <code>(x,y)=(e_i,1)</code> fifty times.</li>\n<li>Present <code>(x,y)=(1⃗,0)</code> once.</li>\n</ol>\n<p>Each block has <code>50,001</code> trials. Use the <strong>static sparse comparator</strong> <code>u_t=0⃗</code> throughout.</p>\n<p>All theorem assumptions are met:</p>\n<ul>\n<li>Every instance coordinate and every outcome is either zero or one, so <code>X=Y=1</code> are valid bounds.</li>\n<li><code>α=0.001</code> is strictly between zero and one; no singular parameter endpoint is used.</li>\n<li>The algorithm starts at the required <code>w_1=(1/1000,…,1/1000)</code>.</li>\n<li>The exact specified gradient is <code>2x_i(w·x−y)</code> (Figure 1's caption), and coordinate clipping is performed after every gradient update.</li>\n<li>The comparator <code>0⃗</code> belongs to the stated enlarged comparator box. Its shift amount, initial norm, terminal norm, and entropy all vanish. Here <code>H(0⃗)=0</code> is the continuous extension of <code>s ln(1/s)</code> at zero, which is also required by the paper's expressly permitted sparse vectors.</li>\n<li>This is a deterministic finite sequence; no stochastic or realizability condition is required by either theorem.</li>\n</ul>\n<p><strong>Exact lower bound on the algorithm's loss.</strong> During the fifty basis trials for one coordinate, its weight follows</p>\n<div class=\"equation-block\"><div class=\"equation-content\">\\[\nf(z)=z\\exp\\!\\left[\\frac23(1-z)\\right].\n\\]</div></div>\n<p>For <code>0&lt;z≤1</code>, <code>z≤f(z)≤1</code>: the upper inequality follows from\n<code>ln z≤z−1</code>. Thus these training updates stay inside the box and projection does not alter them. If <code>z≤1/2</code>, then <code>f(z)≥z e^(1/3)</code>. Every block starts with each weight at least <code>δ</code>; consequently the weight reaches <code>1/2</code> within forty-two basis updates, because</p>\n<div class=\"equation-block\"><div class=\"equation-content\">\\[\n\\delta e^{14}&gt;\\frac12,\n\\qquad e^{14}&gt;(8/3)^{14}\n=\\frac{4398046511104}{4782969}&gt;500000.\n\\]</div></div>\n<p>Here <code>e&gt;1+1+1/2+1/6=8/3</code> supplies an exact elementary bound. Once <code>z≥1/2</code>, the inequality <code>e^r≥1+r</code> gives</p>\n<div class=\"equation-block\"><div class=\"equation-content\">\\[\nf(z)\\ge z+\\frac23z(1-z)\n\\ge z+\\frac13(1-z),\n\\]</div></div>\n<p>so the remaining gap contracts by at least a factor <code>2/3</code> per update. After fifty updates, every coordinate therefore satisfies</p>\n<div class=\"equation-block\"><div class=\"equation-content\">\\[\nz\\ge1-\\frac12(2/3)^8=\\frac{6433}{6561}.\n\\]</div></div>\n<p>The final all-ones trial of <strong>each block</strong> has prediction at least <code>1000·6433/6561</code> and label zero. Its squared loss alone is at least</p>\n<div class=\"equation-block\"><div class=\"equation-content\">\\[\nB=\\left(1000\\frac{6433}{6561}\\right)^2\n=\\frac{41383489000000}{43046721}\n&gt;961362.\n\\]</div></div>\n<p>After that trial, each weight is multiplied by <code>exp[−(2/3)(w·1⃗)]</code> and then clipped. This leaves every coordinate between <code>δ</code> and one, so the same proof applies to the next block. Initial weights also lie in this interval. Thus, including only the final trials and ignoring all other nonnegative losses,</p>\n<div class=\"equation-block\"><div class=\"equation-content\">\\[\nL_A\\ge KB.\n\\]</div></div>\n<p><strong>The claimed bound is much smaller.</strong> The zero comparator loses one on each of the <code>50,000</code> basis trials and zero on the final trial. Hence <code>L_U=50,000K</code>, <code>V=0</code>, and <code>ℓ=50,001K</code>. Equation (50) gives</p>\n<div class=\"equation-block\"><div class=\"equation-content\">\\[\nL_A\\le150000K+3\\left[\\frac{50001K-1}{1000}+1\\right]\n=150150.003K+2.997.\n\\]</div></div>\n<p>Already for <code>K=1</code>, the exact lower bound exceeds <code>961,362</code>, while the theorem permits only <code>150,153</code>. For larger <code>K</code>, the discrepancy grows linearly. Adding a fixed initialization-loss term cannot repair the theorem.</p>\n<p><strong>Theorem 15 also fails with comparators inside the constraint set.</strong> Set every comparator coordinate to <code>δ=10⁻⁶</code> instead of zero. This static comparator is inside the original clipping box. Its per-block loss is</p>\n<div class=\"equation-block\"><div class=\"equation-content\">\\[\n50000(1-10^{-6})^2+10^{-6}.\n\\]</div></div>\n<p>Its norm is <code>α</code>, its entropy is <code>α ln(10⁶)</code>, and its shift amount is zero. For one block, Equation (44)'s right side is approximately <code>150,002.7652</code>, still below the exact <code>961,362</code> lower bound. Thus the failure is present even before extending the comparison class to sparse vectors.</p>\n<p><strong>The failed proof premise can be checked directly.</strong> In Lemma 12 take dimension one, <code>X=Y=x=1</code>, <code>y=0</code>, <code>w=4</code>, and <code>u=0</code>. Its stated update gives <code>w′=4e^(−4/3)</code>. The left side of (41) is <code>16/3</code>, while</p>\n<div class=\"equation-block\"><div class=\"equation-content\">\\[\nD_{ne}(0,4)-D_{ne}(0,4e^{-4/3})\n=4(1-e^{-4/3})&lt;4&lt;16/3.\n\\]</div></div>\n<p>Every stated assumption of that lemma holds. Halving or doubling the exponential step cannot fix this local example: its divergence decrease remains less than four. The long-sequence counterexample above uses the actual factor-two gradient in the algorithm, not an inference from the inconsistent shorthand in Lemma 12.</p>\n<p><strong>Independent numerical reproduction.</strong> A 100-digit implementation of the paper's weight update and clipping gives:</p>\n<div class=\"evidence-table-wrap\"><table class=\"evidence-table\">\n<thead>\n<tr>\n<th style=\"text-align:right\">Blocks</th>\n<th style=\"text-align:right\">Algorithm loss</th>\n<th style=\"text-align:right\">Equation (50) right side</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td style=\"text-align:right\">1</td>\n<td style=\"text-align:right\">1,009,123.9922</td>\n<td style=\"text-align:right\">150,153.000</td>\n</tr>\n<tr>\n<td style=\"text-align:right\">2</td>\n<td style=\"text-align:right\">2,028,608.5631</td>\n<td style=\"text-align:right\">300,303.003</td>\n</tr>\n<tr>\n<td style=\"text-align:right\">3</td>\n<td style=\"text-align:right\">3,048,093.1340</td>\n<td style=\"text-align:right\">450,453.006</td>\n</tr>\n</tbody>\n</table></div>\n<p>The numerical run also confirms that the dense trial's subsequent projection resets all coordinates to the lower clipping bound. The rational proof does not rely on that stronger reset observation or on floating-point computation.</p>\n<p>Reproduction artifacts:</p>\n<ul>\n<li>Check script [unpublished artifact reference omitted]</li>\n<li>Check results [unpublished artifact reference omitted]</li>\n<li>Independent verification [unpublished artifact reference omitted]</li>\n</ul>\n<h4>Reason for rejection</h4>\n<p>The EGU shifting guarantee and its extension to sparse comparator sequences are explicit principal applications of the paper's proposed method (Section 5 and Section 5.1), and the sparse comparison is emphasized as the setting with a potential exponential dimensional advantage over GD. The specified algorithm violates these main guarantees on allowed sequences with ordinary <code>X=Y=1</code>, including static comparators both inside and outside the original constraint box.</p>\n<p>The same construction scales: taking <code>O(log n)</code> basis repetitions per coordinate makes the final loss per block <code>Ω(n²)</code>, while the zero-comparator loss and the claimed bound are <code>O(n log n)</code>. Thus a dimension-independent change of the numerical constant or a fixed additive initialization correction is insufficient. The application lacks the very amortized inequality required by the valid conditional general theorem. A repair must change the specified prediction/loss/update, impose a substantive prediction-magnitude restriction, or replace the claimed guarantee with one paying for the uncontrolled predictions. This invalidates a central claimed contribution as written and warrants changing an acceptance recommendation to rejection. This finding does not assert that the general conditional projection theorem or the GD result is false.</p>\n<h4>Discovery method</h4>\n<p>While tracing Theorem 18 back to Lemma 12, the asserted <code>XY</code> loss scale appeared incompatible with the unnormalized algorithm's unrestricted linear prediction. A one-trial scaling test exposed a violation; the repeated-block construction was then developed to determine whether an initialization correction could resolve it.</p>\n<h4>Verification method</h4>\n<p>Read the full paper and Appendix, checked the original rendered definitions, Figure 1, Lemma 12, and Theorems 15 and 18; derived the exact recurrence and a rational per-block lower bound; checked every interval, parameter, initialization, comparator, projection, and entropy assumption; and reproduced the full updates at 100-digit precision. A second reviewer independently checked the original rendered pages, exact rational bound, recurrence, and numerical results. The derivation and independent run agree. Other theorems and the projection algorithm were checked after identifying the issue; additional lower-threshold candidates were not counted.</p>\n<h4>Confidence</h4>\n<p><strong>High.</strong> The contradiction is established by explicit allowed inputs and a rational lower bound, with a large margin. It repeats indefinitely, applies to both zero and strictly positive in-box comparators, and is independently reproduced numerically and algebraically. It does not depend on PDF text extraction, unavailable artifacts, a guessed implementation, or an unproved claim that a mere proof gap makes the theorem false.</p>\n",
+          "html": "<p><strong>Exact location.</strong> Lemma 12, Equation (41), PDF page 18 / printed page 298; Theorem 15, Equation (44), PDF page 19 / printed page 299; and Theorem 18, Equation (50), PDF page 21 / printed page 301. The algorithm is specified by Equations (4)–(5), PDF page 4 / printed page 284; the projection update (11), PDF page 6 / printed page 286; and Figure 1, Equations (13) and (16), PDF page 7 / printed page 287. Corollary 19 relies on Theorem 18. These are manifestations of the same missing valid EGU amortized-loss premise, counted once.</p>\n<p><strong>Claim.</strong> Theorem 18 claims that the specified constrained unnormalized exponentiated-gradient algorithm, with learning rate <span class=\"source-math\">\\(\\eta=\\frac{1}{3XY}\\)</span> and coordinate clipping into <span class=\"source-math\">\\(\\left[\\frac{\\alpha}{n},\\frac{n}{\\alpha}\\right]^n\\)</span>, satisfies</p>\n<div class=\"equation-block\"><div class=\"equation-content\">\\[\n\\begin{aligned}\nL_A\\le{}&amp;3L_U+3XY\\Bigl[\\\\\n&amp;\\quad\\|u_1\\|_1\\ln n\\\\\n&amp;\\quad+\\ln(n/\\alpha)V\\\\\n&amp;\\quad+\\alpha(\\ell-1)\\\\\n&amp;\\quad+\\|u_\\ell\\|_1\\\\\n&amp;\\quad+H(u_\\ell)+1\\Bigr],\n\\end{aligned}\n\\]</div></div>\n<p>where</p>\n<ul>\n<li><span class=\"source-math\">\\(V=\\sum_{t&lt;\\ell}\\lVert u_t-u_{t+1}\\rVert_1\\)</span>,</li>\n<li><span class=\"source-math\">\\(H(u)=\\sum_i u_i\\ln\\!\\left(\\frac{1}{u_i}\\right)\\)</span>,</li>\n<li>the initial algorithm weights are all <span class=\"source-math\">\\(\\frac{1}{n}\\)</span>,</li>\n<li><span class=\"source-math\">\\(x_t\\in[0,X]^n\\)</span>,</li>\n<li><span class=\"source-math\">\\(y_t\\in[0,Y]\\)</span>, and</li>\n<li>every comparator lies in <span class=\"source-math\">\\(\\left[0,\\frac{n}{\\alpha}\\right]^n\\)</span>.</li>\n</ul>\n<p>Loss is the squared error</p>\n<div class=\"equation-block\"><div class=\"equation-content\">\\[\n(w_t\\cdot x_t-y_t)^2,\n\\]</div></div>\n<p>as expressly stated before Lemmas 11–13. Theorem 15 gives a related bound for comparators inside the clipping box, without the <span class=\"source-math\">\\(\\alpha(\\ell-1)\\)</span> term.</p>\n<h4>Error and evidence</h4>\n<p>The algorithm clips its weights, but its linear prediction is not restricted to <span class=\"source-math\">\\([0,Y]\\)</span>. Its allowed predictions can therefore be much larger than the outcome bound. Lemma 12's asserted local inequality does not hold in this situation. The resulting failure is sustained and invalidates both EGU applications; it is not an initialization penalty.</p>\n<p>Take the following fixed allowed parameters:</p>\n<div class=\"equation-block\"><div class=\"equation-content\">\\[\n\\begin{gathered}\nn=1000,\\quad X=Y=1,\\\\\n\\alpha=1/1000,\\quad\\eta=1/3,\\\\\n\\delta=\\alpha/n=10^{-6}.\n\\end{gathered}\n\\]</div></div>\n<p>The clipping box is <span class=\"source-math\">\\([10^{-6},10^6]^{1000}\\)</span>. Repeat the following block <span class=\"source-math\">\\(K\\)</span> times, for any positive integer <span class=\"source-math\">\\(K\\)</span>:</p>\n<ol>\n<li>For each coordinate <span class=\"source-math\">\\(i=1,\\ldots,1000\\)</span>, present <span class=\"source-math\">\\((x,y)=(e_i,1)\\)</span> fifty times.</li>\n<li>Present <span class=\"source-math\">\\((x,y)=(\\mathbf{1},0)\\)</span> once.</li>\n</ol>\n<p>Each block has <span class=\"source-math\">\\(50{,}001\\)</span> trials. Use the <strong>static sparse comparator</strong> <span class=\"source-math\">\\(u_t=\\mathbf{0}\\)</span> throughout.</p>\n<p>All theorem assumptions are met:</p>\n<ul>\n<li>Every instance coordinate and every outcome is either zero or one, so <span class=\"source-math\">\\(X=Y=1\\)</span> are valid bounds.</li>\n<li><span class=\"source-math\">\\(\\alpha=0.001\\)</span> is strictly between zero and one; no singular parameter endpoint is used.</li>\n<li>The algorithm starts at the required <span class=\"source-math\">\\(w_1=(1/1000,\\ldots,1/1000)\\)</span>.</li>\n<li>The exact specified gradient is <span class=\"source-math\">\\(2x_i(w\\cdot x-y)\\)</span> (Figure 1's caption), and coordinate clipping is performed after every gradient update.</li>\n<li>The comparator <span class=\"source-math\">\\(\\mathbf{0}\\)</span> belongs to the stated enlarged comparator box. Its shift amount, initial norm, terminal norm, and entropy all vanish. Here <span class=\"source-math\">\\(H(\\mathbf{0})=0\\)</span> is the continuous extension of <span class=\"source-math\">\\(s\\ln(1/s)\\)</span> at zero, which is also required by the paper's expressly permitted sparse vectors.</li>\n<li>This is a deterministic finite sequence; no stochastic or realizability condition is required by either theorem.</li>\n</ul>\n<p><strong>Exact lower bound on the algorithm's loss.</strong> During the fifty basis trials for one coordinate, its weight follows</p>\n<div class=\"equation-block\"><div class=\"equation-content\">\\[\nf(z)=z\\exp\\!\\left[\\frac23(1-z)\\right].\n\\]</div></div>\n<p>For <span class=\"source-math\">\\(0&lt;z\\le1\\)</span>, <span class=\"source-math\">\\(z\\le f(z)\\le1\\)</span>: the upper inequality follows from\n<span class=\"source-math\">\\(\\ln z\\le z-1\\)</span>. Thus these training updates stay inside the box and projection does not alter them. If <span class=\"source-math\">\\(z\\le1/2\\)</span>, then <span class=\"source-math\">\\(f(z)\\ge z e^{1/3}\\)</span>. Every block starts with each weight at least <span class=\"source-math\">\\(\\delta\\)</span>; consequently the weight reaches <span class=\"source-math\">\\(\\frac{1}{2}\\)</span> within forty-two basis updates, because</p>\n<div class=\"equation-block\"><div class=\"equation-content\">\\[\n\\begin{aligned}\n\\delta e^{14}&amp;&gt;\\frac12,\\\\\ne^{14}&amp;&gt;(8/3)^{14}\\\\\n&amp;=\\frac{4398046511104}{4782969}\\\\\n&amp;&gt;500000.\n\\end{aligned}\n\\]</div></div>\n<p>Here <span class=\"source-math\">\\(e&gt;1+1+1/2+1/6=8/3\\)</span> supplies an exact elementary bound. Once <span class=\"source-math\">\\(z\\ge1/2\\)</span>, the inequality <span class=\"source-math\">\\(e^r\\ge1+r\\)</span> gives</p>\n<div class=\"equation-block\"><div class=\"equation-content\">\\[\n\\begin{aligned}\nf(z)&amp;\\ge z+\\frac23z(1-z)\\\\\n&amp;\\ge z+\\frac13(1-z),\n\\end{aligned}\n\\]</div></div>\n<p>so the remaining gap contracts by at least a factor <span class=\"source-math\">\\(\\frac{2}{3}\\)</span> per update. After fifty updates, every coordinate therefore satisfies</p>\n<div class=\"equation-block\"><div class=\"equation-content\">\\[\n\\begin{aligned}\nz&amp;\\ge1-\\frac12(2/3)^8\\\\\n&amp;=\\frac{6433}{6561}.\n\\end{aligned}\n\\]</div></div>\n<p>The final all-ones trial of <strong>each block</strong> has prediction at least <span class=\"source-math\">\\(1000\\cdot\\frac{6433}{6561}\\)</span> and label zero. Its squared loss alone is at least</p>\n<div class=\"equation-block\"><div class=\"equation-content\">\\[\n\\begin{aligned}\nB&amp;=\\left(1000\\frac{6433}{6561}\\right)^2\\\\\n&amp;=\\frac{41383489000000}{43046721}\\\\\n&amp;&gt;961362.\n\\end{aligned}\n\\]</div></div>\n<p>After that trial, each weight is multiplied by <span class=\"source-math\">\\(\\exp[-(2/3)(w\\cdot\\mathbf{1})]\\)</span> and then clipped. This leaves every coordinate between <span class=\"source-math\">\\(\\delta\\)</span> and one, so the same proof applies to the next block. Initial weights also lie in this interval. Thus, including only the final trials and ignoring all other nonnegative losses,</p>\n<div class=\"equation-block\"><div class=\"equation-content\">\\[\nL_A\\ge KB.\n\\]</div></div>\n<p><strong>The claimed bound is much smaller.</strong> The zero comparator loses one on each of the <span class=\"source-math\">\\(50{,}000\\)</span> basis trials and zero on the final trial. Hence <span class=\"source-math\">\\(L_U=50{,}000K\\)</span>, <span class=\"source-math\">\\(V=0\\)</span>, and <span class=\"source-math\">\\(\\ell=50{,}001K\\)</span>. Equation (50) gives</p>\n<div class=\"equation-block\"><div class=\"equation-content\">\\[\n\\begin{aligned}\nL_A&amp;\\le150000K\\\\\n&amp;\\quad+3\\left[\\frac{50001K-1}{1000}+1\\right]\\\\\n&amp;=150150.003K+2.997.\n\\end{aligned}\n\\]</div></div>\n<p>Already for <span class=\"source-math\">\\(K=1\\)</span>, the exact lower bound exceeds <span class=\"source-math\">\\(961{,}362\\)</span>, while the theorem permits only <span class=\"source-math\">\\(150{,}153\\)</span>. For larger <span class=\"source-math\">\\(K\\)</span>, the discrepancy grows linearly. Adding a fixed initialization-loss term cannot repair the theorem.</p>\n<p><strong>Theorem 15 also fails with comparators inside the constraint set.</strong> Set every comparator coordinate to <span class=\"source-math\">\\(\\delta=10^{-6}\\)</span> instead of zero. This static comparator is inside the original clipping box. Its per-block loss is</p>\n<div class=\"equation-block\"><div class=\"equation-content\">\\[\n50000(1-10^{-6})^2+10^{-6}.\n\\]</div></div>\n<p>Its norm is <span class=\"source-math\">\\(\\alpha\\)</span>, its entropy is <span class=\"source-math\">\\(\\alpha\\ln(10^6)\\)</span>, and its shift amount is zero. For one block, Equation (44)'s right side is approximately <span class=\"source-math\">\\(150{,}002.7652\\)</span>, still below the exact <span class=\"source-math\">\\(961{,}362\\)</span> lower bound. Thus the failure is present even before extending the comparison class to sparse vectors.</p>\n<p><strong>The failed proof premise can be checked directly.</strong> In Lemma 12 take dimension one, <span class=\"source-math\">\\(X=Y=x=1\\)</span>, <span class=\"source-math\">\\(y=0\\)</span>, <span class=\"source-math\">\\(w=4\\)</span>, and <span class=\"source-math\">\\(u=0\\)</span>. Its stated update gives <span class=\"source-math\">\\(w'=4e^{-4/3}\\)</span>. The left side of (41) is <span class=\"source-math\">\\(\\frac{16}{3}\\)</span>, while</p>\n<div class=\"equation-block\"><div class=\"equation-content\">\\[\n\\begin{aligned}\n&amp;D_{ne}(0,4)\\\\\n&amp;\\quad-D_{ne}(0,4e^{-4/3})\\\\\n&amp;=4(1-e^{-4/3})\\\\\n&amp;&lt;4&lt;16/3.\n\\end{aligned}\n\\]</div></div>\n<p>Every stated assumption of that lemma holds. Halving or doubling the exponential step cannot fix this local example: its divergence decrease remains less than four. The long-sequence counterexample above uses the actual factor-two gradient in the algorithm, not an inference from the inconsistent shorthand in Lemma 12.</p>\n<p><strong>Independent numerical reproduction.</strong> A 100-digit implementation of the paper's weight update and clipping gives:</p>\n<div class=\"evidence-table-wrap\"><table class=\"evidence-table\">\n<thead>\n<tr>\n<th style=\"text-align:right\">Blocks</th>\n<th style=\"text-align:right\">Algorithm loss</th>\n<th style=\"text-align:right\">Equation (50) right side</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td style=\"text-align:right\">1</td>\n<td style=\"text-align:right\">1,009,123.9922</td>\n<td style=\"text-align:right\">150,153.000</td>\n</tr>\n<tr>\n<td style=\"text-align:right\">2</td>\n<td style=\"text-align:right\">2,028,608.5631</td>\n<td style=\"text-align:right\">300,303.003</td>\n</tr>\n<tr>\n<td style=\"text-align:right\">3</td>\n<td style=\"text-align:right\">3,048,093.1340</td>\n<td style=\"text-align:right\">450,453.006</td>\n</tr>\n</tbody>\n</table></div>\n<p>The numerical run also confirms that the dense trial's subsequent projection resets all coordinates to the lower clipping bound. The rational proof does not rely on that stronger reset observation or on floating-point computation.</p>\n<p>Reproduction artifacts:</p>\n<ul>\n<li>Check script [unpublished artifact reference omitted]</li>\n<li>Check results [unpublished artifact reference omitted]</li>\n<li>Independent verification [unpublished artifact reference omitted]</li>\n</ul>\n<h4>Reason for rejection</h4>\n<p>The EGU shifting guarantee and its extension to sparse comparator sequences are explicit principal applications of the paper's proposed method (Section 5 and Section 5.1), and the sparse comparison is emphasized as the setting with a potential exponential dimensional advantage over GD. The specified algorithm violates these main guarantees on allowed sequences with ordinary <span class=\"source-math\">\\(X=Y=1\\)</span>, including static comparators both inside and outside the original constraint box.</p>\n<p>The same construction scales: taking <span class=\"source-math\">\\(O(\\log n)\\)</span> basis repetitions per coordinate makes the final loss per block <span class=\"source-math\">\\(\\Omega(n^2)\\)</span>, while the zero-comparator loss and the claimed bound are <span class=\"source-math\">\\(O(n\\log n)\\)</span>. Thus a dimension-independent change of the numerical constant or a fixed additive initialization correction is insufficient. The application lacks the very amortized inequality required by the valid conditional general theorem. A repair must change the specified prediction/loss/update, impose a substantive prediction-magnitude restriction, or replace the claimed guarantee with one paying for the uncontrolled predictions. This invalidates a central claimed contribution as written and warrants changing an acceptance recommendation to rejection. This finding does not assert that the general conditional projection theorem or the GD result is false.</p>\n<h4>Discovery method</h4>\n<p>While tracing Theorem 18 back to Lemma 12, the asserted <span class=\"source-math\">\\(XY\\)</span> loss scale appeared incompatible with the unnormalized algorithm's unrestricted linear prediction. A one-trial scaling test exposed a violation; the repeated-block construction was then developed to determine whether an initialization correction could resolve it.</p>\n<h4>Verification method</h4>\n<p>Read the full paper and Appendix, checked the original rendered definitions, Figure 1, Lemma 12, and Theorems 15 and 18; derived the exact recurrence and a rational per-block lower bound; checked every interval, parameter, initialization, comparator, projection, and entropy assumption; and reproduced the full updates at 100-digit precision. A second reviewer independently checked the original rendered pages, exact rational bound, recurrence, and numerical results. The derivation and independent run agree. Other theorems and the projection algorithm were checked after identifying the issue; additional lower-threshold candidates were not counted.</p>\n<h4>Confidence</h4>\n<p><strong>High.</strong> The contradiction is established by explicit allowed inputs and a rational lower bound, with a large margin. It repeats indefinitely, applies to both zero and strictly positive in-box comparators, and is independently reproduced numerically and algebraically. It does not depend on PDF text extraction, unavailable artifacts, a guessed implementation, or an unproved claim that a mere proof gap makes the theorem false.</p>\n",
           "source_body_sha256": "c836364fac17ea676ee38ccbdecef5bb23450a12c7e2c8bf765f6239266d9ea8",
           "export_text_sha256": "de1bd227ff3a5f98353475b205363f675c03e184b78c014ec9a78a94bf3f3c3b",
           "private_reference_substitutions": 3,
-          "display_equations": 11,
-          "inline_equations": 0,
-          "formatting_normalizations": []
+          "display_equations": 12,
+          "inline_equations": 63,
+          "formatting_normalizations": [
+            {
+              "rule": "reviewed_inline_math_typesetting",
+              "original": "`η=1/(3XY)`",
+              "rendered_markdown": "\\(\\eta=\\frac{1}{3XY}\\)",
+              "occurrences": 1
+            },
+            {
+              "rule": "reviewed_inline_math_typesetting",
+              "original": "`[α/n,n/α]^n`",
+              "rendered_markdown": "\\(\\left[\\frac{\\alpha}{n},\\frac{n}{\\alpha}\\right]^n\\)",
+              "occurrences": 1
+            },
+            {
+              "rule": "reviewed_inline_math_typesetting",
+              "original": "`V=Σ(t<ℓ)||u_t−u_(t+1)||₁`",
+              "rendered_markdown": "\\(V=\\sum_{t<\\ell}\\lVert u_t-u_{t+1}\\rVert_1\\)",
+              "occurrences": 1
+            },
+            {
+              "rule": "reviewed_inline_math_typesetting",
+              "original": "`H(u)=Σ_i u_i ln(1/u_i)`",
+              "rendered_markdown": "\\(H(u)=\\sum_i u_i\\ln\\!\\left(\\frac{1}{u_i}\\right)\\)",
+              "occurrences": 1
+            },
+            {
+              "rule": "reviewed_inline_math_typesetting",
+              "original": "`1/n`",
+              "rendered_markdown": "\\(\\frac{1}{n}\\)",
+              "occurrences": 1
+            },
+            {
+              "rule": "reviewed_inline_math_typesetting",
+              "original": "`x_t∈[0,X]^n`",
+              "rendered_markdown": "\\(x_t\\in[0,X]^n\\)",
+              "occurrences": 1
+            },
+            {
+              "rule": "reviewed_inline_math_typesetting",
+              "original": "`y_t∈[0,Y]`",
+              "rendered_markdown": "\\(y_t\\in[0,Y]\\)",
+              "occurrences": 1
+            },
+            {
+              "rule": "reviewed_inline_math_typesetting",
+              "original": "`[0,n/α]^n`",
+              "rendered_markdown": "\\(\\left[0,\\frac{n}{\\alpha}\\right]^n\\)",
+              "occurrences": 1
+            },
+            {
+              "rule": "reviewed_inline_math_typesetting",
+              "original": "`(w_t·x_t−y_t)^2`",
+              "rendered_markdown": "\\((w_t\\cdot x_t-y_t)^2\\)",
+              "occurrences": 1
+            },
+            {
+              "rule": "reviewed_inline_math_typesetting",
+              "original": "`α(ℓ−1)`",
+              "rendered_markdown": "\\(\\alpha(\\ell-1)\\)",
+              "occurrences": 1
+            },
+            {
+              "rule": "reviewed_inline_math_typesetting",
+              "original": "`[0,Y]`",
+              "rendered_markdown": "\\([0,Y]\\)",
+              "occurrences": 1
+            },
+            {
+              "rule": "reviewed_inline_math_typesetting",
+              "original": "`[10⁻⁶,10⁶]^1000`",
+              "rendered_markdown": "\\([10^{-6},10^6]^{1000}\\)",
+              "occurrences": 1
+            },
+            {
+              "rule": "reviewed_inline_math_typesetting",
+              "original": "`K`",
+              "rendered_markdown": "\\(K\\)",
+              "occurrences": 3
+            },
+            {
+              "rule": "reviewed_inline_math_typesetting",
+              "original": "`i=1,…,1000`",
+              "rendered_markdown": "\\(i=1,\\ldots,1000\\)",
+              "occurrences": 1
+            },
+            {
+              "rule": "reviewed_inline_math_typesetting",
+              "original": "`(x,y)=(e_i,1)`",
+              "rendered_markdown": "\\((x,y)=(e_i,1)\\)",
+              "occurrences": 1
+            },
+            {
+              "rule": "reviewed_inline_math_typesetting",
+              "original": "`(x,y)=(1⃗,0)`",
+              "rendered_markdown": "\\((x,y)=(\\mathbf{1},0)\\)",
+              "occurrences": 1
+            },
+            {
+              "rule": "reviewed_inline_math_typesetting",
+              "original": "`50,001`",
+              "rendered_markdown": "\\(50{,}001\\)",
+              "occurrences": 1
+            },
+            {
+              "rule": "reviewed_inline_math_typesetting",
+              "original": "`u_t=0⃗`",
+              "rendered_markdown": "\\(u_t=\\mathbf{0}\\)",
+              "occurrences": 1
+            },
+            {
+              "rule": "reviewed_inline_math_typesetting",
+              "original": "`X=Y=1`",
+              "rendered_markdown": "\\(X=Y=1\\)",
+              "occurrences": 2
+            },
+            {
+              "rule": "reviewed_inline_math_typesetting",
+              "original": "`α=0.001`",
+              "rendered_markdown": "\\(\\alpha=0.001\\)",
+              "occurrences": 1
+            },
+            {
+              "rule": "reviewed_inline_math_typesetting",
+              "original": "`w_1=(1/1000,…,1/1000)`",
+              "rendered_markdown": "\\(w_1=(1/1000,\\ldots,1/1000)\\)",
+              "occurrences": 1
+            },
+            {
+              "rule": "reviewed_inline_math_typesetting",
+              "original": "`2x_i(w·x−y)`",
+              "rendered_markdown": "\\(2x_i(w\\cdot x-y)\\)",
+              "occurrences": 1
+            },
+            {
+              "rule": "reviewed_inline_math_typesetting",
+              "original": "`0⃗`",
+              "rendered_markdown": "\\(\\mathbf{0}\\)",
+              "occurrences": 1
+            },
+            {
+              "rule": "reviewed_inline_math_typesetting",
+              "original": "`H(0⃗)=0`",
+              "rendered_markdown": "\\(H(\\mathbf{0})=0\\)",
+              "occurrences": 1
+            },
+            {
+              "rule": "reviewed_inline_math_typesetting",
+              "original": "`s ln(1/s)`",
+              "rendered_markdown": "\\(s\\ln(1/s)\\)",
+              "occurrences": 1
+            },
+            {
+              "rule": "reviewed_inline_math_typesetting",
+              "original": "`0<z≤1`",
+              "rendered_markdown": "\\(0<z\\le1\\)",
+              "occurrences": 1
+            },
+            {
+              "rule": "reviewed_inline_math_typesetting",
+              "original": "`z≤f(z)≤1`",
+              "rendered_markdown": "\\(z\\le f(z)\\le1\\)",
+              "occurrences": 1
+            },
+            {
+              "rule": "reviewed_inline_math_typesetting",
+              "original": "`ln z≤z−1`",
+              "rendered_markdown": "\\(\\ln z\\le z-1\\)",
+              "occurrences": 1
+            },
+            {
+              "rule": "reviewed_inline_math_typesetting",
+              "original": "`z≤1/2`",
+              "rendered_markdown": "\\(z\\le1/2\\)",
+              "occurrences": 1
+            },
+            {
+              "rule": "reviewed_inline_math_typesetting",
+              "original": "`f(z)≥z e^(1/3)`",
+              "rendered_markdown": "\\(f(z)\\ge z e^{1/3}\\)",
+              "occurrences": 1
+            },
+            {
+              "rule": "reviewed_inline_math_typesetting",
+              "original": "`δ`",
+              "rendered_markdown": "\\(\\delta\\)",
+              "occurrences": 2
+            },
+            {
+              "rule": "reviewed_inline_math_typesetting",
+              "original": "`1/2`",
+              "rendered_markdown": "\\(\\frac{1}{2}\\)",
+              "occurrences": 1
+            },
+            {
+              "rule": "reviewed_inline_math_typesetting",
+              "original": "`e>1+1+1/2+1/6=8/3`",
+              "rendered_markdown": "\\(e>1+1+1/2+1/6=8/3\\)",
+              "occurrences": 1
+            },
+            {
+              "rule": "reviewed_inline_math_typesetting",
+              "original": "`z≥1/2`",
+              "rendered_markdown": "\\(z\\ge1/2\\)",
+              "occurrences": 1
+            },
+            {
+              "rule": "reviewed_inline_math_typesetting",
+              "original": "`e^r≥1+r`",
+              "rendered_markdown": "\\(e^r\\ge1+r\\)",
+              "occurrences": 1
+            },
+            {
+              "rule": "reviewed_inline_math_typesetting",
+              "original": "`2/3`",
+              "rendered_markdown": "\\(\\frac{2}{3}\\)",
+              "occurrences": 1
+            },
+            {
+              "rule": "reviewed_inline_math_typesetting",
+              "original": "`1000·6433/6561`",
+              "rendered_markdown": "\\(1000\\cdot\\frac{6433}{6561}\\)",
+              "occurrences": 1
+            },
+            {
+              "rule": "reviewed_inline_math_typesetting",
+              "original": "`exp[−(2/3)(w·1⃗)]`",
+              "rendered_markdown": "\\(\\exp[-(2/3)(w\\cdot\\mathbf{1})]\\)",
+              "occurrences": 1
+            },
+            {
+              "rule": "reviewed_inline_math_typesetting",
+              "original": "`50,000`",
+              "rendered_markdown": "\\(50{,}000\\)",
+              "occurrences": 1
+            },
+            {
+              "rule": "reviewed_inline_math_typesetting",
+              "original": "`L_U=50,000K`",
+              "rendered_markdown": "\\(L_U=50{,}000K\\)",
+              "occurrences": 1
+            },
+            {
+              "rule": "reviewed_inline_math_typesetting",
+              "original": "`V=0`",
+              "rendered_markdown": "\\(V=0\\)",
+              "occurrences": 1
+            },
+            {
+              "rule": "reviewed_inline_math_typesetting",
+              "original": "`ℓ=50,001K`",
+              "rendered_markdown": "\\(\\ell=50{,}001K\\)",
+              "occurrences": 1
+            },
+            {
+              "rule": "reviewed_inline_math_typesetting",
+              "original": "`K=1`",
+              "rendered_markdown": "\\(K=1\\)",
+              "occurrences": 1
+            },
+            {
+              "rule": "reviewed_inline_math_typesetting",
+              "original": "`961,362`",
+              "rendered_markdown": "\\(961{,}362\\)",
+              "occurrences": 2
+            },
+            {
+              "rule": "reviewed_inline_math_typesetting",
+              "original": "`150,153`",
+              "rendered_markdown": "\\(150{,}153\\)",
+              "occurrences": 1
+            },
+            {
+              "rule": "reviewed_inline_math_typesetting",
+              "original": "`δ=10⁻⁶`",
+              "rendered_markdown": "\\(\\delta=10^{-6}\\)",
+              "occurrences": 1
+            },
+            {
+              "rule": "reviewed_inline_math_typesetting",
+              "original": "`α`",
+              "rendered_markdown": "\\(\\alpha\\)",
+              "occurrences": 1
+            },
+            {
+              "rule": "reviewed_inline_math_typesetting",
+              "original": "`α ln(10⁶)`",
+              "rendered_markdown": "\\(\\alpha\\ln(10^6)\\)",
+              "occurrences": 1
+            },
+            {
+              "rule": "reviewed_inline_math_typesetting",
+              "original": "`150,002.7652`",
+              "rendered_markdown": "\\(150{,}002.7652\\)",
+              "occurrences": 1
+            },
+            {
+              "rule": "reviewed_inline_math_typesetting",
+              "original": "`X=Y=x=1`",
+              "rendered_markdown": "\\(X=Y=x=1\\)",
+              "occurrences": 1
+            },
+            {
+              "rule": "reviewed_inline_math_typesetting",
+              "original": "`y=0`",
+              "rendered_markdown": "\\(y=0\\)",
+              "occurrences": 1
+            },
+            {
+              "rule": "reviewed_inline_math_typesetting",
+              "original": "`w=4`",
+              "rendered_markdown": "\\(w=4\\)",
+              "occurrences": 1
+            },
+            {
+              "rule": "reviewed_inline_math_typesetting",
+              "original": "`u=0`",
+              "rendered_markdown": "\\(u=0\\)",
+              "occurrences": 1
+            },
+            {
+              "rule": "reviewed_inline_math_typesetting",
+              "original": "`w′=4e^(−4/3)`",
+              "rendered_markdown": "\\(w'=4e^{-4/3}\\)",
+              "occurrences": 1
+            },
+            {
+              "rule": "reviewed_inline_math_typesetting",
+              "original": "`16/3`",
+              "rendered_markdown": "\\(\\frac{16}{3}\\)",
+              "occurrences": 1
+            },
+            {
+              "rule": "reviewed_inline_math_typesetting",
+              "original": "`O(log n)`",
+              "rendered_markdown": "\\(O(\\log n)\\)",
+              "occurrences": 1
+            },
+            {
+              "rule": "reviewed_inline_math_typesetting",
+              "original": "`Ω(n²)`",
+              "rendered_markdown": "\\(\\Omega(n^2)\\)",
+              "occurrences": 1
+            },
+            {
+              "rule": "reviewed_inline_math_typesetting",
+              "original": "`O(n log n)`",
+              "rendered_markdown": "\\(O(n\\log n)\\)",
+              "occurrences": 1
+            },
+            {
+              "rule": "reviewed_inline_math_typesetting",
+              "original": "`XY`",
+              "rendered_markdown": "\\(XY\\)",
+              "occurrences": 1
+            },
+            {
+              "rule": "definitions_list_and_display_loss",
+              "original": "where `V=Σ(t<ℓ)||u_t−u_(t+1)||₁`, `H(u)=Σ_i u_i ln(1/u_i)`, the initial algorithm weights are all `1/n`, `x_t∈[0,X]^n`, `y_t∈[0,Y]`, and every comparator lies in `[0,n/α]^n`. Loss is the squared error `(w_t·x_t−y_t)^2`, as expressly stated before Lemmas 11–13. Theorem 15 gives a related bound for comparators inside the clipping box, without the `α(ℓ−1)` term.",
+              "rendered_markdown": "where\n\n- \\(V=\\sum_{t<\\ell}\\lVert u_t-u_{t+1}\\rVert_1\\),\n- \\(H(u)=\\sum_i u_i\\ln\\!\\left(\\frac{1}{u_i}\\right)\\),\n- the initial algorithm weights are all \\(\\frac{1}{n}\\),\n- \\(x_t\\in[0,X]^n\\),\n- \\(y_t\\in[0,Y]\\), and\n- every comparator lies in \\(\\left[0,\\frac{n}{\\alpha}\\right]^n\\).\n\nLoss is the squared error\n\n\\[\n(w_t\\cdot x_t-y_t)^2,\n\\]\n\nas expressly stated before Lemmas 11–13. Theorem 15 gives a related bound for comparators inside the clipping box, without the \\(\\alpha(\\ell-1)\\) term.",
+              "occurrences": 1,
+              "description": "Split the original definitions into bullets and display the squared-error expression; preserve every prose word and mathematical claim."
+            },
+            {
+              "rule": "reviewed_display_equation_line_breaks",
+              "original": "\\[\nL_A\\le 3L_U+3XY\\left[\\|u_1\\|_1\\ln n+\n\\ln(n/\\alpha)V+\\alpha(\\ell-1)+\\|u_\\ell\\|_1+H(u_\\ell)+1\\right],\n\\]",
+              "rendered_markdown": "\\[\n\\begin{aligned}\nL_A\\le{}&3L_U+3XY\\Bigl[\\\\\n&\\quad\\|u_1\\|_1\\ln n\\\\\n&\\quad+\\ln(n/\\alpha)V\\\\\n&\\quad+\\alpha(\\ell-1)\\\\\n&\\quad+\\|u_\\ell\\|_1\\\\\n&\\quad+H(u_\\ell)+1\\Bigr],\n\\end{aligned}\n\\]",
+              "occurrences": 1,
+              "description": "Break the existing expression into aligned rows; keep mathematical terms, operators, grouping, and order unchanged."
+            },
+            {
+              "rule": "reviewed_display_equation_line_breaks",
+              "original": "\\[\nn=1000,\\quad X=Y=1,\\quad \\alpha=1/1000,\\quad\n\\eta=1/3,\\quad \\delta=\\alpha/n=10^{-6}.\n\\]",
+              "rendered_markdown": "\\[\n\\begin{gathered}\nn=1000,\\quad X=Y=1,\\\\\n\\alpha=1/1000,\\quad\\eta=1/3,\\\\\n\\delta=\\alpha/n=10^{-6}.\n\\end{gathered}\n\\]",
+              "occurrences": 1,
+              "description": "Break the existing expression into aligned rows; keep mathematical terms, operators, grouping, and order unchanged."
+            },
+            {
+              "rule": "reviewed_display_equation_line_breaks",
+              "original": "\\[\n\\delta e^{14}>\\frac12,\n\\qquad e^{14}>(8/3)^{14}\n=\\frac{4398046511104}{4782969}>500000.\n\\]",
+              "rendered_markdown": "\\[\n\\begin{aligned}\n\\delta e^{14}&>\\frac12,\\\\\ne^{14}&>(8/3)^{14}\\\\\n&=\\frac{4398046511104}{4782969}\\\\\n&>500000.\n\\end{aligned}\n\\]",
+              "occurrences": 1,
+              "description": "Break the existing expression into aligned rows; keep mathematical terms, operators, grouping, and order unchanged."
+            },
+            {
+              "rule": "reviewed_display_equation_line_breaks",
+              "original": "\\[\nf(z)\\ge z+\\frac23z(1-z)\n\\ge z+\\frac13(1-z),\n\\]",
+              "rendered_markdown": "\\[\n\\begin{aligned}\nf(z)&\\ge z+\\frac23z(1-z)\\\\\n&\\ge z+\\frac13(1-z),\n\\end{aligned}\n\\]",
+              "occurrences": 1,
+              "description": "Break the existing expression into aligned rows; keep mathematical terms, operators, grouping, and order unchanged."
+            },
+            {
+              "rule": "reviewed_display_equation_line_breaks",
+              "original": "\\[\nz\\ge1-\\frac12(2/3)^8=\\frac{6433}{6561}.\n\\]",
+              "rendered_markdown": "\\[\n\\begin{aligned}\nz&\\ge1-\\frac12(2/3)^8\\\\\n&=\\frac{6433}{6561}.\n\\end{aligned}\n\\]",
+              "occurrences": 1,
+              "description": "Break the existing expression into aligned rows; keep mathematical terms, operators, grouping, and order unchanged."
+            },
+            {
+              "rule": "reviewed_display_equation_line_breaks",
+              "original": "\\[\nB=\\left(1000\\frac{6433}{6561}\\right)^2\n=\\frac{41383489000000}{43046721}\n>961362.\n\\]",
+              "rendered_markdown": "\\[\n\\begin{aligned}\nB&=\\left(1000\\frac{6433}{6561}\\right)^2\\\\\n&=\\frac{41383489000000}{43046721}\\\\\n&>961362.\n\\end{aligned}\n\\]",
+              "occurrences": 1,
+              "description": "Break the existing expression into aligned rows; keep mathematical terms, operators, grouping, and order unchanged."
+            },
+            {
+              "rule": "reviewed_display_equation_line_breaks",
+              "original": "\\[\nL_A\\le150000K+3\\left[\\frac{50001K-1}{1000}+1\\right]\n=150150.003K+2.997.\n\\]",
+              "rendered_markdown": "\\[\n\\begin{aligned}\nL_A&\\le150000K\\\\\n&\\quad+3\\left[\\frac{50001K-1}{1000}+1\\right]\\\\\n&=150150.003K+2.997.\n\\end{aligned}\n\\]",
+              "occurrences": 1,
+              "description": "Break the existing expression into aligned rows; keep mathematical terms, operators, grouping, and order unchanged."
+            },
+            {
+              "rule": "reviewed_display_equation_line_breaks",
+              "original": "\\[\nD_{ne}(0,4)-D_{ne}(0,4e^{-4/3})\n=4(1-e^{-4/3})<4<16/3.\n\\]",
+              "rendered_markdown": "\\[\n\\begin{aligned}\n&D_{ne}(0,4)\\\\\n&\\quad-D_{ne}(0,4e^{-4/3})\\\\\n&=4(1-e^{-4/3})\\\\\n&<4<16/3.\n\\end{aligned}\n\\]",
+              "occurrences": 1,
+              "description": "Break the existing expression into aligned rows; keep mathematical terms, operators, grouping, and order unchanged."
+            }
+          ]
         }
       ]
     },

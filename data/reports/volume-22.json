@@ -12,13 +12,199 @@
           "title": "A standard-UCB exploration guarantee is incorrectly applied to the greedy phases of UCB-z",
           "source_heading": "## Issue 2021__accepted__v22-17-720__I01 — A standard-UCB exploration guarantee is incorrectly applied to the greedy phases of UCB-z",
           "markdown": "\n\n**Exact location.** Theorem 8, PDF page 15, equations (14)–(16), and its explanation invoking Theorem 7; Appendix C, PDF pages 38–40, especially the restriction of the sample-count sum in equations (52)→(53) on page 39. The incorrectly substituted count is defined for standard UCB in Lemma 6, PDF page 13, with proof on pages 40–42. The policy being analyzed is Algorithm 3, PDF page 14. Model assumptions and normalized means are on PDF pages 5–6.\n\n**Claim.** Algorithm 3 uses UCB when the known positive bounded reward multiplier satisfies `G(t)<z`, and otherwise greedily selects the arm with the largest empirical unscaled mean. Theorem 8 bounds its expected scaled regret using\n\n\\[\n\\beta_j^U(t)=\\frac{2}{\\Delta_j^2}\n\\exp\\left[-\\frac{\\Delta_j^2}{2}(x_t-1)\\right],\n\\]\n\nwhere the theorem refers to the count from Lemma 6. That lemma provides a lower bound on each arm's pulls under **standard UCB**. Page 15 explicitly invokes its logarithmic growth from Theorem 7 to justify decay of the error probability in high-reward zones. Appendix C removes all sampling histories with fewer than that count when deriving the probability bound.\n\n**Error and evidence.** The greedy branch does not have the exploration property used by Lemma 6. It can stop sampling the optimal arm permanently. Consider the following instance, which satisfies the paper's assumptions:\n\n| Quantity | Value |\n|---|---|\n| Arms | Two |\n| Arm 1 | Independent Bernoulli rewards with success probability `9/10` |\n| Arm 2 | Deterministic reward `1/10` on every pull |\n| Reward range | `[0,1]`, so `r=1` |\n| Means and gap | `mu_1=9/10`, `mu_2=1/10`, `Delta_2=4/5` |\n| Initialization | Arm 1 at round 1; arm 2 at round 2 |\n| Multiplier | `G(1)=G(2)=1`; `G(t)=3` for every `t>=3` |\n| Threshold | `z=2` |\n\nLet `E` be the event that arm 1's initial reward is zero. Its probability is exactly `1/10`. After initialization on this event, the empirical means are `0` and `1/10`. From round 3 onward, the algorithm always uses the greedy branch. It chooses arm 2, obtains another unscaled reward `1/10`, and leaves both empirical means unchanged. Induction shows that it chooses arm 2 forever. The scaled observation is `3/10`; dividing by `G(t)=3` yields precisely the unscaled update used here. There are no ties.\n\nConsequently,\n\n\\[\n\\mathbb E[R_n]\\geq\\mathbb P(E)\\,3\\frac45(n-2)\n=\\frac6{25}(n-2).\n\\]\n\nFor `n=1,000,000`, this is **239,999.52**. The optimal arm has still been sampled only once on `E`.\n\nFor comparison, substitute the paper's Lemma 6 count into Theorem 8 exactly as instructed. With two arms and `r=1`, write\n\n\\[\n\\phi_y=\\min\\left\\{v\\in\\mathbb N:\n\\sqrt{2\\log(v)/y}>1,\\quad\nv>\\frac{2\\log v}{(\\sqrt{2\\log(v)/y}-1)^2}\\right\\},\n\\qquad\nx_s=1+\\max\\{y:\\phi_y\\leq s\\}.\n\\]\n\nThe initial thresholds are `6,14,28,50,83`; the relevant final thresholds are `phi_27=850377` and `phi_28=1366305`. Thus this standard-UCB count reaches 28 within the chosen horizon, despite the threshold policy leaving an arm at count one.\n\nThe proposed upper bound is contradicted even after these conservative enlargements:\n\n- use `x_(t-1)` instead of `x_t`, delaying each count increase by one round;\n- include the final turn, although the printed high-zone set excludes it;\n- use count one before the maximum defining `x_s` is nonempty;\n- include both initialization rounds in the low-round count, giving `tilde n=2`;\n- interpret the optimal arm's zero-gap contribution as zero, rather than relying on its formally undefined `0/0` expression.\n\nThe resulting enlarged right side is\n\n\\[\n\\frac45+2\\left[\\frac{8\\log2}{4/5}\n+\\left(1+\\frac{\\pi^2}{3}\\right)\\frac45\\right]\n+15\\sum_{t=3}^{10^6}\n\\exp\\left[-\\frac8{25}(x_{t-1}-1)\\right].\n\\]\n\nEvaluating its constant-count blocks gives approximately **9,996.63**, versus the expected-regret lower bound **239,999.52**. An independent verification using rational intervals for logarithms, square roots, and enlarged exponential terms certifies the still more generous upper bound\n\n\\[\n\\frac{6124187109694301}{600000000000}<10,207.\n\\]\n\nThe exact expected-regret lower bound is `5999988/25`. Thus the contradiction does not depend on floating-point rounding, an asymptotic approximation, or a Monte Carlo estimate.\n\nAt the failing proof step on PDF page 39, histories with `T_*(t-1)=1` have been excluded even though they have probability at least `1/10` for arbitrarily large `t` under Algorithm 3. Lemma 6 applies to an algorithm that continues using the UCB bonus; it cannot supply this count for an algorithm that switches to indefinitely greedy decisions.\n\nThe paper warns about high multipliers early in the game and explicitly presents the algorithm without imposing extra exploration. That warning does not exclude this instance. Indeed, the stated purpose of its bounds is to identify schedules where the proposed algorithm performs badly. The printed substitution fails precisely that test.\n\n**Reason for rejection.** The paper identifies theoretical regret guarantees and their use in deciding when to regulate exploration as central contributions. Theorem 8 is the main guarantee for its UCB threshold algorithm. Its proposed computable error certificate can decay while the actual error probability remains bounded away from zero and expected regret is linear. This defeats the claimed theoretical guidance for an allowed known bounded multiplier.\n\nRedefining `x_t` as the actual minimum count of the hybrid policy would give `x_t=1` here. A generic exponential-tail expression in terms of that different count can remain valid, but it no longer has the Lemma 6 computation or Theorem 7 decay used by the paper. It yields a potentially linear bound and loses the advertised guarantee. Restoring the claimed conclusion requires a new analysis of the multiplier schedule, an additional exploration condition, or a changed policy. A change of constants or an initial-round correction cannot repair the permanent trap. This central unsupported guarantee warrants rejection of the paper as written, even though the heuristic may help on other schedules and other algorithms may remain useful.\n\n**Discovery method.** While tracing the UCB-z regret proof, I noticed that a minimum-pull guarantee for an always-UCB policy was invoked during high-reward phases that remove its confidence bonus. I tested whether an initial estimation error could persist throughout such a phase.\n\n**Verification method.** Read all assumptions, the full paper and appendices, and rechecked the rendered original pages containing the policy, Lemma 6, Theorem 8, and the proof. Proved the positive-probability trap inductively. Computed all 28 relevant integer threshold minima with 70-digit arithmetic and signed predecessor checks, then summed the exact integer-length blocks. A second auditor independently certified the minima and a conservative finite bound using rational intervals. Executed the unchanged author `policy.py` UCB-z branch with an `xrange=range` compatibility binding: after the seeded admissible observations, all 10,000 subsequent calls chose arm 2, producing counts `[1,10001]`.\n\n**Reproduction artifacts.** Audit scripts:\n\n- `[unpublished artifact reference omitted]`\n- `[unpublished artifact reference omitted]`\n- `[unpublished artifact reference omitted]`\n\nEvidence directory:\n`[unpublished artifact reference omitted]`\n\nIt contains `targeted-controls.json`, `native-controls.json`, and `greed17720-root-qa.json`, their successful-run logs, the independent QA scope, and whole-paper review notes. The native policy is from author repository `5tefan0/Regulating-Greed-Over-Time`, commit `f6cb8f116bfaa383e863e231a0f2b5885a501595`; verified source hashes are retained. The independent auditor performed bounded claim/severity verification, not a second full-paper review.\n\n**Confidence: High.** The exact distributions, bounded multiplier, initialization event, policy decisions, and expected-regret lower bound satisfy the stated conditions. The finite contradiction has a wide gap and independent rational certification. The finding is scoped to the false standard-UCB count substitution and the resulting UCB-z guarantee; it does not claim that every inequality stated in terms of an actual hybrid-policy minimum is false.\n",
-          "html": "<p><strong>Exact location.</strong> Theorem 8, PDF page 15, equations (14)–(16), and its explanation invoking Theorem 7; Appendix C, PDF pages 38–40, especially the restriction of the sample-count sum in equations (52)→(53) on page 39. The incorrectly substituted count is defined for standard UCB in Lemma 6, PDF page 13, with proof on pages 40–42. The policy being analyzed is Algorithm 3, PDF page 14. Model assumptions and normalized means are on PDF pages 5–6.</p>\n<p><strong>Claim.</strong> Algorithm 3 uses UCB when the known positive bounded reward multiplier satisfies <code>G(t)&lt;z</code>, and otherwise greedily selects the arm with the largest empirical unscaled mean. Theorem 8 bounds its expected scaled regret using</p>\n<div class=\"equation-block\"><div class=\"equation-content\">\\[\n\\beta_j^U(t)=\\frac{2}{\\Delta_j^2}\n\\exp\\left[-\\frac{\\Delta_j^2}{2}(x_t-1)\\right],\n\\]</div></div>\n<p>where the theorem refers to the count from Lemma 6. That lemma provides a lower bound on each arm's pulls under <strong>standard UCB</strong>. Page 15 explicitly invokes its logarithmic growth from Theorem 7 to justify decay of the error probability in high-reward zones. Appendix C removes all sampling histories with fewer than that count when deriving the probability bound.</p>\n<p><strong>Error and evidence.</strong> The greedy branch does not have the exploration property used by Lemma 6. It can stop sampling the optimal arm permanently. Consider the following instance, which satisfies the paper's assumptions:</p>\n<div class=\"evidence-table-wrap\"><table class=\"evidence-table\">\n<thead>\n<tr>\n<th>Quantity</th>\n<th>Value</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>Arms</td>\n<td>Two</td>\n</tr>\n<tr>\n<td>Arm 1</td>\n<td>Independent Bernoulli rewards with success probability <code>9/10</code></td>\n</tr>\n<tr>\n<td>Arm 2</td>\n<td>Deterministic reward <code>1/10</code> on every pull</td>\n</tr>\n<tr>\n<td>Reward range</td>\n<td><code>[0,1]</code>, so <code>r=1</code></td>\n</tr>\n<tr>\n<td>Means and gap</td>\n<td><code>mu_1=9/10</code>, <code>mu_2=1/10</code>, <code>Delta_2=4/5</code></td>\n</tr>\n<tr>\n<td>Initialization</td>\n<td>Arm 1 at round 1; arm 2 at round 2</td>\n</tr>\n<tr>\n<td>Multiplier</td>\n<td><code>G(1)=G(2)=1</code>; <code>G(t)=3</code> for every <code>t&gt;=3</code></td>\n</tr>\n<tr>\n<td>Threshold</td>\n<td><code>z=2</code></td>\n</tr>\n</tbody>\n</table></div>\n<p>Let <code>E</code> be the event that arm 1's initial reward is zero. Its probability is exactly <code>1/10</code>. After initialization on this event, the empirical means are <code>0</code> and <code>1/10</code>. From round 3 onward, the algorithm always uses the greedy branch. It chooses arm 2, obtains another unscaled reward <code>1/10</code>, and leaves both empirical means unchanged. Induction shows that it chooses arm 2 forever. The scaled observation is <code>3/10</code>; dividing by <code>G(t)=3</code> yields precisely the unscaled update used here. There are no ties.</p>\n<p>Consequently,</p>\n<div class=\"equation-block\"><div class=\"equation-content\">\\[\n\\mathbb E[R_n]\\geq\\mathbb P(E)\\,3\\frac45(n-2)\n=\\frac6{25}(n-2).\n\\]</div></div>\n<p>For <code>n=1,000,000</code>, this is <strong>239,999.52</strong>. The optimal arm has still been sampled only once on <code>E</code>.</p>\n<p>For comparison, substitute the paper's Lemma 6 count into Theorem 8 exactly as instructed. With two arms and <code>r=1</code>, write</p>\n<div class=\"equation-block\"><div class=\"equation-content\">\\[\n\\phi_y=\\min\\left\\{v\\in\\mathbb N:\n\\sqrt{2\\log(v)/y}&gt;1,\\quad\nv&gt;\\frac{2\\log v}{(\\sqrt{2\\log(v)/y}-1)^2}\\right\\},\n\\qquad\nx_s=1+\\max\\{y:\\phi_y\\leq s\\}.\n\\]</div></div>\n<p>The initial thresholds are <code>6,14,28,50,83</code>; the relevant final thresholds are <code>phi_27=850377</code> and <code>phi_28=1366305</code>. Thus this standard-UCB count reaches 28 within the chosen horizon, despite the threshold policy leaving an arm at count one.</p>\n<p>The proposed upper bound is contradicted even after these conservative enlargements:</p>\n<ul>\n<li>use <code>x_(t-1)</code> instead of <code>x_t</code>, delaying each count increase by one round;</li>\n<li>include the final turn, although the printed high-zone set excludes it;</li>\n<li>use count one before the maximum defining <code>x_s</code> is nonempty;</li>\n<li>include both initialization rounds in the low-round count, giving <code>tilde n=2</code>;</li>\n<li>interpret the optimal arm's zero-gap contribution as zero, rather than relying on its formally undefined <code>0/0</code> expression.</li>\n</ul>\n<p>The resulting enlarged right side is</p>\n<div class=\"equation-block\"><div class=\"equation-content\">\\[\n\\frac45+2\\left[\\frac{8\\log2}{4/5}\n+\\left(1+\\frac{\\pi^2}{3}\\right)\\frac45\\right]\n+15\\sum_{t=3}^{10^6}\n\\exp\\left[-\\frac8{25}(x_{t-1}-1)\\right].\n\\]</div></div>\n<p>Evaluating its constant-count blocks gives approximately <strong>9,996.63</strong>, versus the expected-regret lower bound <strong>239,999.52</strong>. An independent verification using rational intervals for logarithms, square roots, and enlarged exponential terms certifies the still more generous upper bound</p>\n<div class=\"equation-block\"><div class=\"equation-content\">\\[\n\\frac{6124187109694301}{600000000000}&lt;10,207.\n\\]</div></div>\n<p>The exact expected-regret lower bound is <code>5999988/25</code>. Thus the contradiction does not depend on floating-point rounding, an asymptotic approximation, or a Monte Carlo estimate.</p>\n<p>At the failing proof step on PDF page 39, histories with <code>T_*(t-1)=1</code> have been excluded even though they have probability at least <code>1/10</code> for arbitrarily large <code>t</code> under Algorithm 3. Lemma 6 applies to an algorithm that continues using the UCB bonus; it cannot supply this count for an algorithm that switches to indefinitely greedy decisions.</p>\n<p>The paper warns about high multipliers early in the game and explicitly presents the algorithm without imposing extra exploration. That warning does not exclude this instance. Indeed, the stated purpose of its bounds is to identify schedules where the proposed algorithm performs badly. The printed substitution fails precisely that test.</p>\n<p><strong>Reason for rejection.</strong> The paper identifies theoretical regret guarantees and their use in deciding when to regulate exploration as central contributions. Theorem 8 is the main guarantee for its UCB threshold algorithm. Its proposed computable error certificate can decay while the actual error probability remains bounded away from zero and expected regret is linear. This defeats the claimed theoretical guidance for an allowed known bounded multiplier.</p>\n<p>Redefining <code>x_t</code> as the actual minimum count of the hybrid policy would give <code>x_t=1</code> here. A generic exponential-tail expression in terms of that different count can remain valid, but it no longer has the Lemma 6 computation or Theorem 7 decay used by the paper. It yields a potentially linear bound and loses the advertised guarantee. Restoring the claimed conclusion requires a new analysis of the multiplier schedule, an additional exploration condition, or a changed policy. A change of constants or an initial-round correction cannot repair the permanent trap. This central unsupported guarantee warrants rejection of the paper as written, even though the heuristic may help on other schedules and other algorithms may remain useful.</p>\n<p><strong>Discovery method.</strong> While tracing the UCB-z regret proof, I noticed that a minimum-pull guarantee for an always-UCB policy was invoked during high-reward phases that remove its confidence bonus. I tested whether an initial estimation error could persist throughout such a phase.</p>\n<p><strong>Verification method.</strong> Read all assumptions, the full paper and appendices, and rechecked the rendered original pages containing the policy, Lemma 6, Theorem 8, and the proof. Proved the positive-probability trap inductively. Computed all 28 relevant integer threshold minima with 70-digit arithmetic and signed predecessor checks, then summed the exact integer-length blocks. A second auditor independently certified the minima and a conservative finite bound using rational intervals. Executed the unchanged author <code>policy.py</code> UCB-z branch with an <code>xrange=range</code> compatibility binding: after the seeded admissible observations, all 10,000 subsequent calls chose arm 2, producing counts <code>[1,10001]</code>.</p>\n<p><strong>Reproduction artifacts.</strong> Audit scripts:</p>\n<ul>\n<li><code>[unpublished artifact reference omitted]</code></li>\n<li><code>[unpublished artifact reference omitted]</code></li>\n<li><code>[unpublished artifact reference omitted]</code></li>\n</ul>\n<p>Evidence directory:\n<code>[unpublished artifact reference omitted]</code></p>\n<p>It contains <code>targeted-controls.json</code>, <code>native-controls.json</code>, and <code>greed17720-root-qa.json</code>, their successful-run logs, the independent QA scope, and whole-paper review notes. The native policy is from author repository <code>5tefan0/Regulating-Greed-Over-Time</code>, commit <code>f6cb8f116bfaa383e863e231a0f2b5885a501595</code>; verified source hashes are retained. The independent auditor performed bounded claim/severity verification, not a second full-paper review.</p>\n<p><strong>Confidence: High.</strong> The exact distributions, bounded multiplier, initialization event, policy decisions, and expected-regret lower bound satisfy the stated conditions. The finite contradiction has a wide gap and independent rational certification. The finding is scoped to the false standard-UCB count substitution and the resulting UCB-z guarantee; it does not claim that every inequality stated in terms of an actual hybrid-policy minimum is false.</p>\n",
+          "html": "<p><strong>Exact location.</strong> Theorem 8, PDF page 15, equations (14)–(16), and its explanation invoking Theorem 7; Appendix C, PDF pages 38–40, especially the restriction of the sample-count sum in equations (52)→(53) on page 39. The incorrectly substituted count is defined for standard UCB in Lemma 6, PDF page 13, with proof on pages 40–42. The policy being analyzed is Algorithm 3, PDF page 14. Model assumptions and normalized means are on PDF pages 5–6.</p>\n<p><strong>Claim.</strong> Algorithm 3 uses UCB when the known positive bounded reward multiplier satisfies <span class=\"source-math\">\\(G(t)&lt;z\\)</span>, and otherwise greedily selects the arm with the largest empirical unscaled mean. Theorem 8 bounds its expected scaled regret using</p>\n<div class=\"equation-block\"><div class=\"equation-content\">\\[\n\\beta_j^U(t)=\\frac{2}{\\Delta_j^2}\n\\exp\\left[-\\frac{\\Delta_j^2}{2}(x_t-1)\\right],\n\\]</div></div>\n<p>where the theorem refers to the count from Lemma 6. That lemma provides a lower bound on each arm's pulls under <strong>standard UCB</strong>. Page 15 explicitly invokes its logarithmic growth from Theorem 7 to justify decay of the error probability in high-reward zones. Appendix C removes all sampling histories with fewer than that count when deriving the probability bound.</p>\n<p><strong>Error and evidence.</strong> The greedy branch does not have the exploration property used by Lemma 6. It can stop sampling the optimal arm permanently. Consider the following instance, which satisfies the paper's assumptions:</p>\n<div class=\"evidence-table-wrap\"><table class=\"evidence-table\">\n<thead>\n<tr>\n<th>Quantity</th>\n<th>Value</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>Arms</td>\n<td>Two</td>\n</tr>\n<tr>\n<td>Arm 1</td>\n<td>Independent Bernoulli rewards with success probability <span class=\"source-math\">\\(\\frac{9}{10}\\)</span></td>\n</tr>\n<tr>\n<td>Arm 2</td>\n<td>Deterministic reward <span class=\"source-math\">\\(\\frac{1}{10}\\)</span> on every pull</td>\n</tr>\n<tr>\n<td>Reward range</td>\n<td><span class=\"source-math\">\\([0,1]\\)</span>, so <span class=\"source-math\">\\(r=1\\)</span></td>\n</tr>\n<tr>\n<td>Means and gap</td>\n<td><span class=\"source-math\">\\(\\mu _{1}=9/10\\)</span>, <span class=\"source-math\">\\(\\mu _{2}=1/10\\)</span>, <span class=\"source-math\">\\(\\Delta _{2}=4/5\\)</span></td>\n</tr>\n<tr>\n<td>Initialization</td>\n<td>Arm 1 at round 1; arm 2 at round 2</td>\n</tr>\n<tr>\n<td>Multiplier</td>\n<td><span class=\"source-math\">\\(G(1)=G(2)=1\\)</span>; <span class=\"source-math\">\\(G(t)=3\\)</span> for every <span class=\"source-math\">\\(t\\ge 3\\)</span></td>\n</tr>\n<tr>\n<td>Threshold</td>\n<td><span class=\"source-math\">\\(z=2\\)</span></td>\n</tr>\n</tbody>\n</table></div>\n<p>Let <span class=\"source-math\">\\(E\\)</span> be the event that arm 1's initial reward is zero. Its probability is exactly <span class=\"source-math\">\\(\\frac{1}{10}\\)</span>. After initialization on this event, the empirical means are <span class=\"source-math\">\\(0\\)</span> and <span class=\"source-math\">\\(\\frac{1}{10}\\)</span>. From round 3 onward, the algorithm always uses the greedy branch. It chooses arm 2, obtains another unscaled reward <span class=\"source-math\">\\(\\frac{1}{10}\\)</span>, and leaves both empirical means unchanged. Induction shows that it chooses arm 2 forever. The scaled observation is <span class=\"source-math\">\\(\\frac{3}{10}\\)</span>; dividing by <span class=\"source-math\">\\(G(t)=3\\)</span> yields precisely the unscaled update used here. There are no ties.</p>\n<p>Consequently,</p>\n<div class=\"equation-block\"><div class=\"equation-content\">\\[\n\\mathbb E[R_n]\\geq\\mathbb P(E)\\,3\\frac45(n-2)\n=\\frac6{25}(n-2).\n\\]</div></div>\n<p>For <span class=\"source-math\">\\(n=1,000,000\\)</span>, this is <strong>239,999.52</strong>. The optimal arm has still been sampled only once on <span class=\"source-math\">\\(E\\)</span>.</p>\n<p>For comparison, substitute the paper's Lemma 6 count into Theorem 8 exactly as instructed. With two arms and <span class=\"source-math\">\\(r=1\\)</span>, write</p>\n<div class=\"equation-block\"><div class=\"equation-content\">\\[\n\\phi_y=\\min\\left\\{v\\in\\mathbb N:\n\\sqrt{2\\log(v)/y}&gt;1,\\quad\nv&gt;\\frac{2\\log v}{(\\sqrt{2\\log(v)/y}-1)^2}\\right\\},\n\\qquad\nx_s=1+\\max\\{y:\\phi_y\\leq s\\}.\n\\]</div></div>\n<p>The initial thresholds are <span class=\"source-math\">\\(6,14,28,50,83\\)</span>; the relevant final thresholds are <span class=\"source-math\">\\(\\phi _{27}=850377\\)</span> and <span class=\"source-math\">\\(\\phi _{28}=1366305\\)</span>. Thus this standard-UCB count reaches 28 within the chosen horizon, despite the threshold policy leaving an arm at count one.</p>\n<p>The proposed upper bound is contradicted even after these conservative enlargements:</p>\n<ul>\n<li>use <span class=\"source-math\">\\(x_{t-1}\\)</span> instead of <span class=\"source-math\">\\(x_{t}\\)</span>, delaying each count increase by one round;</li>\n<li>include the final turn, although the printed high-zone set excludes it;</li>\n<li>use count one before the maximum defining <span class=\"source-math\">\\(x_{s}\\)</span> is nonempty;</li>\n<li>include both initialization rounds in the low-round count, giving <span class=\"source-math\">\\(\\widetilde{n}=2\\)</span>;</li>\n<li>interpret the optimal arm's zero-gap contribution as zero, rather than relying on its formally undefined <span class=\"source-math\">\\(\\frac{0}{0}\\)</span> expression.</li>\n</ul>\n<p>The resulting enlarged right side is</p>\n<div class=\"equation-block\"><div class=\"equation-content\">\\[\n\\frac45+2\\left[\\frac{8\\log2}{4/5}\n+\\left(1+\\frac{\\pi^2}{3}\\right)\\frac45\\right]\n+15\\sum_{t=3}^{10^6}\n\\exp\\left[-\\frac8{25}(x_{t-1}-1)\\right].\n\\]</div></div>\n<p>Evaluating its constant-count blocks gives approximately <strong>9,996.63</strong>, versus the expected-regret lower bound <strong>239,999.52</strong>. An independent verification using rational intervals for logarithms, square roots, and enlarged exponential terms certifies the still more generous upper bound</p>\n<div class=\"equation-block\"><div class=\"equation-content\">\\[\n\\frac{6124187109694301}{600000000000}&lt;10,207.\n\\]</div></div>\n<p>The exact expected-regret lower bound is <span class=\"source-math\">\\(\\frac{5999988}{25}\\)</span>. Thus the contradiction does not depend on floating-point rounding, an asymptotic approximation, or a Monte Carlo estimate.</p>\n<p>At the failing proof step on PDF page 39, histories with <span class=\"source-math\">\\(T_{*}(t-1)=1\\)</span> have been excluded even though they have probability at least <span class=\"source-math\">\\(\\frac{1}{10}\\)</span> for arbitrarily large <span class=\"source-math\">\\(t\\)</span> under Algorithm 3. Lemma 6 applies to an algorithm that continues using the UCB bonus; it cannot supply this count for an algorithm that switches to indefinitely greedy decisions.</p>\n<p>The paper warns about high multipliers early in the game and explicitly presents the algorithm without imposing extra exploration. That warning does not exclude this instance. Indeed, the stated purpose of its bounds is to identify schedules where the proposed algorithm performs badly. The printed substitution fails precisely that test.</p>\n<p><strong>Reason for rejection.</strong> The paper identifies theoretical regret guarantees and their use in deciding when to regulate exploration as central contributions. Theorem 8 is the main guarantee for its UCB threshold algorithm. Its proposed computable error certificate can decay while the actual error probability remains bounded away from zero and expected regret is linear. This defeats the claimed theoretical guidance for an allowed known bounded multiplier.</p>\n<p>Redefining <span class=\"source-math\">\\(x_{t}\\)</span> as the actual minimum count of the hybrid policy would give <span class=\"source-math\">\\(x_{t}=1\\)</span> here. A generic exponential-tail expression in terms of that different count can remain valid, but it no longer has the Lemma 6 computation or Theorem 7 decay used by the paper. It yields a potentially linear bound and loses the advertised guarantee. Restoring the claimed conclusion requires a new analysis of the multiplier schedule, an additional exploration condition, or a changed policy. A change of constants or an initial-round correction cannot repair the permanent trap. This central unsupported guarantee warrants rejection of the paper as written, even though the heuristic may help on other schedules and other algorithms may remain useful.</p>\n<p><strong>Discovery method.</strong> While tracing the UCB-z regret proof, I noticed that a minimum-pull guarantee for an always-UCB policy was invoked during high-reward phases that remove its confidence bonus. I tested whether an initial estimation error could persist throughout such a phase.</p>\n<p><strong>Verification method.</strong> Read all assumptions, the full paper and appendices, and rechecked the rendered original pages containing the policy, Lemma 6, Theorem 8, and the proof. Proved the positive-probability trap inductively. Computed all 28 relevant integer threshold minima with 70-digit arithmetic and signed predecessor checks, then summed the exact integer-length blocks. A second auditor independently certified the minima and a conservative finite bound using rational intervals. Executed the unchanged author <code>policy.py</code> UCB-z branch with an <code>xrange=range</code> compatibility binding: after the seeded admissible observations, all 10,000 subsequent calls chose arm 2, producing counts <span class=\"source-math\">\\([1,10001]\\)</span>.</p>\n<p><strong>Reproduction artifacts.</strong> Audit scripts:</p>\n<ul>\n<li><code>[unpublished artifact reference omitted]</code></li>\n<li><code>[unpublished artifact reference omitted]</code></li>\n<li><code>[unpublished artifact reference omitted]</code></li>\n</ul>\n<p>Evidence directory:\n<code>[unpublished artifact reference omitted]</code></p>\n<p>It contains <code>targeted-controls.json</code>, <code>native-controls.json</code>, and <code>greed17720-root-qa.json</code>, their successful-run logs, the independent QA scope, and whole-paper review notes. The native policy is from author repository <code>5tefan0/Regulating-Greed-Over-Time</code>, commit <code>f6cb8f116bfaa383e863e231a0f2b5885a501595</code>; verified source hashes are retained. The independent auditor performed bounded claim/severity verification, not a second full-paper review.</p>\n<p><strong>Confidence: High.</strong> The exact distributions, bounded multiplier, initialization event, policy decisions, and expected-regret lower bound satisfy the stated conditions. The finite contradiction has a wide gap and independent rational certification. The finding is scoped to the false standard-UCB count substitution and the resulting UCB-z guarantee; it does not claim that every inequality stated in terms of an actual hybrid-policy minimum is false.</p>\n",
           "source_body_sha256": "7d963b020a01443cdc465233672af52e1fa05ba6bf8a3fc0c77cc1ad9c300b11",
           "export_text_sha256": "9575e66d41e6787737f5e40ff066da580b1894d2af7f217f757408bc36f47232",
           "private_reference_substitutions": 4,
           "display_equations": 5,
-          "inline_equations": 0,
-          "formatting_normalizations": []
+          "inline_equations": 37,
+          "formatting_normalizations": [
+            {
+              "rule": "literal_inline_notation",
+              "source": "G(t)<z",
+              "tex": "G(t)<z"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "9/10",
+              "tex": "\\frac{9}{10}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "1/10",
+              "tex": "\\frac{1}{10}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "[0,1]",
+              "tex": "[0,1]"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "r=1",
+              "tex": "r=1"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "mu_1=9/10",
+              "tex": "\\mu _{1}=9/10"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "mu_2=1/10",
+              "tex": "\\mu _{2}=1/10"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "Delta_2=4/5",
+              "tex": "\\Delta _{2}=4/5"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "G(1)=G(2)=1",
+              "tex": "G(1)=G(2)=1"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "G(t)=3",
+              "tex": "G(t)=3"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "t>=3",
+              "tex": "t\\ge 3"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "z=2",
+              "tex": "z=2"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "E",
+              "tex": "E"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "1/10",
+              "tex": "\\frac{1}{10}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "0",
+              "tex": "0"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "1/10",
+              "tex": "\\frac{1}{10}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "1/10",
+              "tex": "\\frac{1}{10}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "3/10",
+              "tex": "\\frac{3}{10}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "G(t)=3",
+              "tex": "G(t)=3"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "n=1,000,000",
+              "tex": "n=1,000,000"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "E",
+              "tex": "E"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "r=1",
+              "tex": "r=1"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "6,14,28,50,83",
+              "tex": "6,14,28,50,83"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "phi_27=850377",
+              "tex": "\\phi _{27}=850377"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "phi_28=1366305",
+              "tex": "\\phi _{28}=1366305"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "x_(t-1)",
+              "tex": "x_{t-1}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "x_t",
+              "tex": "x_{t}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "x_s",
+              "tex": "x_{s}"
+            },
+            {
+              "rule": "reviewed_inline_notation",
+              "source": "tilde n=2",
+              "tex": "\\widetilde{n}=2"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "0/0",
+              "tex": "\\frac{0}{0}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "5999988/25",
+              "tex": "\\frac{5999988}{25}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "T_*(t-1)=1",
+              "tex": "T_{*}(t-1)=1"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "1/10",
+              "tex": "\\frac{1}{10}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "t",
+              "tex": "t"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "x_t",
+              "tex": "x_{t}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "x_t=1",
+              "tex": "x_{t}=1"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "[1,10001]",
+              "tex": "[1,10001]"
+            }
+          ]
         }
       ]
     },
@@ -54,26 +240,488 @@
           "title": "One-shot algorithm has linear stochastic regret on a linear objective",
           "source_heading": "## Issue 2021__accepted__v22-18-407-I01 — One-shot algorithm has linear stochastic regret on a linear objective",
           "markdown": "\n\n**Exact location.** PDF page 12, Theorem 2, Equation (18); page 7, stochastic-regret definition (10); page 9, updates (13)–(15); page 10, Algorithm 2, especially lines 5–9. The proof error is the transition from Equation (101), page 34, to Equation (102), page 35, subsequently summed in Equation (104). The stochastic guarantee is highlighted in the abstract, page 3 contribution list and page 38 conclusion.\n\n**Claim.** Under Assumptions 1–5, Algorithm 2 with the stated parameters achieves expected cumulative `(1−1/e)` stochastic regret `O(T^(2/3))` against the best fixed feasible decision. Equation (10) evaluates the sum of rewards of all played decisions, rather than only the terminal point.\n\n**Error and evidence.** Let there be one agent and one coordinate, with feasible set `[0,1]`, `A(t)=[1]`, `mu=1/2`, and `B=1`. The one-agent case is expressly allowed by the remark on PDF page 9. Choose an iid point-mass distribution of functions, so every sampled function is\n\n    F_t(x)=F(x)=x.\n\nThis satisfies every relevant assumption: compact convex nonnegative domain containing zero, `D=R=1`; monotone DR-submodular function with zero Hessian, `L=0`, gradient bound `G=1`; exact unbiased gradient 1 and variance `sigma^2=0`; doubly stochastic, positively weighted, strongly connected graph. The comparator is `x*=1`. There are no stochastic-expectation or gradient-query subtleties: the function and gradient are deterministic and there is one gradient per round.\n\nAlgorithm 2 starts from zero, plays `x(t)` before updating, and uses the fixed horizon `T` in its update. Since `gamma=1/sqrt(T)>0`, its gradient estimate `d(t)` is positive and its unique linear maximizer is `v(t)=1`. Therefore\n\n    x(t)=(t−1)/T,\n    sum_(t=1)^T F(x(t))=(T−1)/2,\n    (1−1/e)-SR_T=(1/2−1/e)T+1/2.\n\nEvery iterate is feasible, including `x(T+1)=1`. The regret is linear because `1/2−1/e>0`. Even evaluating the shifted points `x(t+1)` used at the end of the proof changes the result only to `(1/2−1/e)T−1/2`, also linear. Identical linear objectives on any number of completely connected agents give the same path, so the failure also exists on ordinary multi-agent networks.\n\nThere is an exact finite violation of the printed constants. At `T=10000`, the definitions following Equation (23) give `beta=7/8`, `nu=64/49`, and `nu/(1−beta)=512/49`. Substituting `L=sigma=0`, `D=G=N=1` into (18) gives\n\n    RHS = (1+512/(49 sqrt(2)))100 + 512/49\n        < 56612/49 < 1250.5.\n\nBut `e>8/3` implies the actual regret is greater than `10000/8+1/2=1250.5`. The shifted version is greater than `1249.5`, which also exceeds `56612/49`. The helper verifies these rational comparisons and independently executes the published recurrence at five horizons through 10000.\n\nThe proof retains `(1−1/T)^t` in (101), then replaces it by `1/e` in (102) for all `t<=T`. The stated inequality `(1−1/T)^T<=1/e` does not justify this replacement for the earlier times. Retaining the transient before summing gives precisely the missing linear contribution. This is a false theorem, not merely an unverified inference from a proof typo.\n\n**Reason for rejection.** The one-gradient stochastic online algorithm and its sublinear `(1−1/e)` cumulative regret constitute a main advertised contribution. The algorithm fails that guarantee even on a deterministic linear instance. A terminal-output approximation theorem would not establish the cumulative-regret result as written; obtaining that result requires a different algorithm/protocol or new substantive analysis. This changes acceptance to rejection for the paper's central stochastic contribution.\n\n**Discovery method.** Noticed that the fixed `1/T` update moves from zero along a continuous-greedy path, so early-round rewards need not match the terminal approximation; traced the cumulative-regret proof.\n\n**Verification method.** Read the full paper and rechecked the regret definition, sampling model, assumptions, timing, update and theorem against original rendered PDF pages 7,9–12,34–35. Derived the exact trajectory and finite-bound violation; executed exact-fraction recurrence controls and checked the shifted-output interpretation. These tests use published equations, not unavailable historical experiment code.\n\n**Confidence.** High. Every assumption and iterate is explicit; the regret and strict finite inequality have elementary exact certificates. Alternative indexing and multi-agent interpretations do not remove the failure.\n\n",
-          "html": "<p><strong>Exact location.</strong> PDF page 12, Theorem 2, Equation (18); page 7, stochastic-regret definition (10); page 9, updates (13)–(15); page 10, Algorithm 2, especially lines 5–9. The proof error is the transition from Equation (101), page 34, to Equation (102), page 35, subsequently summed in Equation (104). The stochastic guarantee is highlighted in the abstract, page 3 contribution list and page 38 conclusion.</p>\n<p><strong>Claim.</strong> Under Assumptions 1–5, Algorithm 2 with the stated parameters achieves expected cumulative <code>(1−1/e)</code> stochastic regret <code>O(T^(2/3))</code> against the best fixed feasible decision. Equation (10) evaluates the sum of rewards of all played decisions, rather than only the terminal point.</p>\n<p><strong>Error and evidence.</strong> Let there be one agent and one coordinate, with feasible set <code>[0,1]</code>, <code>A(t)=[1]</code>, <code>mu=1/2</code>, and <code>B=1</code>. The one-agent case is expressly allowed by the remark on PDF page 9. Choose an iid point-mass distribution of functions, so every sampled function is</p>\n<pre><code>F_t(x)=F(x)=x.\n</code></pre>\n<p>This satisfies every relevant assumption: compact convex nonnegative domain containing zero, <code>D=R=1</code>; monotone DR-submodular function with zero Hessian, <code>L=0</code>, gradient bound <code>G=1</code>; exact unbiased gradient 1 and variance <code>sigma^2=0</code>; doubly stochastic, positively weighted, strongly connected graph. The comparator is <code>x*=1</code>. There are no stochastic-expectation or gradient-query subtleties: the function and gradient are deterministic and there is one gradient per round.</p>\n<p>Algorithm 2 starts from zero, plays <code>x(t)</code> before updating, and uses the fixed horizon <code>T</code> in its update. Since <code>gamma=1/sqrt(T)&gt;0</code>, its gradient estimate <code>d(t)</code> is positive and its unique linear maximizer is <code>v(t)=1</code>. Therefore</p>\n<pre><code>x(t)=(t−1)/T,\nsum_(t=1)^T F(x(t))=(T−1)/2,\n(1−1/e)-SR_T=(1/2−1/e)T+1/2.\n</code></pre>\n<p>Every iterate is feasible, including <code>x(T+1)=1</code>. The regret is linear because <code>1/2−1/e&gt;0</code>. Even evaluating the shifted points <code>x(t+1)</code> used at the end of the proof changes the result only to <code>(1/2−1/e)T−1/2</code>, also linear. Identical linear objectives on any number of completely connected agents give the same path, so the failure also exists on ordinary multi-agent networks.</p>\n<p>There is an exact finite violation of the printed constants. At <code>T=10000</code>, the definitions following Equation (23) give <code>beta=7/8</code>, <code>nu=64/49</code>, and <code>nu/(1−beta)=512/49</code>. Substituting <code>L=sigma=0</code>, <code>D=G=N=1</code> into (18) gives</p>\n<pre><code>RHS = (1+512/(49 sqrt(2)))100 + 512/49\n    &lt; 56612/49 &lt; 1250.5.\n</code></pre>\n<p>But <code>e&gt;8/3</code> implies the actual regret is greater than <code>10000/8+1/2=1250.5</code>. The shifted version is greater than <code>1249.5</code>, which also exceeds <code>56612/49</code>. The helper verifies these rational comparisons and independently executes the published recurrence at five horizons through 10000.</p>\n<p>The proof retains <code>(1−1/T)^t</code> in (101), then replaces it by <code>1/e</code> in (102) for all <code>t&lt;=T</code>. The stated inequality <code>(1−1/T)^T&lt;=1/e</code> does not justify this replacement for the earlier times. Retaining the transient before summing gives precisely the missing linear contribution. This is a false theorem, not merely an unverified inference from a proof typo.</p>\n<p><strong>Reason for rejection.</strong> The one-gradient stochastic online algorithm and its sublinear <code>(1−1/e)</code> cumulative regret constitute a main advertised contribution. The algorithm fails that guarantee even on a deterministic linear instance. A terminal-output approximation theorem would not establish the cumulative-regret result as written; obtaining that result requires a different algorithm/protocol or new substantive analysis. This changes acceptance to rejection for the paper's central stochastic contribution.</p>\n<p><strong>Discovery method.</strong> Noticed that the fixed <code>1/T</code> update moves from zero along a continuous-greedy path, so early-round rewards need not match the terminal approximation; traced the cumulative-regret proof.</p>\n<p><strong>Verification method.</strong> Read the full paper and rechecked the regret definition, sampling model, assumptions, timing, update and theorem against original rendered PDF pages 7,9–12,34–35. Derived the exact trajectory and finite-bound violation; executed exact-fraction recurrence controls and checked the shifted-output interpretation. These tests use published equations, not unavailable historical experiment code.</p>\n<p><strong>Confidence.</strong> High. Every assumption and iterate is explicit; the regret and strict finite inequality have elementary exact certificates. Alternative indexing and multi-agent interpretations do not remove the failure.</p>\n",
+          "html": "<p><strong>Exact location.</strong> PDF page 12, Theorem 2, Equation (18); page 7, stochastic-regret definition (10); page 9, updates (13)–(15); page 10, Algorithm 2, especially lines 5–9. The proof error is the transition from Equation (101), page 34, to Equation (102), page 35, subsequently summed in Equation (104). The stochastic guarantee is highlighted in the abstract, page 3 contribution list and page 38 conclusion.</p>\n<p><strong>Claim.</strong> Under Assumptions 1–5, Algorithm 2 with the stated parameters achieves expected cumulative <span class=\"source-math\">\\((1-1/e)\\)</span> stochastic regret <span class=\"source-math\">\\(O(T^{2/3})\\)</span> against the best fixed feasible decision. Equation (10) evaluates the sum of rewards of all played decisions, rather than only the terminal point.</p>\n<p><strong>Error and evidence.</strong> Let there be one agent and one coordinate, with feasible set <span class=\"source-math\">\\([0,1]\\)</span>, <span class=\"source-math\">\\(A(t)=[1]\\)</span>, <span class=\"source-math\">\\(\\mu =1/2\\)</span>, and <span class=\"source-math\">\\(B=1\\)</span>. The one-agent case is expressly allowed by the remark on PDF page 9. Choose an iid point-mass distribution of functions, so every sampled function is</p>\n<pre><code>F_t(x)=F(x)=x.\n</code></pre>\n<p>This satisfies every relevant assumption: compact convex nonnegative domain containing zero, <span class=\"source-math\">\\(D=R=1\\)</span>; monotone DR-submodular function with zero Hessian, <span class=\"source-math\">\\(L=0\\)</span>, gradient bound <span class=\"source-math\">\\(G=1\\)</span>; exact unbiased gradient 1 and variance <span class=\"source-math\">\\(\\sigma ^{2}=0\\)</span>; doubly stochastic, positively weighted, strongly connected graph. The comparator is <span class=\"source-math\">\\(x*=1\\)</span>. There are no stochastic-expectation or gradient-query subtleties: the function and gradient are deterministic and there is one gradient per round.</p>\n<p>Algorithm 2 starts from zero, plays <span class=\"source-math\">\\(x(t)\\)</span> before updating, and uses the fixed horizon <span class=\"source-math\">\\(T\\)</span> in its update. Since <span class=\"source-math\">\\(\\gamma =1/\\operatorname{sqrt}(T)&gt;0\\)</span>, its gradient estimate <span class=\"source-math\">\\(d(t)\\)</span> is positive and its unique linear maximizer is <span class=\"source-math\">\\(v(t)=1\\)</span>. Therefore</p>\n<pre><code>x(t)=(t−1)/T,\nsum_(t=1)^T F(x(t))=(T−1)/2,\n(1−1/e)-SR_T=(1/2−1/e)T+1/2.\n</code></pre>\n<p>Every iterate is feasible, including <span class=\"source-math\">\\(x(T+1)=1\\)</span>. The regret is linear because <span class=\"source-math\">\\(1/2-1/e&gt;0\\)</span>. Even evaluating the shifted points <span class=\"source-math\">\\(x(t+1)\\)</span> used at the end of the proof changes the result only to <span class=\"source-math\">\\((1/2-1/e)T-1/2\\)</span>, also linear. Identical linear objectives on any number of completely connected agents give the same path, so the failure also exists on ordinary multi-agent networks.</p>\n<p>There is an exact finite violation of the printed constants. At <span class=\"source-math\">\\(T=10000\\)</span>, the definitions following Equation (23) give <span class=\"source-math\">\\(\\beta =7/8\\)</span>, <span class=\"source-math\">\\(\\nu =64/49\\)</span>, and <span class=\"source-math\">\\(\\nu /(1-\\beta )=512/49\\)</span>. Substituting <span class=\"source-math\">\\(L=\\sigma =0\\)</span>, <span class=\"source-math\">\\(D=G=N=1\\)</span> into (18) gives</p>\n<pre><code>RHS = (1+512/(49 sqrt(2)))100 + 512/49\n    &lt; 56612/49 &lt; 1250.5.\n</code></pre>\n<p>But <span class=\"source-math\">\\(e&gt;8/3\\)</span> implies the actual regret is greater than <span class=\"source-math\">\\(10000/8+1/2=1250.5\\)</span>. The shifted version is greater than <span class=\"source-math\">\\(1249.5\\)</span>, which also exceeds <span class=\"source-math\">\\(\\frac{56612}{49}\\)</span>. The helper verifies these rational comparisons and independently executes the published recurrence at five horizons through 10000.</p>\n<p>The proof retains <span class=\"source-math\">\\((1-1/T)^{t}\\)</span> in (101), then replaces it by <span class=\"source-math\">\\(\\frac{1}{e}\\)</span> in (102) for all <span class=\"source-math\">\\(t\\le T\\)</span>. The stated inequality <span class=\"source-math\">\\((1-1/T)^{T}\\le 1/e\\)</span> does not justify this replacement for the earlier times. Retaining the transient before summing gives precisely the missing linear contribution. This is a false theorem, not merely an unverified inference from a proof typo.</p>\n<p><strong>Reason for rejection.</strong> The one-gradient stochastic online algorithm and its sublinear <span class=\"source-math\">\\((1-1/e)\\)</span> cumulative regret constitute a main advertised contribution. The algorithm fails that guarantee even on a deterministic linear instance. A terminal-output approximation theorem would not establish the cumulative-regret result as written; obtaining that result requires a different algorithm/protocol or new substantive analysis. This changes acceptance to rejection for the paper's central stochastic contribution.</p>\n<p><strong>Discovery method.</strong> Noticed that the fixed <span class=\"source-math\">\\(\\frac{1}{T}\\)</span> update moves from zero along a continuous-greedy path, so early-round rewards need not match the terminal approximation; traced the cumulative-regret proof.</p>\n<p><strong>Verification method.</strong> Read the full paper and rechecked the regret definition, sampling model, assumptions, timing, update and theorem against original rendered PDF pages 7,9–12,34–35. Derived the exact trajectory and finite-bound violation; executed exact-fraction recurrence controls and checked the shifted-output interpretation. These tests use published equations, not unavailable historical experiment code.</p>\n<p><strong>Confidence.</strong> High. Every assumption and iterate is explicit; the regret and strict finite inequality have elementary exact certificates. Alternative indexing and multi-agent interpretations do not remove the failure.</p>\n",
           "source_body_sha256": "b671aa2f921d9eecd805ca1bf59d2384fdf16e8fed1e3e728abb178609923e16",
           "export_text_sha256": "b671aa2f921d9eecd805ca1bf59d2384fdf16e8fed1e3e728abb178609923e16",
           "private_reference_substitutions": 0,
           "display_equations": 0,
-          "inline_equations": 0,
-          "formatting_normalizations": []
+          "inline_equations": 36,
+          "formatting_normalizations": [
+            {
+              "rule": "literal_inline_notation",
+              "source": "(1−1/e)",
+              "tex": "(1-1/e)"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "O(T^(2/3))",
+              "tex": "O(T^{2/3})"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "[0,1]",
+              "tex": "[0,1]"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "A(t)=[1]",
+              "tex": "A(t)=[1]"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "mu=1/2",
+              "tex": "\\mu =1/2"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "B=1",
+              "tex": "B=1"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "D=R=1",
+              "tex": "D=R=1"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "L=0",
+              "tex": "L=0"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "G=1",
+              "tex": "G=1"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "sigma^2=0",
+              "tex": "\\sigma ^{2}=0"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "x*=1",
+              "tex": "x*=1"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "x(t)",
+              "tex": "x(t)"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "T",
+              "tex": "T"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "gamma=1/sqrt(T)>0",
+              "tex": "\\gamma =1/\\operatorname{sqrt}(T)>0"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "d(t)",
+              "tex": "d(t)"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "v(t)=1",
+              "tex": "v(t)=1"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "x(T+1)=1",
+              "tex": "x(T+1)=1"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "1/2−1/e>0",
+              "tex": "1/2-1/e>0"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "x(t+1)",
+              "tex": "x(t+1)"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "(1/2−1/e)T−1/2",
+              "tex": "(1/2-1/e)T-1/2"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "T=10000",
+              "tex": "T=10000"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "beta=7/8",
+              "tex": "\\beta =7/8"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "nu=64/49",
+              "tex": "\\nu =64/49"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "nu/(1−beta)=512/49",
+              "tex": "\\nu /(1-\\beta )=512/49"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "L=sigma=0",
+              "tex": "L=\\sigma =0"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "D=G=N=1",
+              "tex": "D=G=N=1"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "e>8/3",
+              "tex": "e>8/3"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "10000/8+1/2=1250.5",
+              "tex": "10000/8+1/2=1250.5"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "1249.5",
+              "tex": "1249.5"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "56612/49",
+              "tex": "\\frac{56612}{49}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "(1−1/T)^t",
+              "tex": "(1-1/T)^{t}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "1/e",
+              "tex": "\\frac{1}{e}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "t<=T",
+              "tex": "t\\le T"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "(1−1/T)^T<=1/e",
+              "tex": "(1-1/T)^{T}\\le 1/e"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "(1−1/e)",
+              "tex": "(1-1/e)"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "1/T",
+              "tex": "\\frac{1}{T}"
+            }
+          ]
         },
         {
           "id": "2021__accepted__v22-18-407-I02",
           "title": "Inner consensus analysis uses a graph sequence that Algorithm 1 does not execute",
           "source_heading": "## Issue 2021__accepted__v22-18-407-I02 — Inner consensus analysis uses a graph sequence that Algorithm 1 does not execute",
           "markdown": "\n\n**Exact location.** PDF page 11, Theorem 1 and Equation (17); pages 8–9, Algorithm 1 and updates (11)–(12); pages 13–15, matrix-product definition (23), fixed-matrix recursion (25), alleged expansion (26), and Lemma 4; page 16, repeated mismatch (35)–(36). The theorem's dependence on the consensus bounds continues through pages 29–31.\n\n**Claim.** With doubly stochastic weights bounded below by `mu`, joint strong connectivity across `B` consecutive outer online rounds, and online linear oracles with sublinear regret, Algorithm 1 achieves the finite bound (17), hence `(1−1/e)` adversarial regret `O(sqrt(T))` for `K=T^(3/2)`.\n\n**Error and evidence.** At fixed outer online time `t`, Equation (25) repeatedly multiplies by the same `A(t)` across the `K` inner steps. Its actual expansion contains powers of `A(t)`. Equation (26) instead uses products `A(s+1)...A(k−1)`, which vary in the inner index. Joint connectivity in outer time cannot mix the inner iteration when the current `A(t)` is identity. The following example satisfies even the stronger intended joint-strong-connectivity interpretation of Assumption 4 and demonstrates a false main bound, rather than relying only on the expansion error.\n\nTake two agents, two coordinates, and the simplex\n\n    K={x>=0: x_1+x_2<=1},   R=1, D=sqrt(2).\n\nAt every time use exact-gradient linear local functions\n\n    F_(t,1)(x)=x_1,   F_(t,2)(x)=3x_2.\n\nThey satisfy monotonicity, DR-submodularity, nonnegativity, `L=0`, `G=3`, and `sigma=0`. Repeat the matrices `I,I,J`, where every entry of `J` is `1/2`. Set `mu=1/2`, `B=3`. Every sliding three-round union is complete and strongly connected, and all self-loops/positive weights meet Assumption 1.\n\nFor each inner linear oracle, agent 1 plays `e1=(1,0)` and agent 2 plays `e2=(0,1)`. These actions can be generated by causal oracles with a uniform sublinear regret guarantee, and their actual regret on this instance is zero at every prefix. For clarity, a suitable oracle plays its preferred basis until the observed cumulative regret first becomes positive, then switches permanently to a projection-free exponential-weights optimizer over vertices 0,e1,e2. Prior regret is nonpositive, the first violation costs less than 6, and the exponential-weights fallback, using payoff range at most 6 for feedback norm at most 3, has regret at most `6 sqrt(T log(3)/2)<6 sqrt(T)`. Thus this wrapper has uniform bound `6+6 sqrt(T)`. On the instance below it never switches; the action choice is not made with hindsight.\n\nTo verify that assertion and all algorithm states, put\n\n    eta=2/K^(2/3), gamma=1/sqrt(K),\n    u_k=1−(1−eta)^k,\n    h_0=0, h_k=(1−gamma)h_(k−1)+gamma u_k,\n    q_k=gamma u_k.\n\nHere `h_k>=q_k>0`. Local smoothed gradients are `g_i^(k)=u_k grad(F_i)`. On identity rounds the feedbacks are `d1=(h,0)`, `d2=(0,3h)`. On a `J` round they are\n\n    d1=((h+q)/2, 3(h−q)/2),\n    d2=((h−q)/2, 3(h+q)/2).\n\nEach complete `I,I,J` period gives agent 1 cumulative first-versus-second-coordinate advantage `h+2q>0`, and its first two prefixes add `h` and `2h`. Agent 2 prefers its second coordinate at every round. Since feedbacks are nonnegative, zero is never a better comparator. Thus each preferred basis maximizes cumulative linear reward at every prefix for every inner oracle; actual regret is zero.\n\nExecuting the `K` primal updates from zero yields\n\n    identity round: x1=e1, x2=e2;\n    J round: x1=(1/2+1/(2K),1/2−1/(2K)), x2 with coordinates swapped.\n\nEvery intermediate state is feasible. The global objective is `f(x)=(x_1+3x_2)/2`, maximized at `e2` with value `3/2`. Agent 1 obtains global reward `1/2` on identity rounds and `1−1/(2K)` on `J` rounds. For `T` divisible by three,\n\n    average agent-1 reward = 2/3−1/(6K),\n    (1−1/e)-R_T = [3(1−1/e)/2−2/3+1/(6K)]T\n                > 13T/48.\n\nThis remains linear when `K=ceil(T^(3/2))`, while the asserted bound is sublinear for any fixed `O(sqrt(T))` oracle guarantee. The helper independently executes all inner smoothed-gradient, consensus and primal recurrences for `K=64` and `729` with their exact prescribed step sizes, checking 793 steps and the prefix-comparator inequalities against these formulas.\n\nA finite bound violation can be checked without executing an enormous loop. Let `T=300000000`, `K=1000000000000`. The published constants are `nu=1024/961` and `beta=(31/32)^(1/3)<95/96`, so `nu/(1−beta)<103`. The right side of (17), with actual oracle regret zero, is strictly less than\n\n    1236T/K + 2066T/sqrt(K) + 6T/K^(1/3)\n    = 799800.3708.\n\nThe actual regret is greater than `13T/48=81250000`. Even adding the generic uniform oracle bound `6+6sqrt(T)<108006` leaves the asserted upper bound below `907806.3708`. The finite inequalities use exact fractions and safe upper bounds, not floating-point evidence for the large trajectory.\n\nLemma 4 itself also fails: on an identity round, at inner index `k=K` after `K−1` updates, its left side is `(K−1)/K`, while its claimed right side is `4nu/[K(1−beta)]<412/K`.\n\n**Reason for rejection.** Decentralized adversarial regret under time-varying, jointly connected networks is the other principal contribution. Its claimed finite and sublinear bounds fail under precisely that network model, despite valid no-regret linear oracles and exact linear gradients. Requiring every outer graph to be individually connected, or executing a different graph sequence during the inner loop, changes the advertised model/algorithm. Replacing the incorrect matrix expansion with the actual powers exposes nonvanishing disagreement and linear regret. This requires substantive revision, warranting rejection as written.\n\n**Discovery method.** Noticed that the proof changed the graph's time index when expanding a recursion at fixed outer time; tested an identity current graph inside a jointly connected outer sequence.\n\n**Verification method.** Read the complete adversarial proof and inspected original rendered PDF pages 8–9,11,13–16,24,31. Constructed the explicit valid-graph linear-objective instance; derived its feedbacks, causal oracle behavior, primal trajectory and regret; verified exact inner recurrences and rational finite-bound inequalities. The initialization's extraneous zero/one superscript is normalized to the intended `K` updates from zero; a bounded one-step shift does not repair the mismatch or linear regret.\n\n**Confidence.** High. The counterexample satisfies the strong intended connectivity condition, includes an explicit causal universally sublinear-regret oracle construction, and demonstrates failure of the main theorem itself. It does not depend on the stochastic transient error in I01.\n\n## Reproducibility\n\nCertificate source: `[unpublished artifact reference omitted]`. Results: `[unpublished artifact reference omitted]` and `targeted-controls.log`. The helper verifies the original PDF hash, executes the exact recurrence controls, and completed with actual exit code 0 and terminal `DECENTRAL407_EXACT_THEOREM_COUNTEREXAMPLES_PASS`.\n\nIndependent bounded QA: `decentral407-root-qa.json`, `.md` and `.log` in the same evidence directory, with source `[unpublished artifact reference omitted]`. It independently checked the original relevant PDF sections/renders, the 10000-step stochastic recurrence and strict bounds, and 64 adversarial inner steps across five outer periods, supporting both findings. This was bounded QA, not a second full-paper review or historical author-code rerun.\n",
-          "html": "<p><strong>Exact location.</strong> PDF page 11, Theorem 1 and Equation (17); pages 8–9, Algorithm 1 and updates (11)–(12); pages 13–15, matrix-product definition (23), fixed-matrix recursion (25), alleged expansion (26), and Lemma 4; page 16, repeated mismatch (35)–(36). The theorem's dependence on the consensus bounds continues through pages 29–31.</p>\n<p><strong>Claim.</strong> With doubly stochastic weights bounded below by <code>mu</code>, joint strong connectivity across <code>B</code> consecutive outer online rounds, and online linear oracles with sublinear regret, Algorithm 1 achieves the finite bound (17), hence <code>(1−1/e)</code> adversarial regret <code>O(sqrt(T))</code> for <code>K=T^(3/2)</code>.</p>\n<p><strong>Error and evidence.</strong> At fixed outer online time <code>t</code>, Equation (25) repeatedly multiplies by the same <code>A(t)</code> across the <code>K</code> inner steps. Its actual expansion contains powers of <code>A(t)</code>. Equation (26) instead uses products <code>A(s+1)...A(k−1)</code>, which vary in the inner index. Joint connectivity in outer time cannot mix the inner iteration when the current <code>A(t)</code> is identity. The following example satisfies even the stronger intended joint-strong-connectivity interpretation of Assumption 4 and demonstrates a false main bound, rather than relying only on the expansion error.</p>\n<p>Take two agents, two coordinates, and the simplex</p>\n<pre><code>K={x&gt;=0: x_1+x_2&lt;=1},   R=1, D=sqrt(2).\n</code></pre>\n<p>At every time use exact-gradient linear local functions</p>\n<pre><code>F_(t,1)(x)=x_1,   F_(t,2)(x)=3x_2.\n</code></pre>\n<p>They satisfy monotonicity, DR-submodularity, nonnegativity, <code>L=0</code>, <code>G=3</code>, and <code>sigma=0</code>. Repeat the matrices <code>I,I,J</code>, where every entry of <code>J</code> is <code>1/2</code>. Set <code>mu=1/2</code>, <code>B=3</code>. Every sliding three-round union is complete and strongly connected, and all self-loops/positive weights meet Assumption 1.</p>\n<p>For each inner linear oracle, agent 1 plays <code>e1=(1,0)</code> and agent 2 plays <code>e2=(0,1)</code>. These actions can be generated by causal oracles with a uniform sublinear regret guarantee, and their actual regret on this instance is zero at every prefix. For clarity, a suitable oracle plays its preferred basis until the observed cumulative regret first becomes positive, then switches permanently to a projection-free exponential-weights optimizer over vertices 0,e1,e2. Prior regret is nonpositive, the first violation costs less than 6, and the exponential-weights fallback, using payoff range at most 6 for feedback norm at most 3, has regret at most <code>6 sqrt(T log(3)/2)&lt;6 sqrt(T)</code>. Thus this wrapper has uniform bound <code>6+6 sqrt(T)</code>. On the instance below it never switches; the action choice is not made with hindsight.</p>\n<p>To verify that assertion and all algorithm states, put</p>\n<pre><code>eta=2/K^(2/3), gamma=1/sqrt(K),\nu_k=1−(1−eta)^k,\nh_0=0, h_k=(1−gamma)h_(k−1)+gamma u_k,\nq_k=gamma u_k.\n</code></pre>\n<p>Here <code>h_k&gt;=q_k&gt;0</code>. Local smoothed gradients are <code>g_i^(k)=u_k grad(F_i)</code>. On identity rounds the feedbacks are <code>d1=(h,0)</code>, <code>d2=(0,3h)</code>. On a <code>J</code> round they are</p>\n<pre><code>d1=((h+q)/2, 3(h−q)/2),\nd2=((h−q)/2, 3(h+q)/2).\n</code></pre>\n<p>Each complete <code>I,I,J</code> period gives agent 1 cumulative first-versus-second-coordinate advantage <code>h+2q&gt;0</code>, and its first two prefixes add <code>h</code> and <code>2h</code>. Agent 2 prefers its second coordinate at every round. Since feedbacks are nonnegative, zero is never a better comparator. Thus each preferred basis maximizes cumulative linear reward at every prefix for every inner oracle; actual regret is zero.</p>\n<p>Executing the <code>K</code> primal updates from zero yields</p>\n<pre><code>identity round: x1=e1, x2=e2;\nJ round: x1=(1/2+1/(2K),1/2−1/(2K)), x2 with coordinates swapped.\n</code></pre>\n<p>Every intermediate state is feasible. The global objective is <code>f(x)=(x_1+3x_2)/2</code>, maximized at <code>e2</code> with value <code>3/2</code>. Agent 1 obtains global reward <code>1/2</code> on identity rounds and <code>1−1/(2K)</code> on <code>J</code> rounds. For <code>T</code> divisible by three,</p>\n<pre><code>average agent-1 reward = 2/3−1/(6K),\n(1−1/e)-R_T = [3(1−1/e)/2−2/3+1/(6K)]T\n            &gt; 13T/48.\n</code></pre>\n<p>This remains linear when <code>K=ceil(T^(3/2))</code>, while the asserted bound is sublinear for any fixed <code>O(sqrt(T))</code> oracle guarantee. The helper independently executes all inner smoothed-gradient, consensus and primal recurrences for <code>K=64</code> and <code>729</code> with their exact prescribed step sizes, checking 793 steps and the prefix-comparator inequalities against these formulas.</p>\n<p>A finite bound violation can be checked without executing an enormous loop. Let <code>T=300000000</code>, <code>K=1000000000000</code>. The published constants are <code>nu=1024/961</code> and <code>beta=(31/32)^(1/3)&lt;95/96</code>, so <code>nu/(1−beta)&lt;103</code>. The right side of (17), with actual oracle regret zero, is strictly less than</p>\n<pre><code>1236T/K + 2066T/sqrt(K) + 6T/K^(1/3)\n= 799800.3708.\n</code></pre>\n<p>The actual regret is greater than <code>13T/48=81250000</code>. Even adding the generic uniform oracle bound <code>6+6sqrt(T)&lt;108006</code> leaves the asserted upper bound below <code>907806.3708</code>. The finite inequalities use exact fractions and safe upper bounds, not floating-point evidence for the large trajectory.</p>\n<p>Lemma 4 itself also fails: on an identity round, at inner index <code>k=K</code> after <code>K−1</code> updates, its left side is <code>(K−1)/K</code>, while its claimed right side is <code>4nu/[K(1−beta)]&lt;412/K</code>.</p>\n<p><strong>Reason for rejection.</strong> Decentralized adversarial regret under time-varying, jointly connected networks is the other principal contribution. Its claimed finite and sublinear bounds fail under precisely that network model, despite valid no-regret linear oracles and exact linear gradients. Requiring every outer graph to be individually connected, or executing a different graph sequence during the inner loop, changes the advertised model/algorithm. Replacing the incorrect matrix expansion with the actual powers exposes nonvanishing disagreement and linear regret. This requires substantive revision, warranting rejection as written.</p>\n<p><strong>Discovery method.</strong> Noticed that the proof changed the graph's time index when expanding a recursion at fixed outer time; tested an identity current graph inside a jointly connected outer sequence.</p>\n<p><strong>Verification method.</strong> Read the complete adversarial proof and inspected original rendered PDF pages 8–9,11,13–16,24,31. Constructed the explicit valid-graph linear-objective instance; derived its feedbacks, causal oracle behavior, primal trajectory and regret; verified exact inner recurrences and rational finite-bound inequalities. The initialization's extraneous zero/one superscript is normalized to the intended <code>K</code> updates from zero; a bounded one-step shift does not repair the mismatch or linear regret.</p>\n<p><strong>Confidence.</strong> High. The counterexample satisfies the strong intended connectivity condition, includes an explicit causal universally sublinear-regret oracle construction, and demonstrates failure of the main theorem itself. It does not depend on the stochastic transient error in I01.</p>\n<h3>Reproducibility</h3>\n<p>Certificate source: <code>[unpublished artifact reference omitted]</code>. Results: <code>[unpublished artifact reference omitted]</code> and <code>targeted-controls.log</code>. The helper verifies the original PDF hash, executes the exact recurrence controls, and completed with actual exit code 0 and terminal <code>DECENTRAL407_EXACT_THEOREM_COUNTEREXAMPLES_PASS</code>.</p>\n<p>Independent bounded QA: <code>decentral407-root-qa.json</code>, <code>.md</code> and <code>.log</code> in the same evidence directory, with source <code>[unpublished artifact reference omitted]</code>. It independently checked the original relevant PDF sections/renders, the 10000-step stochastic recurrence and strict bounds, and 64 adversarial inner steps across five outer periods, supporting both findings. This was bounded QA, not a second full-paper review or historical author-code rerun.</p>\n",
+          "html": "<p><strong>Exact location.</strong> PDF page 11, Theorem 1 and Equation (17); pages 8–9, Algorithm 1 and updates (11)–(12); pages 13–15, matrix-product definition (23), fixed-matrix recursion (25), alleged expansion (26), and Lemma 4; page 16, repeated mismatch (35)–(36). The theorem's dependence on the consensus bounds continues through pages 29–31.</p>\n<p><strong>Claim.</strong> With doubly stochastic weights bounded below by <span class=\"source-math\">\\(\\mu\\)</span>, joint strong connectivity across <span class=\"source-math\">\\(B\\)</span> consecutive outer online rounds, and online linear oracles with sublinear regret, Algorithm 1 achieves the finite bound (17), hence <span class=\"source-math\">\\((1-1/e)\\)</span> adversarial regret <span class=\"source-math\">\\(O(\\operatorname{sqrt}(T))\\)</span> for <span class=\"source-math\">\\(K=T^{3/2}\\)</span>.</p>\n<p><strong>Error and evidence.</strong> At fixed outer online time <span class=\"source-math\">\\(t\\)</span>, Equation (25) repeatedly multiplies by the same <span class=\"source-math\">\\(A(t)\\)</span> across the <span class=\"source-math\">\\(K\\)</span> inner steps. Its actual expansion contains powers of <span class=\"source-math\">\\(A(t)\\)</span>. Equation (26) instead uses products <span class=\"source-math\">\\(A(s+1)\\ldots A(k-1)\\)</span>, which vary in the inner index. Joint connectivity in outer time cannot mix the inner iteration when the current <span class=\"source-math\">\\(A(t)\\)</span> is identity. The following example satisfies even the stronger intended joint-strong-connectivity interpretation of Assumption 4 and demonstrates a false main bound, rather than relying only on the expansion error.</p>\n<p>Take two agents, two coordinates, and the simplex</p>\n<pre><code>K={x&gt;=0: x_1+x_2&lt;=1},   R=1, D=sqrt(2).\n</code></pre>\n<p>At every time use exact-gradient linear local functions</p>\n<pre><code>F_(t,1)(x)=x_1,   F_(t,2)(x)=3x_2.\n</code></pre>\n<p>They satisfy monotonicity, DR-submodularity, nonnegativity, <span class=\"source-math\">\\(L=0\\)</span>, <span class=\"source-math\">\\(G=3\\)</span>, and <span class=\"source-math\">\\(\\sigma =0\\)</span>. Repeat the matrices <span class=\"source-math\">\\(I,I,J\\)</span>, where every entry of <span class=\"source-math\">\\(J\\)</span> is <span class=\"source-math\">\\(\\frac{1}{2}\\)</span>. Set <span class=\"source-math\">\\(\\mu =1/2\\)</span>, <span class=\"source-math\">\\(B=3\\)</span>. Every sliding three-round union is complete and strongly connected, and all self-loops/positive weights meet Assumption 1.</p>\n<p>For each inner linear oracle, agent 1 plays <span class=\"source-math\">\\(e1=(1,0)\\)</span> and agent 2 plays <span class=\"source-math\">\\(e2=(0,1)\\)</span>. These actions can be generated by causal oracles with a uniform sublinear regret guarantee, and their actual regret on this instance is zero at every prefix. For clarity, a suitable oracle plays its preferred basis until the observed cumulative regret first becomes positive, then switches permanently to a projection-free exponential-weights optimizer over vertices 0,e1,e2. Prior regret is nonpositive, the first violation costs less than 6, and the exponential-weights fallback, using payoff range at most 6 for feedback norm at most 3, has regret at most <span class=\"source-math\">\\(6 \\operatorname{sqrt}(T \\log (3)/2)&lt;6 \\operatorname{sqrt}(T)\\)</span>. Thus this wrapper has uniform bound <span class=\"source-math\">\\(6+6 \\operatorname{sqrt}(T)\\)</span>. On the instance below it never switches; the action choice is not made with hindsight.</p>\n<p>To verify that assertion and all algorithm states, put</p>\n<pre><code>eta=2/K^(2/3), gamma=1/sqrt(K),\nu_k=1−(1−eta)^k,\nh_0=0, h_k=(1−gamma)h_(k−1)+gamma u_k,\nq_k=gamma u_k.\n</code></pre>\n<p>Here <span class=\"source-math\">\\(h_{k}\\ge q_{k}&gt;0\\)</span>. Local smoothed gradients are <code>g_i^(k)=u_k grad(F_i)</code>. On identity rounds the feedbacks are <span class=\"source-math\">\\(d1=(h,0)\\)</span>, <span class=\"source-math\">\\(d2=(0,3h)\\)</span>. On a <span class=\"source-math\">\\(J\\)</span> round they are</p>\n<pre><code>d1=((h+q)/2, 3(h−q)/2),\nd2=((h−q)/2, 3(h+q)/2).\n</code></pre>\n<p>Each complete <span class=\"source-math\">\\(I,I,J\\)</span> period gives agent 1 cumulative first-versus-second-coordinate advantage <span class=\"source-math\">\\(h+2q&gt;0\\)</span>, and its first two prefixes add <span class=\"source-math\">\\(h\\)</span> and <span class=\"source-math\">\\(2h\\)</span>. Agent 2 prefers its second coordinate at every round. Since feedbacks are nonnegative, zero is never a better comparator. Thus each preferred basis maximizes cumulative linear reward at every prefix for every inner oracle; actual regret is zero.</p>\n<p>Executing the <span class=\"source-math\">\\(K\\)</span> primal updates from zero yields</p>\n<pre><code>identity round: x1=e1, x2=e2;\nJ round: x1=(1/2+1/(2K),1/2−1/(2K)), x2 with coordinates swapped.\n</code></pre>\n<p>Every intermediate state is feasible. The global objective is <span class=\"source-math\">\\(f(x)=(x_{1}+3x_{2})/2\\)</span>, maximized at <span class=\"source-math\">\\(e2\\)</span> with value <span class=\"source-math\">\\(\\frac{3}{2}\\)</span>. Agent 1 obtains global reward <span class=\"source-math\">\\(\\frac{1}{2}\\)</span> on identity rounds and <span class=\"source-math\">\\(1-1/(2K)\\)</span> on <span class=\"source-math\">\\(J\\)</span> rounds. For <span class=\"source-math\">\\(T\\)</span> divisible by three,</p>\n<pre><code>average agent-1 reward = 2/3−1/(6K),\n(1−1/e)-R_T = [3(1−1/e)/2−2/3+1/(6K)]T\n            &gt; 13T/48.\n</code></pre>\n<p>This remains linear when <span class=\"source-math\">\\(K=\\operatorname{ceil}(T^{3/2})\\)</span>, while the asserted bound is sublinear for any fixed <span class=\"source-math\">\\(O(\\operatorname{sqrt}(T))\\)</span> oracle guarantee. The helper independently executes all inner smoothed-gradient, consensus and primal recurrences for <span class=\"source-math\">\\(K=64\\)</span> and <span class=\"source-math\">\\(729\\)</span> with their exact prescribed step sizes, checking 793 steps and the prefix-comparator inequalities against these formulas.</p>\n<p>A finite bound violation can be checked without executing an enormous loop. Let <span class=\"source-math\">\\(T=300000000\\)</span>, <span class=\"source-math\">\\(K=1000000000000\\)</span>. The published constants are <span class=\"source-math\">\\(\\nu =1024/961\\)</span> and <span class=\"source-math\">\\(\\beta =(31/32)^{1/3}&lt;95/96\\)</span>, so <span class=\"source-math\">\\(\\nu /(1-\\beta )&lt;103\\)</span>. The right side of (17), with actual oracle regret zero, is strictly less than</p>\n<pre><code>1236T/K + 2066T/sqrt(K) + 6T/K^(1/3)\n= 799800.3708.\n</code></pre>\n<p>The actual regret is greater than <span class=\"source-math\">\\(13T/48=81250000\\)</span>. Even adding the generic uniform oracle bound <span class=\"source-math\">\\(6+6\\operatorname{sqrt}(T)&lt;108006\\)</span> leaves the asserted upper bound below <span class=\"source-math\">\\(907806.3708\\)</span>. The finite inequalities use exact fractions and safe upper bounds, not floating-point evidence for the large trajectory.</p>\n<p>Lemma 4 itself also fails: on an identity round, at inner index <span class=\"source-math\">\\(k=K\\)</span> after <span class=\"source-math\">\\(K-1\\)</span> updates, its left side is <span class=\"source-math\">\\((K-1)/K\\)</span>, while its claimed right side is <span class=\"source-math\">\\(4\\nu /[K(1-\\beta )]&lt;412/K\\)</span>.</p>\n<p><strong>Reason for rejection.</strong> Decentralized adversarial regret under time-varying, jointly connected networks is the other principal contribution. Its claimed finite and sublinear bounds fail under precisely that network model, despite valid no-regret linear oracles and exact linear gradients. Requiring every outer graph to be individually connected, or executing a different graph sequence during the inner loop, changes the advertised model/algorithm. Replacing the incorrect matrix expansion with the actual powers exposes nonvanishing disagreement and linear regret. This requires substantive revision, warranting rejection as written.</p>\n<p><strong>Discovery method.</strong> Noticed that the proof changed the graph's time index when expanding a recursion at fixed outer time; tested an identity current graph inside a jointly connected outer sequence.</p>\n<p><strong>Verification method.</strong> Read the complete adversarial proof and inspected original rendered PDF pages 8–9,11,13–16,24,31. Constructed the explicit valid-graph linear-objective instance; derived its feedbacks, causal oracle behavior, primal trajectory and regret; verified exact inner recurrences and rational finite-bound inequalities. The initialization's extraneous zero/one superscript is normalized to the intended <span class=\"source-math\">\\(K\\)</span> updates from zero; a bounded one-step shift does not repair the mismatch or linear regret.</p>\n<p><strong>Confidence.</strong> High. The counterexample satisfies the strong intended connectivity condition, includes an explicit causal universally sublinear-regret oracle construction, and demonstrates failure of the main theorem itself. It does not depend on the stochastic transient error in I01.</p>\n<h3>Reproducibility</h3>\n<p>Certificate source: <code>[unpublished artifact reference omitted]</code>. Results: <code>[unpublished artifact reference omitted]</code> and <code>targeted-controls.log</code>. The helper verifies the original PDF hash, executes the exact recurrence controls, and completed with actual exit code 0 and terminal <code>DECENTRAL407_EXACT_THEOREM_COUNTEREXAMPLES_PASS</code>.</p>\n<p>Independent bounded QA: <code>decentral407-root-qa.json</code>, <code>.md</code> and <code>.log</code> in the same evidence directory, with source <code>[unpublished artifact reference omitted]</code>. It independently checked the original relevant PDF sections/renders, the 10000-step stochastic recurrence and strict bounds, and 64 adversarial inner steps across five outer periods, supporting both findings. This was bounded QA, not a second full-paper review or historical author-code rerun.</p>\n",
           "source_body_sha256": "e508b9d09b5b13c9306b439e9a65c05f5d7c83a91189e1270b42629e6d2a5d31",
           "export_text_sha256": "dfa5a4c4cfdbecbae9fa8f90f0592705179aec8cc0295b4f55442288a6ab3ac5",
           "private_reference_substitutions": 3,
           "display_equations": 0,
-          "inline_equations": 0,
-          "formatting_normalizations": []
+          "inline_equations": 56,
+          "formatting_normalizations": [
+            {
+              "rule": "literal_inline_notation",
+              "source": "mu",
+              "tex": "\\mu"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "B",
+              "tex": "B"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "(1−1/e)",
+              "tex": "(1-1/e)"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "O(sqrt(T))",
+              "tex": "O(\\operatorname{sqrt}(T))"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "K=T^(3/2)",
+              "tex": "K=T^{3/2}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "t",
+              "tex": "t"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "A(t)",
+              "tex": "A(t)"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "K",
+              "tex": "K"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "A(t)",
+              "tex": "A(t)"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "A(s+1)...A(k−1)",
+              "tex": "A(s+1)\\ldots A(k-1)"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "A(t)",
+              "tex": "A(t)"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "L=0",
+              "tex": "L=0"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "G=3",
+              "tex": "G=3"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "sigma=0",
+              "tex": "\\sigma =0"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "I,I,J",
+              "tex": "I,I,J"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "J",
+              "tex": "J"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "1/2",
+              "tex": "\\frac{1}{2}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "mu=1/2",
+              "tex": "\\mu =1/2"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "B=3",
+              "tex": "B=3"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "e1=(1,0)",
+              "tex": "e1=(1,0)"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "e2=(0,1)",
+              "tex": "e2=(0,1)"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "6 sqrt(T log(3)/2)<6 sqrt(T)",
+              "tex": "6 \\operatorname{sqrt}(T \\log (3)/2)<6 \\operatorname{sqrt}(T)"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "6+6 sqrt(T)",
+              "tex": "6+6 \\operatorname{sqrt}(T)"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "h_k>=q_k>0",
+              "tex": "h_{k}\\ge q_{k}>0"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "d1=(h,0)",
+              "tex": "d1=(h,0)"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "d2=(0,3h)",
+              "tex": "d2=(0,3h)"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "J",
+              "tex": "J"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "I,I,J",
+              "tex": "I,I,J"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "h+2q>0",
+              "tex": "h+2q>0"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "h",
+              "tex": "h"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "2h",
+              "tex": "2h"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "K",
+              "tex": "K"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "f(x)=(x_1+3x_2)/2",
+              "tex": "f(x)=(x_{1}+3x_{2})/2"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "e2",
+              "tex": "e2"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "3/2",
+              "tex": "\\frac{3}{2}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "1/2",
+              "tex": "\\frac{1}{2}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "1−1/(2K)",
+              "tex": "1-1/(2K)"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "J",
+              "tex": "J"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "T",
+              "tex": "T"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "K=ceil(T^(3/2))",
+              "tex": "K=\\operatorname{ceil}(T^{3/2})"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "O(sqrt(T))",
+              "tex": "O(\\operatorname{sqrt}(T))"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "K=64",
+              "tex": "K=64"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "729",
+              "tex": "729"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "T=300000000",
+              "tex": "T=300000000"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "K=1000000000000",
+              "tex": "K=1000000000000"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "nu=1024/961",
+              "tex": "\\nu =1024/961"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "beta=(31/32)^(1/3)<95/96",
+              "tex": "\\beta =(31/32)^{1/3}<95/96"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "nu/(1−beta)<103",
+              "tex": "\\nu /(1-\\beta )<103"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "13T/48=81250000",
+              "tex": "13T/48=81250000"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "6+6sqrt(T)<108006",
+              "tex": "6+6\\operatorname{sqrt}(T)<108006"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "907806.3708",
+              "tex": "907806.3708"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "k=K",
+              "tex": "k=K"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "K−1",
+              "tex": "K-1"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "(K−1)/K",
+              "tex": "(K-1)/K"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "4nu/[K(1−beta)]<412/K",
+              "tex": "4\\nu /[K(1-\\beta )]<412/K"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "K",
+              "tex": "K"
+            }
+          ]
         }
       ]
     },

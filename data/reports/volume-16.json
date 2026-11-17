@@ -11,11 +11,11 @@
           "id": "2015__accepted__v16-addarioberry15a-01",
           "title": "The claimed exceptional-clique dimension has the wrong asymptotic order",
           "source_heading": "## Issue 2015__accepted__v16-addarioberry15a-01 — The claimed exceptional-clique dimension has the wrong asymptotic order",
-          "markdown": "\n\n**Exact location.** PDF page 5 (printed 1897), Theorem 2(iv); PDF pages 4–5 advertise the threshold order; PDF pages 7–8 contain its second-moment proof, particularly the shared-edge spherical-cap bound on page 8. The original model and halfspace count are on PDF pages 2–3.\n\n**Claim.** In the paper's model the edge vectors are independent standard Gaussian vectors in R^d, and a graph at direction s contains edge e precisely when ⟨X_e,s⟩≥0. For every fixed c>2 and c′>c²/(2 ln 2), Theorem 2(iv) asserts that, if d≥c′(ln n)²/ln ln n, with probability tending to one some unit direction produces a clique of size at least c log₂n. Page 4 explicitly identifies (ln n)²/ln ln n as the critical order. Natural logarithms are stipulated on that page.\n\n**Error and evidence.** At the claimed sufficient dimension, the probability of any such clique actually tends to zero. Let\n\n\\[\n k=\\lceil c\\log_2 n\\rceil,\\quad m=\\binom{k}{2},\\quad\n d=\\left\\lceil c'(\\ln n)^2/\\ln\\ln n\\right\\rceil.\n\\]\n\nFor a fixed set of k vertices, its m Gaussian edge vectors are in general position almost surely and have independent symmetric orientations. The exact probability that **some direction**, chosen after all vectors are observed, makes every edge present is\n\n\\[\n P_k=2^{1-m}\\sum_{r=0}^{d-1}\\binom{m-1}{r}.\n\\]\n\nThis follows directly from the paper's own Lemma 1: condition on the m unoriented Gaussian lines, expose their 2^m equally likely independent orientation signs, and count the C(m,d)=2∑_{r<d}binom(m−1,r) orientations for which the all-positive labeling is realizable. Thus the calculation already optimizes over the continuum of directions; no discretization or independence between different vertex sets is assumed.\n\nThe paper uses non-strict products ≥0. This does not change this probability. Almost surely at most d−1 vectors can have zero product with a nonzero feasible direction, and they are linearly independent. Choose a perturbation having positive product with each of these vectors. A sufficiently small perturbation preserves the other strict positive products; normalize to unit length. A closed-hemisphere solution therefore implies a strict solution.\n\nA union bound over all k-subsets now gives\n\n\\[\n \\Pr\\{\\exists s:\\mathrm{cl}(X_n,s)\\ge k\\}\n \\le\\binom nk\\,2^{1-m}\\sum_{r=0}^{d-1}\\binom{m-1}{r}.\n\\]\n\nHere d/m→0. For d−1≤(m−1)/2, the sum is at most\n\n\\[\n d\\left(\\frac{e(m-1)}{d-1}\\right)^{d-1}.\n\\]\n\nIts logarithm is o(m)=o((ln n)²), since (d/m)ln(m/d)→0. Consequently\n\n\\[\n \\log\\Pr\\{\\exists s:\\mathrm{cl}(X_n,s)\\ge k\\}\n \\le\\left\\frac{c-c^2/2}{\\ln2}+o(1)\\right [unpublished artifact reference omitted]^2\\to-\\infty.\n\\]\n\nThis holds for every fixed c>2 and every fixed c′ above the theorem's required constant. It contradicts its asserted probability tending to one. The argument works unchanged with the floor used inside the proof, so integer rounding cannot resolve the error.\n\nFor a reproducible numerical illustration, choose c=10, c′=80>100/(2 ln2), n=2^64. Then k=640, m=204480 and d=41514. The displayed elementary bound has natural logarithm below −5628; exact stable summation of the binomial terms with binom(n,k)≤n^k/k! gives below −13676. These numerical illustrations supplement the exact asymptotic contradiction.\n\nThe failed proof step can also be identified geometrically. PDF page 8 treats the intersection of the two positive hemispheres for separated directions as lying in a cap of height sin(θ/2). For directions at angle θ its exact Gaussian probability is (π−θ)/(2π), independent of d, rather than O(1/(dθ²)). For example take s±=(cos(θ/2),±sin(θ/2),0), and u=(δ,0,√(1−δ²)) with 0<δ<sin(θ/2). Both products ⟨u,s±⟩ are positive, while the midpoint product δ is below the claimed cap height. The cap substitution is the proof mechanism of the same threshold error, not an additional issue.\n\n**Reason for rejection.** This invalidates one of the main dimension-threshold contributions and its explicitly advertised matching order. Indeed the same first-moment argument rules out these cliques at every d=o((ln n)²), whereas the paper's elementary shattering observation on page 5 supplies them at d≥binom(k,2)=Θ((ln n)²). The claimed ln ln n improvement is therefore false, not a constant or typographical correction. Other clique and chromatic-number conclusions can survive without preserving this central result.\n\n**Discovery method.** The second-moment proof's dimension-dependent shared-edge bound conflicted with the dimension-free probability of an intersection of two Gaussian halfspaces. Tracing the paper's Lemma 1 suggested counting all-positive realizable orientations directly.\n\n**Verification method.** Re-read the original model, logarithm convention, Theorem 2(iv), Lemma 1, proof and relevant appendix geometry; inspect rendered PDF pages 3–5 and 7–8; derive the exact sign-symmetry probability and union-bound asymptotics; evaluate stable binomial sums and elementary bounds; obtain independent bounded original-PDF mathematical QA. Controls and the independent derivation are retained under `[unpublished artifact reference omitted]`.\n\n**Confidence.** **High.** The exact count follows from the paper's own lemma under its Gaussian assumptions, handles the closed inequality and adaptive choice of direction, and gives the opposite limiting probability. Independent derivation agrees.\n\n",
-          "html": "<p><strong>Exact location.</strong> PDF page 5 (printed 1897), Theorem 2(iv); PDF pages 4–5 advertise the threshold order; PDF pages 7–8 contain its second-moment proof, particularly the shared-edge spherical-cap bound on page 8. The original model and halfspace count are on PDF pages 2–3.</p>\n<p><strong>Claim.</strong> In the paper's model the edge vectors are independent standard Gaussian vectors in R^d, and a graph at direction s contains edge e precisely when ⟨X_e,s⟩≥0. For every fixed c&gt;2 and c′&gt;c²/(2 ln 2), Theorem 2(iv) asserts that, if d≥c′(ln n)²/ln ln n, with probability tending to one some unit direction produces a clique of size at least c log₂n. Page 4 explicitly identifies (ln n)²/ln ln n as the critical order. Natural logarithms are stipulated on that page.</p>\n<p><strong>Error and evidence.</strong> At the claimed sufficient dimension, the probability of any such clique actually tends to zero. Let</p>\n<div class=\"equation-block\"><div class=\"equation-content\">\\[\n k=\\lceil c\\log_2 n\\rceil,\\quad m=\\binom{k}{2},\\quad\n d=\\left\\lceil c'(\\ln n)^2/\\ln\\ln n\\right\\rceil.\n\\]</div></div>\n<p>For a fixed set of k vertices, its m Gaussian edge vectors are in general position almost surely and have independent symmetric orientations. The exact probability that <strong>some direction</strong>, chosen after all vectors are observed, makes every edge present is</p>\n<div class=\"equation-block\"><div class=\"equation-content\">\\[\n P_k=2^{1-m}\\sum_{r=0}^{d-1}\\binom{m-1}{r}.\n\\]</div></div>\n<p>This follows directly from the paper's own Lemma 1: condition on the m unoriented Gaussian lines, expose their 2^m equally likely independent orientation signs, and count the C(m,d)=2∑_{r&lt;d}binom(m−1,r) orientations for which the all-positive labeling is realizable. Thus the calculation already optimizes over the continuum of directions; no discretization or independence between different vertex sets is assumed.</p>\n<p>The paper uses non-strict products ≥0. This does not change this probability. Almost surely at most d−1 vectors can have zero product with a nonzero feasible direction, and they are linearly independent. Choose a perturbation having positive product with each of these vectors. A sufficiently small perturbation preserves the other strict positive products; normalize to unit length. A closed-hemisphere solution therefore implies a strict solution.</p>\n<p>A union bound over all k-subsets now gives</p>\n<div class=\"equation-block\"><div class=\"equation-content\">\\[\n \\Pr\\{\\exists s:\\mathrm{cl}(X_n,s)\\ge k\\}\n \\le\\binom nk\\,2^{1-m}\\sum_{r=0}^{d-1}\\binom{m-1}{r}.\n\\]</div></div>\n<p>Here d/m→0. For d−1≤(m−1)/2, the sum is at most</p>\n<div class=\"equation-block\"><div class=\"equation-content\">\\[\n d\\left(\\frac{e(m-1)}{d-1}\\right)^{d-1}.\n\\]</div></div>\n<p>Its logarithm is o(m)=o((ln n)²), since (d/m)ln(m/d)→0. Consequently</p>\n<div class=\"equation-block\"><div class=\"equation-content\">\\[\n \\log\\Pr\\{\\exists s:\\mathrm{cl}(X_n,s)\\ge k\\}\n \\le\\left\\frac{c-c^2/2}{\\ln2}+o(1)\\right [unpublished artifact reference omitted]^2\\to-\\infty.\n\\]</div></div>\n<p>This holds for every fixed c&gt;2 and every fixed c′ above the theorem's required constant. It contradicts its asserted probability tending to one. The argument works unchanged with the floor used inside the proof, so integer rounding cannot resolve the error.</p>\n<p>For a reproducible numerical illustration, choose c=10, c′=80&gt;100/(2 ln2), n=2^64. Then k=640, m=204480 and d=41514. The displayed elementary bound has natural logarithm below −5628; exact stable summation of the binomial terms with binom(n,k)≤n^k/k! gives below −13676. These numerical illustrations supplement the exact asymptotic contradiction.</p>\n<p>The failed proof step can also be identified geometrically. PDF page 8 treats the intersection of the two positive hemispheres for separated directions as lying in a cap of height sin(θ/2). For directions at angle θ its exact Gaussian probability is (π−θ)/(2π), independent of d, rather than O(1/(dθ²)). For example take s±=(cos(θ/2),±sin(θ/2),0), and u=(δ,0,√(1−δ²)) with 0&lt;δ&lt;sin(θ/2). Both products ⟨u,s±⟩ are positive, while the midpoint product δ is below the claimed cap height. The cap substitution is the proof mechanism of the same threshold error, not an additional issue.</p>\n<p><strong>Reason for rejection.</strong> This invalidates one of the main dimension-threshold contributions and its explicitly advertised matching order. Indeed the same first-moment argument rules out these cliques at every d=o((ln n)²), whereas the paper's elementary shattering observation on page 5 supplies them at d≥binom(k,2)=Θ((ln n)²). The claimed ln ln n improvement is therefore false, not a constant or typographical correction. Other clique and chromatic-number conclusions can survive without preserving this central result.</p>\n<p><strong>Discovery method.</strong> The second-moment proof's dimension-dependent shared-edge bound conflicted with the dimension-free probability of an intersection of two Gaussian halfspaces. Tracing the paper's Lemma 1 suggested counting all-positive realizable orientations directly.</p>\n<p><strong>Verification method.</strong> Re-read the original model, logarithm convention, Theorem 2(iv), Lemma 1, proof and relevant appendix geometry; inspect rendered PDF pages 3–5 and 7–8; derive the exact sign-symmetry probability and union-bound asymptotics; evaluate stable binomial sums and elementary bounds; obtain independent bounded original-PDF mathematical QA. Controls and the independent derivation are retained under <code>[unpublished artifact reference omitted]</code>.</p>\n<p><strong>Confidence.</strong> <strong>High.</strong> The exact count follows from the paper's own lemma under its Gaussian assumptions, handles the closed inequality and adaptive choice of direction, and gives the opposite limiting probability. Independent derivation agrees.</p>\n",
+          "markdown": "\n\n**Exact location.** PDF page 5 (printed 1897), Theorem 2(iv); PDF pages 4–5 advertise the threshold order; PDF pages 7–8 contain its second-moment proof, particularly the shared-edge spherical-cap bound on page 8. The original model and halfspace count are on PDF pages 2–3.\n\n**Claim.** In the paper's model the edge vectors are independent standard Gaussian vectors in R^d, and a graph at direction s contains edge e precisely when ⟨X_e,s⟩≥0. For every fixed c>2 and c′>c²/(2 ln 2), Theorem 2(iv) asserts that, if d≥c′(ln n)²/ln ln n, with probability tending to one some unit direction produces a clique of size at least c log₂n. Page 4 explicitly identifies (ln n)²/ln ln n as the critical order. Natural logarithms are stipulated on that page.\n\n**Error and evidence.** At the claimed sufficient dimension, the probability of any such clique actually tends to zero. Let\n\n\\[\n k=\\lceil c\\log_2 n\\rceil,\\quad m=\\binom{k}{2},\\quad\n d=\\left\\lceil c'(\\ln n)^2/\\ln\\ln n\\right\\rceil.\n\\]\n\nFor a fixed set of k vertices, its m Gaussian edge vectors are in general position almost surely and have independent symmetric orientations. The exact probability that **some direction**, chosen after all vectors are observed, makes every edge present is\n\n\\[\n P_k=2^{1-m}\\sum_{r=0}^{d-1}\\binom{m-1}{r}.\n\\]\n\nThis follows directly from the paper's own Lemma 1: condition on the m unoriented Gaussian lines, expose their 2^m equally likely independent orientation signs, and count the C(m,d)=2∑_{r<d}binom(m−1,r) orientations for which the all-positive labeling is realizable. Thus the calculation already optimizes over the continuum of directions; no discretization or independence between different vertex sets is assumed.\n\nThe paper uses non-strict products ≥0. This does not change this probability. Almost surely at most d−1 vectors can have zero product with a nonzero feasible direction, and they are linearly independent. Choose a perturbation having positive product with each of these vectors. A sufficiently small perturbation preserves the other strict positive products; normalize to unit length. A closed-hemisphere solution therefore implies a strict solution.\n\nA union bound over all k-subsets now gives\n\n\\[\n \\Pr\\{\\exists s:\\mathrm{cl}(X_n,s)\\ge k\\}\n \\le\\binom nk\\,2^{1-m}\\sum_{r=0}^{d-1}\\binom{m-1}{r}.\n\\]\n\nHere d/m→0. For d−1≤(m−1)/2, the sum is at most\n\n\\[\n d\\left(\\frac{e(m-1)}{d-1}\\right)^{d-1}.\n\\]\n\nIts logarithm is o(m)=o((ln n)²), since (d/m)ln(m/d)→0. Consequently\n\n\\[\n \\log\\Pr\\{\\exists s:\\mathrm{cl}(X_n,s)\\ge k\\}\n \\le\\left[\\frac{c-c^2/2}{\\ln2}+o(1)\\right](\\ln n)^2\\to-\\infty.\n\\]\n\nThis holds for every fixed c>2 and every fixed c′ above the theorem's required constant. It contradicts its asserted probability tending to one. The argument works unchanged with the floor used inside the proof, so integer rounding cannot resolve the error.\n\nFor a reproducible numerical illustration, choose c=10, c′=80>100/(2 ln2), n=2^64. Then k=640, m=204480 and d=41514. The displayed elementary bound has natural logarithm below −5628; exact stable summation of the binomial terms with binom(n,k)≤n^k/k! gives below −13676. These numerical illustrations supplement the exact asymptotic contradiction.\n\nThe failed proof step can also be identified geometrically. PDF page 8 treats the intersection of the two positive hemispheres for separated directions as lying in a cap of height sin(θ/2). For directions at angle θ its exact Gaussian probability is (π−θ)/(2π), independent of d, rather than O(1/(dθ²)). For example take s±=(cos(θ/2),±sin(θ/2),0), and u=(δ,0,√(1−δ²)) with 0<δ<sin(θ/2). Both products ⟨u,s±⟩ are positive, while the midpoint product δ is below the claimed cap height. The cap substitution is the proof mechanism of the same threshold error, not an additional issue.\n\n**Reason for rejection.** This invalidates one of the main dimension-threshold contributions and its explicitly advertised matching order. Indeed the same first-moment argument rules out these cliques at every d=o((ln n)²), whereas the paper's elementary shattering observation on page 5 supplies them at d≥binom(k,2)=Θ((ln n)²). The claimed ln ln n improvement is therefore false, not a constant or typographical correction. Other clique and chromatic-number conclusions can survive without preserving this central result.\n\n**Discovery method.** The second-moment proof's dimension-dependent shared-edge bound conflicted with the dimension-free probability of an intersection of two Gaussian halfspaces. Tracing the paper's Lemma 1 suggested counting all-positive realizable orientations directly.\n\n**Verification method.** Re-read the original model, logarithm convention, Theorem 2(iv), Lemma 1, proof and relevant appendix geometry; inspect rendered PDF pages 3–5 and 7–8; derive the exact sign-symmetry probability and union-bound asymptotics; evaluate stable binomial sums and elementary bounds; obtain independent bounded original-PDF mathematical QA. Controls and the independent derivation are retained under `[unpublished artifact reference omitted]`.\n\n**Confidence.** **High.** The exact count follows from the paper's own lemma under its Gaussian assumptions, handles the closed inequality and adaptive choice of direction, and gives the opposite limiting probability. Independent derivation agrees.\n\n",
+          "html": "<p><strong>Exact location.</strong> PDF page 5 (printed 1897), Theorem 2(iv); PDF pages 4–5 advertise the threshold order; PDF pages 7–8 contain its second-moment proof, particularly the shared-edge spherical-cap bound on page 8. The original model and halfspace count are on PDF pages 2–3.</p>\n<p><strong>Claim.</strong> In the paper's model the edge vectors are independent standard Gaussian vectors in R^d, and a graph at direction s contains edge e precisely when ⟨X_e,s⟩≥0. For every fixed c&gt;2 and c′&gt;c²/(2 ln 2), Theorem 2(iv) asserts that, if d≥c′(ln n)²/ln ln n, with probability tending to one some unit direction produces a clique of size at least c log₂n. Page 4 explicitly identifies (ln n)²/ln ln n as the critical order. Natural logarithms are stipulated on that page.</p>\n<p><strong>Error and evidence.</strong> At the claimed sufficient dimension, the probability of any such clique actually tends to zero. Let</p>\n<div class=\"equation-block\"><div class=\"equation-content\">\\[\n k=\\lceil c\\log_2 n\\rceil,\\quad m=\\binom{k}{2},\\quad\n d=\\left\\lceil c'(\\ln n)^2/\\ln\\ln n\\right\\rceil.\n\\]</div></div>\n<p>For a fixed set of k vertices, its m Gaussian edge vectors are in general position almost surely and have independent symmetric orientations. The exact probability that <strong>some direction</strong>, chosen after all vectors are observed, makes every edge present is</p>\n<div class=\"equation-block\"><div class=\"equation-content\">\\[\n P_k=2^{1-m}\\sum_{r=0}^{d-1}\\binom{m-1}{r}.\n\\]</div></div>\n<p>This follows directly from the paper's own Lemma 1: condition on the m unoriented Gaussian lines, expose their 2^m equally likely independent orientation signs, and count the C(m,d)=2∑_{r&lt;d}binom(m−1,r) orientations for which the all-positive labeling is realizable. Thus the calculation already optimizes over the continuum of directions; no discretization or independence between different vertex sets is assumed.</p>\n<p>The paper uses non-strict products ≥0. This does not change this probability. Almost surely at most d−1 vectors can have zero product with a nonzero feasible direction, and they are linearly independent. Choose a perturbation having positive product with each of these vectors. A sufficiently small perturbation preserves the other strict positive products; normalize to unit length. A closed-hemisphere solution therefore implies a strict solution.</p>\n<p>A union bound over all k-subsets now gives</p>\n<div class=\"equation-block\"><div class=\"equation-content\">\\[\n \\Pr\\{\\exists s:\\mathrm{cl}(X_n,s)\\ge k\\}\n \\le\\binom nk\\,2^{1-m}\\sum_{r=0}^{d-1}\\binom{m-1}{r}.\n\\]</div></div>\n<p>Here d/m→0. For d−1≤(m−1)/2, the sum is at most</p>\n<div class=\"equation-block\"><div class=\"equation-content\">\\[\n d\\left(\\frac{e(m-1)}{d-1}\\right)^{d-1}.\n\\]</div></div>\n<p>Its logarithm is o(m)=o((ln n)²), since (d/m)ln(m/d)→0. Consequently</p>\n<div class=\"equation-block\"><div class=\"equation-content\">\\[\n \\log\\Pr\\{\\exists s:\\mathrm{cl}(X_n,s)\\ge k\\}\n \\le\\left[\\frac{c-c^2/2}{\\ln2}+o(1)\\right](\\ln n)^2\\to-\\infty.\n\\]</div></div>\n<p>This holds for every fixed c&gt;2 and every fixed c′ above the theorem's required constant. It contradicts its asserted probability tending to one. The argument works unchanged with the floor used inside the proof, so integer rounding cannot resolve the error.</p>\n<p>For a reproducible numerical illustration, choose c=10, c′=80&gt;100/(2 ln2), n=2^64. Then k=640, m=204480 and d=41514. The displayed elementary bound has natural logarithm below −5628; exact stable summation of the binomial terms with binom(n,k)≤n^k/k! gives below −13676. These numerical illustrations supplement the exact asymptotic contradiction.</p>\n<p>The failed proof step can also be identified geometrically. PDF page 8 treats the intersection of the two positive hemispheres for separated directions as lying in a cap of height sin(θ/2). For directions at angle θ its exact Gaussian probability is (π−θ)/(2π), independent of d, rather than O(1/(dθ²)). For example take s±=(cos(θ/2),±sin(θ/2),0), and u=(δ,0,√(1−δ²)) with 0&lt;δ&lt;sin(θ/2). Both products ⟨u,s±⟩ are positive, while the midpoint product δ is below the claimed cap height. The cap substitution is the proof mechanism of the same threshold error, not an additional issue.</p>\n<p><strong>Reason for rejection.</strong> This invalidates one of the main dimension-threshold contributions and its explicitly advertised matching order. Indeed the same first-moment argument rules out these cliques at every d=o((ln n)²), whereas the paper's elementary shattering observation on page 5 supplies them at d≥binom(k,2)=Θ((ln n)²). The claimed ln ln n improvement is therefore false, not a constant or typographical correction. Other clique and chromatic-number conclusions can survive without preserving this central result.</p>\n<p><strong>Discovery method.</strong> The second-moment proof's dimension-dependent shared-edge bound conflicted with the dimension-free probability of an intersection of two Gaussian halfspaces. Tracing the paper's Lemma 1 suggested counting all-positive realizable orientations directly.</p>\n<p><strong>Verification method.</strong> Re-read the original model, logarithm convention, Theorem 2(iv), Lemma 1, proof and relevant appendix geometry; inspect rendered PDF pages 3–5 and 7–8; derive the exact sign-symmetry probability and union-bound asymptotics; evaluate stable binomial sums and elementary bounds; obtain independent bounded original-PDF mathematical QA. Controls and the independent derivation are retained under <code>[unpublished artifact reference omitted]</code>.</p>\n<p><strong>Confidence.</strong> <strong>High.</strong> The exact count follows from the paper's own lemma under its Gaussian assumptions, handles the closed inequality and adaptive choice of direction, and gives the opposite limiting probability. Independent derivation agrees.</p>\n",
           "source_body_sha256": "e102bda256a8ebdd5d09a87171653fe405e552438cfa822b8d0e3b1ce7bec14b",
-          "export_text_sha256": "5f85f7e7181d1ce0a6ca35fe463b908d45fbcaf700230f5ae0a46acb4399153b",
-          "private_reference_substitutions": 2,
+          "export_text_sha256": "d737a66469cf58773679fb55ee94cfc896fa9834e5815725023a7bd5aa765f62",
+          "private_reference_substitutions": 1,
           "display_equations": 5,
           "inline_equations": 0,
           "formatting_normalizations": []
@@ -214,13 +214,259 @@
           "title": "The adaptive rule retains DWD's diverging intercept on perfectly separable data",
           "source_heading": "## Issue 2015__accepted__v16-qiao15a__I01 — The adaptive rule retains DWD's diverging intercept on perfectly separable data",
           "markdown": "\n\n**Exact location.** Algorithm 1, PDF page 11 (printed 1557); Theorem 5, PDF pages 13–14 (printed 1559–1560), especially the integral identity with `0<n_o<=n_+` and the following bounded-intercept remark. The supporting argument is in Online Appendix 1, PDF pages 4–5, §6. The loss and norm-ball optimization are on original PDF pages 9–10, Eq. (3) and §3.2; the adaptive rule's imbalance rationale is on PDF pages 10–11.\n\n**Claim.** The paper proposes selecting the loss threshold adaptively to avoid DWD's sensitivity to imbalance. Theorem 5 considers FLAME solutions trained with a parameter satisfying the Algorithm 1 fixed-point equation\n\n    theta* = 1/[g_(n_+)(theta*) sqrt(C)].\n\nFor `m=n_-/n_+`, it gives a weighted-mean direction equation and requires\n\n    integral (x' omega* + beta*)^-2 dF_-(x | E) = n_+ C/n_o,\n    0 < n_o <= n_+,\n\nwhere `E={1/[Y(X'omega*+beta*)] >= theta* sqrt(C)}` for a majority sample. The accompanying text explicitly contrasts this with DWD: the resulting FLAME intercept is finite and does not diverge as `m` grows. The theorem states no assumption excluding point-mass feature distributions, repeated majority observations or cutoff ties. The “surrounds” condition immediately above belongs to Theorem 4, not Theorem 5.\n\n**Error and evidence.** For each integer `k>=5`, use the following one dimensional, perfectly separable sample:\n\n    C=1; n_+=1; n_-=m=k^2;\n    positive observation x_+=4;\n    every negative observation x_-=0, so F_-=delta_0.\n\nThe printed norm constraint is `|omega|<=1`. The exact FLAME loss is\n\n    L_theta(u) = 2-theta-u,                    u<=1;\n                 max(1/u-theta, 0),           u>1.\n\nAt Algorithm 1's initial `theta=0`, the unique optimum is\n\n    omega=1, beta=-k.\n\nThe positive margin is `4-k<0`; every negative margin is `k>1`. Here is a global certificate covering every alternative margin branch. At these margins, valid supporting slopes for the convex loss are `-1` at the positive margin and `-1/k^2` at every negative margin. For any feasible `(w,b)`, summing the supporting inequalities gives\n\n    F_theta(w,b) >= F_theta(1,-k) + 4(1-w)\n                 >= F_theta(1,-k),\n\nbecause the intercept coefficients cancel: `-1 + k^2/k^2 = 0`. For `theta=0`, these slopes are ordinary derivatives. This certifies the global optimum, rather than assuming in advance that all alternative solutions stay in the same loss branches.\n\nEvery majority order statistic is `k`. Algorithm 1 therefore sets `theta_1=1/k`. At this threshold, every majority margin is exactly at the loss cutoff and has zero loss. The cutoff subdifferential is `[-1/k^2,0]`; choosing its left endpoint at all `k^2` majority observations gives the same global supporting inequality. Consequently `(omega,beta)=(1,-k)` remains the global optimum.\n\nThere is no alternative optimum through which the algorithm can escape. The strict term `4(1-w)` forces `w=1`. With `w=1`, the objective has slope `-1` just below `b=-k`, slope zero immediately to its right only at the endpoint, and strictly positive slope for any small right increment (`-1+k^2/b^2>0`). Convexity then makes `b=-k` its unique minimizer. Thus `theta_2=theta_1=1/k` and Algorithm 1 terminates at precisely the fixed point required by Theorem 5.\n\nThe conclusion fails exactly:\n\n- `E` has probability one, since each inverse majority margin equals `1/k=theta*` and the theorem includes equality.\n- The integral on the left of the asserted identity is `1/k^2`, whereas its right side is `1/n_o>=1`. No permitted `n_o` makes them equal.\n- `beta*=-k` diverges to negative infinity as `m=k^2` grows.\n- The fitted score is `x-k`. It misclassifies every minority observation for every `k>=5`, although the two classes are perfectly linearly separable. Its mean within-class error is `1/2`.\n\nThis is not a limitation of the FLAME family itself. At its SVM endpoint `theta=1`, the feasible separator `omega=1/2,beta=-1` has functional margin one on both feature values, total hinge loss zero, and correct classification of both classes. Every zero-hinge-loss solution separates them correctly. The published adaptive procedure instead stops at the failing DWD-like threshold.\n\nThe formulation change to a quadratic penalty does not resolve the theorem. For any fixed `lambda>0` and sufficiently large `k`, the averaged loss plus `lambda*omega^2/2` has the global optimum\n\n    omega* = 4/[(k^2+1)lambda] > 0,\n    beta* = -k, theta* = 1/k.\n\nThe positive margin remains below one. Its direction derivative is `-4/(k^2+1)+lambda*omega*=0`; the same majority cutoff subgradients make the intercept derivative zero. Convexity certifies the optimum. In fact Theorem 5's direction equation is satisfied, since its tilted majority mean is zero; it is the integral/finite-intercept inference that fails. No fixed penalty is silently identified with the norm-ball constraint across different thresholds.\n\nThe precise proof failure is the assertion on supplement page 4 that there are at most `n_+` majority samples with nonnegative reduced loss. Aligning an order statistic with the cutoff does not imply that count when fitted margins tie. In the example all `k^2` majority observations tie at zero reduced loss, and all of their cutoff subgradients are needed to balance the positive observation's derivative. Replacing them by at most one full observation gives the false integral identity. A correct first-order description must retain cutoff subgradient mass.\n\nThe same proof also says it assumes positive functional margins for the minority. This is absent from the stated theorem and is not a consequence of imbalance or Algorithm 1; the counterexample shows the opposite. The proof's linear minority-loss formula actually permits negative margins. Moreover, even if its positivity sentence is imposed literally, its integral identity still fails: take any large integer `k`, set the positive feature to `k+1/2`, and keep all other values above. The same global supporting certificate gives `omega=1,beta=-k,theta=1/k`, now with positive minority margin `1/2`, yet the integral is still `1/k^2<1`. This additional family checks the formal identity under that sentence; it is not used as a fixed-minority-distribution asymptotic construction. Reading that sentence as an extra restriction would already assume correct minority classification and would not establish the advertised general adaptive resistance. It therefore cannot validate the theorem or algorithmic claim as written.\n\n**Reason for rejection.** Explaining and addressing imbalance through the family and its adaptive threshold is a central contribution in the abstract, §4 and §5.2. Theorem 5 is the proposed theoretical contrast with DWD's diverging intercept. The exact published adaptive procedure instead has a unique, terminating fixed point with the same divergence and total minority failure, on a legal perfectly separable problem where another member of the same family succeeds.\n\nCorrecting a sign, treating an integral as an approximation, or ignoring zero-loss observations cannot fix this: the failure is exact for every `k>=5`, the point-mass population is the exact sampling law, and the zero-loss cutoff observations contribute essential subgradients. Forcing `theta` above a positive lower bound, choosing the SVM endpoint, or changing how cutoff piles determine the adaptive update can repair this example, but Algorithm 1 supplies no such rule. Establishing its intended imbalance guarantee would require a materially revised adaptive procedure or a withdrawal/reformulation of that central theoretical claim. I would change accept to reject for the paper as written on that basis.\n\nThe convex interpolation and Fisher calibration are not refuted. Nor does this finding establish failure on generic continuous Gaussian samples, invalidate all other asymptotic results, or prove that the historical simulations or lung-data curves are numerically wrong. Separate minimum-norm tie corrections in the HDLSS proof and an adaptive cross-validation limitation were checked and retained in the private coverage notes; they are not additional qualifying issues.\n\n**Discovery method.** While tracing the imbalance proof, I noticed that the order-statistic cutoff was converted into a bound on the number of influential majority observations, without accounting for a cutoff pile. I first tested collapsed margins, then replaced that example by distinct, perfectly separable classes to check whether the consequence affected the claimed adaptive benefit.\n\n**Verification method.** I rechecked the loss, norm-ball objective, Algorithm 1, Theorem 5 and supplement §6 against the original rendered pages. The global supporting inequality and uniqueness argument verify every margin branch and the exact algorithmic fixed point. A rational-arithmetic script checks five integer families and 350 branch/boundary controls, with the penalized version checked separately. Independent bounded audits read the critical originals and verified the certificate, uniqueness, the additional positive-margin identity counterexample, and centrality; their coverage is narrower than this full-paper review. The supporting files are in `[unpublished artifact reference omitted]`, particularly `imbalance-candidate.md`, `exact-separable-certificate.py` and `exact-separable-certificate-results.json`. These are mathematical checks, not runs of recovered historical FLAME code; that implementation was not recovered.\n\n**Confidence.** High mathematical confidence; moderately high rejection confidence. The exact global optimum, unique adaptive fixed point and impossible theorem identity have been checked independently. The rejection assessment is narrowly tied to the central adaptive imbalance claim, with the atomic majority distribution and surviving results stated explicitly.\n",
-          "html": "<p><strong>Exact location.</strong> Algorithm 1, PDF page 11 (printed 1557); Theorem 5, PDF pages 13–14 (printed 1559–1560), especially the integral identity with <code>0&lt;n_o&lt;=n_+</code> and the following bounded-intercept remark. The supporting argument is in Online Appendix 1, PDF pages 4–5, §6. The loss and norm-ball optimization are on original PDF pages 9–10, Eq. (3) and §3.2; the adaptive rule's imbalance rationale is on PDF pages 10–11.</p>\n<p><strong>Claim.</strong> The paper proposes selecting the loss threshold adaptively to avoid DWD's sensitivity to imbalance. Theorem 5 considers FLAME solutions trained with a parameter satisfying the Algorithm 1 fixed-point equation</p>\n<pre><code>theta* = 1/[g_(n_+)(theta*) sqrt(C)].\n</code></pre>\n<p>For <code>m=n_-/n_+</code>, it gives a weighted-mean direction equation and requires</p>\n<pre><code>integral (x' omega* + beta*)^-2 dF_-(x | E) = n_+ C/n_o,\n0 &lt; n_o &lt;= n_+,\n</code></pre>\n<p>where <code>E={1/[Y(X'omega*+beta*)] &gt;= theta* sqrt(C)}</code> for a majority sample. The accompanying text explicitly contrasts this with DWD: the resulting FLAME intercept is finite and does not diverge as <code>m</code> grows. The theorem states no assumption excluding point-mass feature distributions, repeated majority observations or cutoff ties. The “surrounds” condition immediately above belongs to Theorem 4, not Theorem 5.</p>\n<p><strong>Error and evidence.</strong> For each integer <code>k&gt;=5</code>, use the following one dimensional, perfectly separable sample:</p>\n<pre><code>C=1; n_+=1; n_-=m=k^2;\npositive observation x_+=4;\nevery negative observation x_-=0, so F_-=delta_0.\n</code></pre>\n<p>The printed norm constraint is <code>|omega|&lt;=1</code>. The exact FLAME loss is</p>\n<pre><code>L_theta(u) = 2-theta-u,                    u&lt;=1;\n             max(1/u-theta, 0),           u&gt;1.\n</code></pre>\n<p>At Algorithm 1's initial <code>theta=0</code>, the unique optimum is</p>\n<pre><code>omega=1, beta=-k.\n</code></pre>\n<p>The positive margin is <code>4-k&lt;0</code>; every negative margin is <code>k&gt;1</code>. Here is a global certificate covering every alternative margin branch. At these margins, valid supporting slopes for the convex loss are <code>-1</code> at the positive margin and <code>-1/k^2</code> at every negative margin. For any feasible <code>(w,b)</code>, summing the supporting inequalities gives</p>\n<pre><code>F_theta(w,b) &gt;= F_theta(1,-k) + 4(1-w)\n             &gt;= F_theta(1,-k),\n</code></pre>\n<p>because the intercept coefficients cancel: <code>-1 + k^2/k^2 = 0</code>. For <code>theta=0</code>, these slopes are ordinary derivatives. This certifies the global optimum, rather than assuming in advance that all alternative solutions stay in the same loss branches.</p>\n<p>Every majority order statistic is <code>k</code>. Algorithm 1 therefore sets <code>theta_1=1/k</code>. At this threshold, every majority margin is exactly at the loss cutoff and has zero loss. The cutoff subdifferential is <code>[-1/k^2,0]</code>; choosing its left endpoint at all <code>k^2</code> majority observations gives the same global supporting inequality. Consequently <code>(omega,beta)=(1,-k)</code> remains the global optimum.</p>\n<p>There is no alternative optimum through which the algorithm can escape. The strict term <code>4(1-w)</code> forces <code>w=1</code>. With <code>w=1</code>, the objective has slope <code>-1</code> just below <code>b=-k</code>, slope zero immediately to its right only at the endpoint, and strictly positive slope for any small right increment (<code>-1+k^2/b^2&gt;0</code>). Convexity then makes <code>b=-k</code> its unique minimizer. Thus <code>theta_2=theta_1=1/k</code> and Algorithm 1 terminates at precisely the fixed point required by Theorem 5.</p>\n<p>The conclusion fails exactly:</p>\n<ul>\n<li><code>E</code> has probability one, since each inverse majority margin equals <code>1/k=theta*</code> and the theorem includes equality.</li>\n<li>The integral on the left of the asserted identity is <code>1/k^2</code>, whereas its right side is <code>1/n_o&gt;=1</code>. No permitted <code>n_o</code> makes them equal.</li>\n<li><code>beta*=-k</code> diverges to negative infinity as <code>m=k^2</code> grows.</li>\n<li>The fitted score is <code>x-k</code>. It misclassifies every minority observation for every <code>k&gt;=5</code>, although the two classes are perfectly linearly separable. Its mean within-class error is <code>1/2</code>.</li>\n</ul>\n<p>This is not a limitation of the FLAME family itself. At its SVM endpoint <code>theta=1</code>, the feasible separator <code>omega=1/2,beta=-1</code> has functional margin one on both feature values, total hinge loss zero, and correct classification of both classes. Every zero-hinge-loss solution separates them correctly. The published adaptive procedure instead stops at the failing DWD-like threshold.</p>\n<p>The formulation change to a quadratic penalty does not resolve the theorem. For any fixed <code>lambda&gt;0</code> and sufficiently large <code>k</code>, the averaged loss plus <code>lambda*omega^2/2</code> has the global optimum</p>\n<pre><code>omega* = 4/[(k^2+1)lambda] &gt; 0,\nbeta* = -k, theta* = 1/k.\n</code></pre>\n<p>The positive margin remains below one. Its direction derivative is <code>-4/(k^2+1)+lambda*omega*=0</code>; the same majority cutoff subgradients make the intercept derivative zero. Convexity certifies the optimum. In fact Theorem 5's direction equation is satisfied, since its tilted majority mean is zero; it is the integral/finite-intercept inference that fails. No fixed penalty is silently identified with the norm-ball constraint across different thresholds.</p>\n<p>The precise proof failure is the assertion on supplement page 4 that there are at most <code>n_+</code> majority samples with nonnegative reduced loss. Aligning an order statistic with the cutoff does not imply that count when fitted margins tie. In the example all <code>k^2</code> majority observations tie at zero reduced loss, and all of their cutoff subgradients are needed to balance the positive observation's derivative. Replacing them by at most one full observation gives the false integral identity. A correct first-order description must retain cutoff subgradient mass.</p>\n<p>The same proof also says it assumes positive functional margins for the minority. This is absent from the stated theorem and is not a consequence of imbalance or Algorithm 1; the counterexample shows the opposite. The proof's linear minority-loss formula actually permits negative margins. Moreover, even if its positivity sentence is imposed literally, its integral identity still fails: take any large integer <code>k</code>, set the positive feature to <code>k+1/2</code>, and keep all other values above. The same global supporting certificate gives <code>omega=1,beta=-k,theta=1/k</code>, now with positive minority margin <code>1/2</code>, yet the integral is still <code>1/k^2&lt;1</code>. This additional family checks the formal identity under that sentence; it is not used as a fixed-minority-distribution asymptotic construction. Reading that sentence as an extra restriction would already assume correct minority classification and would not establish the advertised general adaptive resistance. It therefore cannot validate the theorem or algorithmic claim as written.</p>\n<p><strong>Reason for rejection.</strong> Explaining and addressing imbalance through the family and its adaptive threshold is a central contribution in the abstract, §4 and §5.2. Theorem 5 is the proposed theoretical contrast with DWD's diverging intercept. The exact published adaptive procedure instead has a unique, terminating fixed point with the same divergence and total minority failure, on a legal perfectly separable problem where another member of the same family succeeds.</p>\n<p>Correcting a sign, treating an integral as an approximation, or ignoring zero-loss observations cannot fix this: the failure is exact for every <code>k&gt;=5</code>, the point-mass population is the exact sampling law, and the zero-loss cutoff observations contribute essential subgradients. Forcing <code>theta</code> above a positive lower bound, choosing the SVM endpoint, or changing how cutoff piles determine the adaptive update can repair this example, but Algorithm 1 supplies no such rule. Establishing its intended imbalance guarantee would require a materially revised adaptive procedure or a withdrawal/reformulation of that central theoretical claim. I would change accept to reject for the paper as written on that basis.</p>\n<p>The convex interpolation and Fisher calibration are not refuted. Nor does this finding establish failure on generic continuous Gaussian samples, invalidate all other asymptotic results, or prove that the historical simulations or lung-data curves are numerically wrong. Separate minimum-norm tie corrections in the HDLSS proof and an adaptive cross-validation limitation were checked and retained in the private coverage notes; they are not additional qualifying issues.</p>\n<p><strong>Discovery method.</strong> While tracing the imbalance proof, I noticed that the order-statistic cutoff was converted into a bound on the number of influential majority observations, without accounting for a cutoff pile. I first tested collapsed margins, then replaced that example by distinct, perfectly separable classes to check whether the consequence affected the claimed adaptive benefit.</p>\n<p><strong>Verification method.</strong> I rechecked the loss, norm-ball objective, Algorithm 1, Theorem 5 and supplement §6 against the original rendered pages. The global supporting inequality and uniqueness argument verify every margin branch and the exact algorithmic fixed point. A rational-arithmetic script checks five integer families and 350 branch/boundary controls, with the penalized version checked separately. Independent bounded audits read the critical originals and verified the certificate, uniqueness, the additional positive-margin identity counterexample, and centrality; their coverage is narrower than this full-paper review. The supporting files are in <code>[unpublished artifact reference omitted]</code>, particularly <code>imbalance-candidate.md</code>, <code>exact-separable-certificate.py</code> and <code>exact-separable-certificate-results.json</code>. These are mathematical checks, not runs of recovered historical FLAME code; that implementation was not recovered.</p>\n<p><strong>Confidence.</strong> High mathematical confidence; moderately high rejection confidence. The exact global optimum, unique adaptive fixed point and impossible theorem identity have been checked independently. The rejection assessment is narrowly tied to the central adaptive imbalance claim, with the atomic majority distribution and surviving results stated explicitly.</p>\n",
+          "html": "<p><strong>Exact location.</strong> Algorithm 1, PDF page 11 (printed 1557); Theorem 5, PDF pages 13–14 (printed 1559–1560), especially the integral identity with <code>0&lt;n_o&lt;=n_+</code> and the following bounded-intercept remark. The supporting argument is in Online Appendix 1, PDF pages 4–5, §6. The loss and norm-ball optimization are on original PDF pages 9–10, Eq. (3) and §3.2; the adaptive rule's imbalance rationale is on PDF pages 10–11.</p>\n<p><strong>Claim.</strong> The paper proposes selecting the loss threshold adaptively to avoid DWD's sensitivity to imbalance. Theorem 5 considers FLAME solutions trained with a parameter satisfying the Algorithm 1 fixed-point equation</p>\n<pre><code>theta* = 1/[g_(n_+)(theta*) sqrt(C)].\n</code></pre>\n<p>For <code>m=n_-/n_+</code>, it gives a weighted-mean direction equation and requires</p>\n<pre><code>integral (x' omega* + beta*)^-2 dF_-(x | E) = n_+ C/n_o,\n0 &lt; n_o &lt;= n_+,\n</code></pre>\n<p>where <span class=\"source-math\">\\(E=\\{1/[Y(X^{\\prime}\\omega *+\\beta *)] \\ge  \\theta * \\operatorname{sqrt}(C)\\}\\)</span> for a majority sample. The accompanying text explicitly contrasts this with DWD: the resulting FLAME intercept is finite and does not diverge as <span class=\"source-math\">\\(m\\)</span> grows. The theorem states no assumption excluding point-mass feature distributions, repeated majority observations or cutoff ties. The “surrounds” condition immediately above belongs to Theorem 4, not Theorem 5.</p>\n<p><strong>Error and evidence.</strong> For each integer <span class=\"source-math\">\\(k\\ge 5\\)</span>, use the following one dimensional, perfectly separable sample:</p>\n<pre><code>C=1; n_+=1; n_-=m=k^2;\npositive observation x_+=4;\nevery negative observation x_-=0, so F_-=delta_0.\n</code></pre>\n<p>The printed norm constraint is <span class=\"source-math\">\\(|\\omega |\\le 1\\)</span>. The exact FLAME loss is</p>\n<pre><code>L_theta(u) = 2-theta-u,                    u&lt;=1;\n             max(1/u-theta, 0),           u&gt;1.\n</code></pre>\n<p>At Algorithm 1's initial <span class=\"source-math\">\\(\\theta =0\\)</span>, the unique optimum is</p>\n<pre><code>omega=1, beta=-k.\n</code></pre>\n<p>The positive margin is <span class=\"source-math\">\\(4-k&lt;0\\)</span>; every negative margin is <span class=\"source-math\">\\(k&gt;1\\)</span>. Here is a global certificate covering every alternative margin branch. At these margins, valid supporting slopes for the convex loss are <span class=\"source-math\">\\(-1\\)</span> at the positive margin and <span class=\"source-math\">\\(-1/k^{2}\\)</span> at every negative margin. For any feasible <span class=\"source-math\">\\((w,b)\\)</span>, summing the supporting inequalities gives</p>\n<pre><code>F_theta(w,b) &gt;= F_theta(1,-k) + 4(1-w)\n             &gt;= F_theta(1,-k),\n</code></pre>\n<p>because the intercept coefficients cancel: <span class=\"source-math\">\\(-1 + k^{2}/k^{2} = 0\\)</span>. For <span class=\"source-math\">\\(\\theta =0\\)</span>, these slopes are ordinary derivatives. This certifies the global optimum, rather than assuming in advance that all alternative solutions stay in the same loss branches.</p>\n<p>Every majority order statistic is <span class=\"source-math\">\\(k\\)</span>. Algorithm 1 therefore sets <span class=\"source-math\">\\(\\theta _{1}=1/k\\)</span>. At this threshold, every majority margin is exactly at the loss cutoff and has zero loss. The cutoff subdifferential is <span class=\"source-math\">\\([-1/k^{2},0]\\)</span>; choosing its left endpoint at all <span class=\"source-math\">\\(k^{2}\\)</span> majority observations gives the same global supporting inequality. Consequently <span class=\"source-math\">\\((\\omega ,\\beta )=(1,-k)\\)</span> remains the global optimum.</p>\n<p>There is no alternative optimum through which the algorithm can escape. The strict term <span class=\"source-math\">\\(4(1-w)\\)</span> forces <span class=\"source-math\">\\(w=1\\)</span>. With <span class=\"source-math\">\\(w=1\\)</span>, the objective has slope <span class=\"source-math\">\\(-1\\)</span> just below <span class=\"source-math\">\\(b=-k\\)</span>, slope zero immediately to its right only at the endpoint, and strictly positive slope for any small right increment (<span class=\"source-math\">\\(-1+k^{2}/b^{2}&gt;0\\)</span>). Convexity then makes <span class=\"source-math\">\\(b=-k\\)</span> its unique minimizer. Thus <span class=\"source-math\">\\(\\theta _{2}=\\theta _{1}=1/k\\)</span> and Algorithm 1 terminates at precisely the fixed point required by Theorem 5.</p>\n<p>The conclusion fails exactly:</p>\n<ul>\n<li><span class=\"source-math\">\\(E\\)</span> has probability one, since each inverse majority margin equals <span class=\"source-math\">\\(1/k=\\theta *\\)</span> and the theorem includes equality.</li>\n<li>The integral on the left of the asserted identity is <span class=\"source-math\">\\(1/k^{2}\\)</span>, whereas its right side is <span class=\"source-math\">\\(1/n_{o}\\ge 1\\)</span>. No permitted <span class=\"source-math\">\\(n_{o}\\)</span> makes them equal.</li>\n<li><span class=\"source-math\">\\(\\beta *=-k\\)</span> diverges to negative infinity as <span class=\"source-math\">\\(m=k^{2}\\)</span> grows.</li>\n<li>The fitted score is <span class=\"source-math\">\\(x-k\\)</span>. It misclassifies every minority observation for every <span class=\"source-math\">\\(k\\ge 5\\)</span>, although the two classes are perfectly linearly separable. Its mean within-class error is <span class=\"source-math\">\\(\\frac{1}{2}\\)</span>.</li>\n</ul>\n<p>This is not a limitation of the FLAME family itself. At its SVM endpoint <span class=\"source-math\">\\(\\theta =1\\)</span>, the feasible separator <span class=\"source-math\">\\(\\omega =1/2,\\beta =-1\\)</span> has functional margin one on both feature values, total hinge loss zero, and correct classification of both classes. Every zero-hinge-loss solution separates them correctly. The published adaptive procedure instead stops at the failing DWD-like threshold.</p>\n<p>The formulation change to a quadratic penalty does not resolve the theorem. For any fixed <span class=\"source-math\">\\(\\lambda &gt;0\\)</span> and sufficiently large <span class=\"source-math\">\\(k\\)</span>, the averaged loss plus <span class=\"source-math\">\\(\\lambda *\\omega ^{2}/2\\)</span> has the global optimum</p>\n<pre><code>omega* = 4/[(k^2+1)lambda] &gt; 0,\nbeta* = -k, theta* = 1/k.\n</code></pre>\n<p>The positive margin remains below one. Its direction derivative is <span class=\"source-math\">\\(-4/(k^{2}+1)+\\lambda *\\omega *=0\\)</span>; the same majority cutoff subgradients make the intercept derivative zero. Convexity certifies the optimum. In fact Theorem 5's direction equation is satisfied, since its tilted majority mean is zero; it is the integral/finite-intercept inference that fails. No fixed penalty is silently identified with the norm-ball constraint across different thresholds.</p>\n<p>The precise proof failure is the assertion on supplement page 4 that there are at most <code>n_+</code> majority samples with nonnegative reduced loss. Aligning an order statistic with the cutoff does not imply that count when fitted margins tie. In the example all <span class=\"source-math\">\\(k^{2}\\)</span> majority observations tie at zero reduced loss, and all of their cutoff subgradients are needed to balance the positive observation's derivative. Replacing them by at most one full observation gives the false integral identity. A correct first-order description must retain cutoff subgradient mass.</p>\n<p>The same proof also says it assumes positive functional margins for the minority. This is absent from the stated theorem and is not a consequence of imbalance or Algorithm 1; the counterexample shows the opposite. The proof's linear minority-loss formula actually permits negative margins. Moreover, even if its positivity sentence is imposed literally, its integral identity still fails: take any large integer <span class=\"source-math\">\\(k\\)</span>, set the positive feature to <span class=\"source-math\">\\(k+1/2\\)</span>, and keep all other values above. The same global supporting certificate gives <span class=\"source-math\">\\(\\omega =1,\\beta =-k,\\theta =1/k\\)</span>, now with positive minority margin <span class=\"source-math\">\\(\\frac{1}{2}\\)</span>, yet the integral is still <span class=\"source-math\">\\(1/k^{2}&lt;1\\)</span>. This additional family checks the formal identity under that sentence; it is not used as a fixed-minority-distribution asymptotic construction. Reading that sentence as an extra restriction would already assume correct minority classification and would not establish the advertised general adaptive resistance. It therefore cannot validate the theorem or algorithmic claim as written.</p>\n<p><strong>Reason for rejection.</strong> Explaining and addressing imbalance through the family and its adaptive threshold is a central contribution in the abstract, §4 and §5.2. Theorem 5 is the proposed theoretical contrast with DWD's diverging intercept. The exact published adaptive procedure instead has a unique, terminating fixed point with the same divergence and total minority failure, on a legal perfectly separable problem where another member of the same family succeeds.</p>\n<p>Correcting a sign, treating an integral as an approximation, or ignoring zero-loss observations cannot fix this: the failure is exact for every <span class=\"source-math\">\\(k\\ge 5\\)</span>, the point-mass population is the exact sampling law, and the zero-loss cutoff observations contribute essential subgradients. Forcing <span class=\"source-math\">\\(\\theta\\)</span> above a positive lower bound, choosing the SVM endpoint, or changing how cutoff piles determine the adaptive update can repair this example, but Algorithm 1 supplies no such rule. Establishing its intended imbalance guarantee would require a materially revised adaptive procedure or a withdrawal/reformulation of that central theoretical claim. I would change accept to reject for the paper as written on that basis.</p>\n<p>The convex interpolation and Fisher calibration are not refuted. Nor does this finding establish failure on generic continuous Gaussian samples, invalidate all other asymptotic results, or prove that the historical simulations or lung-data curves are numerically wrong. Separate minimum-norm tie corrections in the HDLSS proof and an adaptive cross-validation limitation were checked and retained in the private coverage notes; they are not additional qualifying issues.</p>\n<p><strong>Discovery method.</strong> While tracing the imbalance proof, I noticed that the order-statistic cutoff was converted into a bound on the number of influential majority observations, without accounting for a cutoff pile. I first tested collapsed margins, then replaced that example by distinct, perfectly separable classes to check whether the consequence affected the claimed adaptive benefit.</p>\n<p><strong>Verification method.</strong> I rechecked the loss, norm-ball objective, Algorithm 1, Theorem 5 and supplement §6 against the original rendered pages. The global supporting inequality and uniqueness argument verify every margin branch and the exact algorithmic fixed point. A rational-arithmetic script checks five integer families and 350 branch/boundary controls, with the penalized version checked separately. Independent bounded audits read the critical originals and verified the certificate, uniqueness, the additional positive-margin identity counterexample, and centrality; their coverage is narrower than this full-paper review. The supporting files are in <code>[unpublished artifact reference omitted]</code>, particularly <code>imbalance-candidate.md</code>, <code>exact-separable-certificate.py</code> and <code>exact-separable-certificate-results.json</code>. These are mathematical checks, not runs of recovered historical FLAME code; that implementation was not recovered.</p>\n<p><strong>Confidence.</strong> High mathematical confidence; moderately high rejection confidence. The exact global optimum, unique adaptive fixed point and impossible theorem identity have been checked independently. The rejection assessment is narrowly tied to the central adaptive imbalance claim, with the atomic majority distribution and surviving results stated explicitly.</p>\n",
           "source_body_sha256": "0ef0770fd8f706750bac2537a8e851d6ab65a92b1b1fe7e7aaffeb8f5ca6ecc8",
           "export_text_sha256": "ce79d2ee953bfc46d62dbd9ec5d70cbb9773191f21d56ee26a724db4e84b9fe7",
           "private_reference_substitutions": 1,
           "display_equations": 0,
-          "inline_equations": 0,
-          "formatting_normalizations": []
+          "inline_equations": 49,
+          "formatting_normalizations": [
+            {
+              "rule": "literal_inline_notation",
+              "source": "E={1/[Y(X'omega*+beta*)] >= theta* sqrt(C)}",
+              "tex": "E=\\{1/[Y(X^{\\prime}\\omega *+\\beta *)] \\ge  \\theta * \\operatorname{sqrt}(C)\\}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "m",
+              "tex": "m"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "k>=5",
+              "tex": "k\\ge 5"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "|omega|<=1",
+              "tex": "|\\omega |\\le 1"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "theta=0",
+              "tex": "\\theta =0"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "4-k<0",
+              "tex": "4-k<0"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "k>1",
+              "tex": "k>1"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "-1",
+              "tex": "-1"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "-1/k^2",
+              "tex": "-1/k^{2}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "(w,b)",
+              "tex": "(w,b)"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "-1 + k^2/k^2 = 0",
+              "tex": "-1 + k^{2}/k^{2} = 0"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "theta=0",
+              "tex": "\\theta =0"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "k",
+              "tex": "k"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "theta_1=1/k",
+              "tex": "\\theta _{1}=1/k"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "[-1/k^2,0]",
+              "tex": "[-1/k^{2},0]"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "k^2",
+              "tex": "k^{2}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "(omega,beta)=(1,-k)",
+              "tex": "(\\omega ,\\beta )=(1,-k)"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "4(1-w)",
+              "tex": "4(1-w)"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "w=1",
+              "tex": "w=1"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "w=1",
+              "tex": "w=1"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "-1",
+              "tex": "-1"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "b=-k",
+              "tex": "b=-k"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "-1+k^2/b^2>0",
+              "tex": "-1+k^{2}/b^{2}>0"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "b=-k",
+              "tex": "b=-k"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "theta_2=theta_1=1/k",
+              "tex": "\\theta _{2}=\\theta _{1}=1/k"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "E",
+              "tex": "E"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "1/k=theta*",
+              "tex": "1/k=\\theta *"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "1/k^2",
+              "tex": "1/k^{2}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "1/n_o>=1",
+              "tex": "1/n_{o}\\ge 1"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "n_o",
+              "tex": "n_{o}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "beta*=-k",
+              "tex": "\\beta *=-k"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "m=k^2",
+              "tex": "m=k^{2}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "x-k",
+              "tex": "x-k"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "k>=5",
+              "tex": "k\\ge 5"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "1/2",
+              "tex": "\\frac{1}{2}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "theta=1",
+              "tex": "\\theta =1"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "omega=1/2,beta=-1",
+              "tex": "\\omega =1/2,\\beta =-1"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "lambda>0",
+              "tex": "\\lambda >0"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "k",
+              "tex": "k"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "lambda*omega^2/2",
+              "tex": "\\lambda *\\omega ^{2}/2"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "-4/(k^2+1)+lambda*omega*=0",
+              "tex": "-4/(k^{2}+1)+\\lambda *\\omega *=0"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "k^2",
+              "tex": "k^{2}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "k",
+              "tex": "k"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "k+1/2",
+              "tex": "k+1/2"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "omega=1,beta=-k,theta=1/k",
+              "tex": "\\omega =1,\\beta =-k,\\theta =1/k"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "1/2",
+              "tex": "\\frac{1}{2}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "1/k^2<1",
+              "tex": "1/k^{2}<1"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "k>=5",
+              "tex": "k\\ge 5"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "theta",
+              "tex": "\\theta"
+            }
+          ]
         }
       ]
     },
@@ -235,13 +481,114 @@
           "title": "The matching upper bound uses nonlinear predictors, leaving the headline linear-predictor tightness unsupported",
           "source_heading": "## Issue 2015__accepted__v16-shamir15a__I01 — The matching upper bound uses nonlinear predictors, leaving the headline linear-predictor tightness unsupported",
           "markdown": "\n\n**Exact location.** PDF 3 (printed 3477), §2, the Vovk–Azoury–Warmuth upper-bound bullet immediately following Theorem 1; PDF 4 (3478), the combined upper-bound display and optimality discussion. The learning problem is defined on PDF 1 (3475), whose abstract advertises tight sample complexity. Theorem 1 itself is not refuted by this finding.\n\n**Claim.** The paper requires an algorithm returning a fixed linear predictor `x -> <w,x>` with bounded-norm comparator class `||w||<=B`, under iid data, `||x||<=1`, and `|y|<=Y`. For `B>=2Y`, it proves a lower bound proportional to\n\n\\[\n\\min\\left\\{Y^2,\\frac{B^2+dY^2}{m},\\frac{BY}{\\sqrt m}\\right\\}.\n\\]\n\nIt then asserts an essentially matching upper bound for this problem, using the Vovk–Azoury–Warmuth (VAW) forecaster and standard online-to-batch conversion for the finite-dimensional branch\n\n\\[\nO\\!\\left(\\frac{B^2+dY^2\\log(1+m/d)}m\\right).\n\\]\n\nThis branch supplies the asserted tightness in finite dimensions and the subsequent optimal-parameter conclusions.\n\n**Error and evidence.** The cited forward forecaster does not produce a fixed linear function of a new input. Given previous examples, write\n\n\\[\nA=\\lambda I+\\sum_{s<t}x_sx_s^\\top,\n\\qquad b=\\sum_{s<t}y_sx_s.\n\\]\n\nIts next prediction is\n\n\\[\nf_t(x)=b^\\top(A+xx^\\top)^{-1}x.\n\\]\n\nThe coefficient depends on the current input. This is explicit in the cited original [Azoury–Warmuth paper](https://mwarmuth.bitbucket.io/pubs/J47.pdf), PDF 29, Eq. (5.12), printed page 239. Calling it an online linear-regression forecaster does not make its prediction function linear for the batch task.\n\nHere is an exact, legal one-dimensional membership check. Set `lambda=1`, `Y=1`, and let the first observed example be `(x1,y1)=(1,1)`. Then `A=2`, `b=1`, and\n\n\\[\nf_2(x)=\\frac{x}{2+x^2},\\qquad f_1(x)=0.\n\\]\n\nStandard averaging of the first two forecasting rules gives\n\n\\[\n\\bar f(x)=\\frac{x}{2(2+x^2)}.\n\\]\n\nBoth test inputs below satisfy `|x|<=1`, but\n\n\\[\n\\bar f(1)=\\frac16,\\qquad\n\\bar f(1/2)=\\frac19\\ne\\frac1{12}=\\frac12\\bar f(1).\n\\]\n\nThus there is no scalar `w` representing this output. Randomly choosing an iterate still sometimes returns the same nonlinear rule. Clipping its predictions does not restore linearity. These examples are a check of the claimed output type; they are not asserted to refute a numerical risk bound for every conceivable linear algorithm.\n\nKeeping the forward coefficients computed at the *training* inputs and averaging them would produce a different linear estimator. The standard online-to-batch argument would then require a new justification: those coefficients depend on the same current inputs at which their online losses were measured. They are not independent of those inputs conditional on the past. The cited loss guarantee for `f_t(x)` consequently does not become the future risk of this different fixed-coefficient estimator by the stated conversion.\n\nThe other immediate substitutions do not fill the gap:\n\n- The cited ordinary incremental ridge alternative, Azoury–Warmuth Theorem 4.6, PDF 21, bounds the maximum of both outcomes and predictions. Its parameter is not merely the label bound `Y` assumed here. Their proposed clipping makes the batch prediction nonlinear again; replacing the prediction bound by `B` changes the required parameter dependence.\n- The zero predictor and the cited mirror-descent algorithm are valid. [Srebro–Sridharan–Tewari Corollary 3](https://proceedings.neurips.cc/paper_files/paper/2010/file/76cf99d3614e23eabab16fb27e944bf9-Paper.pdf), PDF 5, averages fixed vectors in the constraint set and yields the stated dimension-free `O(BY/sqrt(m)+B²/m)` branch. It does not establish the missing finite-dimensional branch. For example, when `B=Y sqrt(d)` and `m/d` grows, that branch is separated from the asserted fast branch by an unbounded factor, even allowing the displayed logarithm.\n\nThe author's later [November 2021 clarification, arXiv v3](https://arxiv.org/pdf/1406.5143v3), PDF 3, explicitly identifies the VAW algorithms as nonlinear outputs outside Theorem 1's setting and changes the abstract to a lower-bound contribution. That corroborates the direct source and algebra checks above; the finding concerns the original JMLR PDF as written. No claim is made that a currently unknown alternative linear algorithm is impossible.\n\n**Reason for rejection.** Tight sample complexity for the specified linear-predictor problem is the abstract's central claim. Its matching finite-dimensional upper argument supplies a predictor outside that problem's output class, so the claimed upper/lower matching and resulting optimality conclusion are unsupported. Allowing nonlinear predictions changes the problem and prevents using this linear-only lower bound as a matching minimax lower bound. Withdrawing tightness leaves a meaningful new lower-bound paper, but withdraws the advertised resolution rather than correcting a constant or notation. Establishing the claimed linear upper rate would require an additional valid algorithm and proof absent from the paper. This is sufficient to reject the paper as written while preserving the valid lower-bound contribution.\n\n**Discovery method.** Tracing the finite-dimensional upper-bound reference raised the question of whether its input-dependent forward update returns a fixed linear coefficient after online-to-batch conversion. The distinction was then checked against the original model and source equations; later primary discussions corroborated it.\n\n**Verification method.** Read all 12 original pages and rechecked rendered PDF 1, 3, 4, 9 and 10. Read and inspected the original Azoury–Warmuth Eq. (5.12) and its incremental-ridge alternative, and checked Srebro et al.'s mirror-descent corollary. Exact rational arithmetic verifies the `1/9` versus `1/12` nonlinearity. Independent root review checked the original contribution/model/upper-bound locations and the same output-class failure. Separately, 84 parameter checks of the first lower construction and 180 checks of the dimension-dependent construction support the surviving lower bound; they are independent mathematical checks, not author software.\n\n**Confidence.** High mathematical confidence; moderately high rejection confidence. The failed output-type step is explicit and exact, and no original assumption resolves it. Rejection is scoped to the central unsupported tightness conclusion. Theorem 1 is not alleged false; neither the later disproof of an expressly labeled ERM conjecture nor any empirical failure is counted as an additional issue.\n",
-          "html": "<p><strong>Exact location.</strong> PDF 3 (printed 3477), §2, the Vovk–Azoury–Warmuth upper-bound bullet immediately following Theorem 1; PDF 4 (3478), the combined upper-bound display and optimality discussion. The learning problem is defined on PDF 1 (3475), whose abstract advertises tight sample complexity. Theorem 1 itself is not refuted by this finding.</p>\n<p><strong>Claim.</strong> The paper requires an algorithm returning a fixed linear predictor <code>x -&gt; &lt;w,x&gt;</code> with bounded-norm comparator class <code>||w||&lt;=B</code>, under iid data, <code>||x||&lt;=1</code>, and <code>|y|&lt;=Y</code>. For <code>B&gt;=2Y</code>, it proves a lower bound proportional to</p>\n<div class=\"equation-block\"><div class=\"equation-content\">\\[\n\\min\\left\\{Y^2,\\frac{B^2+dY^2}{m},\\frac{BY}{\\sqrt m}\\right\\}.\n\\]</div></div>\n<p>It then asserts an essentially matching upper bound for this problem, using the Vovk–Azoury–Warmuth (VAW) forecaster and standard online-to-batch conversion for the finite-dimensional branch</p>\n<div class=\"equation-block\"><div class=\"equation-content\">\\[\nO\\!\\left(\\frac{B^2+dY^2\\log(1+m/d)}m\\right).\n\\]</div></div>\n<p>This branch supplies the asserted tightness in finite dimensions and the subsequent optimal-parameter conclusions.</p>\n<p><strong>Error and evidence.</strong> The cited forward forecaster does not produce a fixed linear function of a new input. Given previous examples, write</p>\n<div class=\"equation-block\"><div class=\"equation-content\">\\[\nA=\\lambda I+\\sum_{s&lt;t}x_sx_s^\\top,\n\\qquad b=\\sum_{s&lt;t}y_sx_s.\n\\]</div></div>\n<p>Its next prediction is</p>\n<div class=\"equation-block\"><div class=\"equation-content\">\\[\nf_t(x)=b^\\top(A+xx^\\top)^{-1}x.\n\\]</div></div>\n<p>The coefficient depends on the current input. This is explicit in the cited original <a href=\"https://mwarmuth.bitbucket.io/pubs/J47.pdf\">Azoury–Warmuth paper</a>, PDF 29, Eq. (5.12), printed page 239. Calling it an online linear-regression forecaster does not make its prediction function linear for the batch task.</p>\n<p>Here is an exact, legal one-dimensional membership check. Set <code>lambda=1</code>, <code>Y=1</code>, and let the first observed example be <code>(x1,y1)=(1,1)</code>. Then <code>A=2</code>, <code>b=1</code>, and</p>\n<div class=\"equation-block\"><div class=\"equation-content\">\\[\nf_2(x)=\\frac{x}{2+x^2},\\qquad f_1(x)=0.\n\\]</div></div>\n<p>Standard averaging of the first two forecasting rules gives</p>\n<div class=\"equation-block\"><div class=\"equation-content\">\\[\n\\bar f(x)=\\frac{x}{2(2+x^2)}.\n\\]</div></div>\n<p>Both test inputs below satisfy <code>|x|&lt;=1</code>, but</p>\n<div class=\"equation-block\"><div class=\"equation-content\">\\[\n\\bar f(1)=\\frac16,\\qquad\n\\bar f(1/2)=\\frac19\\ne\\frac1{12}=\\frac12\\bar f(1).\n\\]</div></div>\n<p>Thus there is no scalar <code>w</code> representing this output. Randomly choosing an iterate still sometimes returns the same nonlinear rule. Clipping its predictions does not restore linearity. These examples are a check of the claimed output type; they are not asserted to refute a numerical risk bound for every conceivable linear algorithm.</p>\n<p>Keeping the forward coefficients computed at the <em>training</em> inputs and averaging them would produce a different linear estimator. The standard online-to-batch argument would then require a new justification: those coefficients depend on the same current inputs at which their online losses were measured. They are not independent of those inputs conditional on the past. The cited loss guarantee for <code>f_t(x)</code> consequently does not become the future risk of this different fixed-coefficient estimator by the stated conversion.</p>\n<p>The other immediate substitutions do not fill the gap:</p>\n<ul>\n<li>The cited ordinary incremental ridge alternative, Azoury–Warmuth Theorem 4.6, PDF 21, bounds the maximum of both outcomes and predictions. Its parameter is not merely the label bound <code>Y</code> assumed here. Their proposed clipping makes the batch prediction nonlinear again; replacing the prediction bound by <code>B</code> changes the required parameter dependence.</li>\n<li>The zero predictor and the cited mirror-descent algorithm are valid. <a href=\"https://proceedings.neurips.cc/paper_files/paper/2010/file/76cf99d3614e23eabab16fb27e944bf9-Paper.pdf\">Srebro–Sridharan–Tewari Corollary 3</a>, PDF 5, averages fixed vectors in the constraint set and yields the stated dimension-free <code>O(BY/sqrt(m)+B²/m)</code> branch. It does not establish the missing finite-dimensional branch. For example, when <code>B=Y sqrt(d)</code> and <code>m/d</code> grows, that branch is separated from the asserted fast branch by an unbounded factor, even allowing the displayed logarithm.</li>\n</ul>\n<p>The author's later <a href=\"https://arxiv.org/pdf/1406.5143v3\">November 2021 clarification, arXiv v3</a>, PDF 3, explicitly identifies the VAW algorithms as nonlinear outputs outside Theorem 1's setting and changes the abstract to a lower-bound contribution. That corroborates the direct source and algebra checks above; the finding concerns the original JMLR PDF as written. No claim is made that a currently unknown alternative linear algorithm is impossible.</p>\n<p><strong>Reason for rejection.</strong> Tight sample complexity for the specified linear-predictor problem is the abstract's central claim. Its matching finite-dimensional upper argument supplies a predictor outside that problem's output class, so the claimed upper/lower matching and resulting optimality conclusion are unsupported. Allowing nonlinear predictions changes the problem and prevents using this linear-only lower bound as a matching minimax lower bound. Withdrawing tightness leaves a meaningful new lower-bound paper, but withdraws the advertised resolution rather than correcting a constant or notation. Establishing the claimed linear upper rate would require an additional valid algorithm and proof absent from the paper. This is sufficient to reject the paper as written while preserving the valid lower-bound contribution.</p>\n<p><strong>Discovery method.</strong> Tracing the finite-dimensional upper-bound reference raised the question of whether its input-dependent forward update returns a fixed linear coefficient after online-to-batch conversion. The distinction was then checked against the original model and source equations; later primary discussions corroborated it.</p>\n<p><strong>Verification method.</strong> Read all 12 original pages and rechecked rendered PDF 1, 3, 4, 9 and 10. Read and inspected the original Azoury–Warmuth Eq. (5.12) and its incremental-ridge alternative, and checked Srebro et al.'s mirror-descent corollary. Exact rational arithmetic verifies the <code>1/9</code> versus <code>1/12</code> nonlinearity. Independent root review checked the original contribution/model/upper-bound locations and the same output-class failure. Separately, 84 parameter checks of the first lower construction and 180 checks of the dimension-dependent construction support the surviving lower bound; they are independent mathematical checks, not author software.</p>\n<p><strong>Confidence.</strong> High mathematical confidence; moderately high rejection confidence. The failed output-type step is explicit and exact, and no original assumption resolves it. Rejection is scoped to the central unsupported tightness conclusion. Theorem 1 is not alleged false; neither the later disproof of an expressly labeled ERM conjecture nor any empirical failure is counted as an additional issue.</p>\n",
+          "html": "<p><strong>Exact location.</strong> PDF 3 (printed 3477), §2, the Vovk–Azoury–Warmuth upper-bound bullet immediately following Theorem 1; PDF 4 (3478), the combined upper-bound display and optimality discussion. The learning problem is defined on PDF 1 (3475), whose abstract advertises tight sample complexity. Theorem 1 itself is not refuted by this finding.</p>\n<p><strong>Claim.</strong> The paper requires an algorithm returning a fixed linear predictor <span class=\"source-math\">\\(x \\to  &lt;w,x&gt;\\)</span> with bounded-norm comparator class <span class=\"source-math\">\\(\\lVert w\\rVert \\le B\\)</span>, under iid data, <span class=\"source-math\">\\(\\lVert x\\rVert \\le 1\\)</span>, and <span class=\"source-math\">\\(|y|\\le Y\\)</span>. For <span class=\"source-math\">\\(B\\ge 2Y\\)</span>, it proves a lower bound proportional to</p>\n<div class=\"equation-block\"><div class=\"equation-content\">\\[\n\\min\\left\\{Y^2,\\frac{B^2+dY^2}{m},\\frac{BY}{\\sqrt m}\\right\\}.\n\\]</div></div>\n<p>It then asserts an essentially matching upper bound for this problem, using the Vovk–Azoury–Warmuth (VAW) forecaster and standard online-to-batch conversion for the finite-dimensional branch</p>\n<div class=\"equation-block\"><div class=\"equation-content\">\\[\nO\\!\\left(\\frac{B^2+dY^2\\log(1+m/d)}m\\right).\n\\]</div></div>\n<p>This branch supplies the asserted tightness in finite dimensions and the subsequent optimal-parameter conclusions.</p>\n<p><strong>Error and evidence.</strong> The cited forward forecaster does not produce a fixed linear function of a new input. Given previous examples, write</p>\n<div class=\"equation-block\"><div class=\"equation-content\">\\[\nA=\\lambda I+\\sum_{s&lt;t}x_sx_s^\\top,\n\\qquad b=\\sum_{s&lt;t}y_sx_s.\n\\]</div></div>\n<p>Its next prediction is</p>\n<div class=\"equation-block\"><div class=\"equation-content\">\\[\nf_t(x)=b^\\top(A+xx^\\top)^{-1}x.\n\\]</div></div>\n<p>The coefficient depends on the current input. This is explicit in the cited original <a href=\"https://mwarmuth.bitbucket.io/pubs/J47.pdf\">Azoury–Warmuth paper</a>, PDF 29, Eq. (5.12), printed page 239. Calling it an online linear-regression forecaster does not make its prediction function linear for the batch task.</p>\n<p>Here is an exact, legal one-dimensional membership check. Set <span class=\"source-math\">\\(\\lambda =1\\)</span>, <span class=\"source-math\">\\(Y=1\\)</span>, and let the first observed example be <span class=\"source-math\">\\((x1,y1)=(1,1)\\)</span>. Then <span class=\"source-math\">\\(A=2\\)</span>, <span class=\"source-math\">\\(b=1\\)</span>, and</p>\n<div class=\"equation-block\"><div class=\"equation-content\">\\[\nf_2(x)=\\frac{x}{2+x^2},\\qquad f_1(x)=0.\n\\]</div></div>\n<p>Standard averaging of the first two forecasting rules gives</p>\n<div class=\"equation-block\"><div class=\"equation-content\">\\[\n\\bar f(x)=\\frac{x}{2(2+x^2)}.\n\\]</div></div>\n<p>Both test inputs below satisfy <span class=\"source-math\">\\(|x|\\le 1\\)</span>, but</p>\n<div class=\"equation-block\"><div class=\"equation-content\">\\[\n\\bar f(1)=\\frac16,\\qquad\n\\bar f(1/2)=\\frac19\\ne\\frac1{12}=\\frac12\\bar f(1).\n\\]</div></div>\n<p>Thus there is no scalar <span class=\"source-math\">\\(w\\)</span> representing this output. Randomly choosing an iterate still sometimes returns the same nonlinear rule. Clipping its predictions does not restore linearity. These examples are a check of the claimed output type; they are not asserted to refute a numerical risk bound for every conceivable linear algorithm.</p>\n<p>Keeping the forward coefficients computed at the <em>training</em> inputs and averaging them would produce a different linear estimator. The standard online-to-batch argument would then require a new justification: those coefficients depend on the same current inputs at which their online losses were measured. They are not independent of those inputs conditional on the past. The cited loss guarantee for <span class=\"source-math\">\\(f_{t}(x)\\)</span> consequently does not become the future risk of this different fixed-coefficient estimator by the stated conversion.</p>\n<p>The other immediate substitutions do not fill the gap:</p>\n<ul>\n<li>The cited ordinary incremental ridge alternative, Azoury–Warmuth Theorem 4.6, PDF 21, bounds the maximum of both outcomes and predictions. Its parameter is not merely the label bound <span class=\"source-math\">\\(Y\\)</span> assumed here. Their proposed clipping makes the batch prediction nonlinear again; replacing the prediction bound by <span class=\"source-math\">\\(B\\)</span> changes the required parameter dependence.</li>\n<li>The zero predictor and the cited mirror-descent algorithm are valid. <a href=\"https://proceedings.neurips.cc/paper_files/paper/2010/file/76cf99d3614e23eabab16fb27e944bf9-Paper.pdf\">Srebro–Sridharan–Tewari Corollary 3</a>, PDF 5, averages fixed vectors in the constraint set and yields the stated dimension-free <span class=\"source-math\">\\(O(BY/\\operatorname{sqrt}(m)+B^{2}/m)\\)</span> branch. It does not establish the missing finite-dimensional branch. For example, when <span class=\"source-math\">\\(B=Y \\operatorname{sqrt}(d)\\)</span> and <span class=\"source-math\">\\(\\frac{m}{d}\\)</span> grows, that branch is separated from the asserted fast branch by an unbounded factor, even allowing the displayed logarithm.</li>\n</ul>\n<p>The author's later <a href=\"https://arxiv.org/pdf/1406.5143v3\">November 2021 clarification, arXiv v3</a>, PDF 3, explicitly identifies the VAW algorithms as nonlinear outputs outside Theorem 1's setting and changes the abstract to a lower-bound contribution. That corroborates the direct source and algebra checks above; the finding concerns the original JMLR PDF as written. No claim is made that a currently unknown alternative linear algorithm is impossible.</p>\n<p><strong>Reason for rejection.</strong> Tight sample complexity for the specified linear-predictor problem is the abstract's central claim. Its matching finite-dimensional upper argument supplies a predictor outside that problem's output class, so the claimed upper/lower matching and resulting optimality conclusion are unsupported. Allowing nonlinear predictions changes the problem and prevents using this linear-only lower bound as a matching minimax lower bound. Withdrawing tightness leaves a meaningful new lower-bound paper, but withdraws the advertised resolution rather than correcting a constant or notation. Establishing the claimed linear upper rate would require an additional valid algorithm and proof absent from the paper. This is sufficient to reject the paper as written while preserving the valid lower-bound contribution.</p>\n<p><strong>Discovery method.</strong> Tracing the finite-dimensional upper-bound reference raised the question of whether its input-dependent forward update returns a fixed linear coefficient after online-to-batch conversion. The distinction was then checked against the original model and source equations; later primary discussions corroborated it.</p>\n<p><strong>Verification method.</strong> Read all 12 original pages and rechecked rendered PDF 1, 3, 4, 9 and 10. Read and inspected the original Azoury–Warmuth Eq. (5.12) and its incremental-ridge alternative, and checked Srebro et al.'s mirror-descent corollary. Exact rational arithmetic verifies the <span class=\"source-math\">\\(\\frac{1}{9}\\)</span> versus <span class=\"source-math\">\\(\\frac{1}{12}\\)</span> nonlinearity. Independent root review checked the original contribution/model/upper-bound locations and the same output-class failure. Separately, 84 parameter checks of the first lower construction and 180 checks of the dimension-dependent construction support the surviving lower bound; they are independent mathematical checks, not author software.</p>\n<p><strong>Confidence.</strong> High mathematical confidence; moderately high rejection confidence. The failed output-type step is explicit and exact, and no original assumption resolves it. Rejection is scoped to the central unsupported tightness conclusion. Theorem 1 is not alleged false; neither the later disproof of an expressly labeled ERM conjecture nor any empirical failure is counted as an additional issue.</p>\n",
           "source_body_sha256": "f9d2d508e6f51422a622ad4a154809023919c6ad6409e7c4c882014147571bcf",
           "export_text_sha256": "f9d2d508e6f51422a622ad4a154809023919c6ad6409e7c4c882014147571bcf",
           "private_reference_substitutions": 0,
           "display_equations": 7,
-          "inline_equations": 0,
-          "formatting_normalizations": []
+          "inline_equations": 20,
+          "formatting_normalizations": [
+            {
+              "rule": "literal_inline_notation",
+              "source": "x -> <w,x>",
+              "tex": "x \\to  <w,x>"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "||w||<=B",
+              "tex": "\\lVert w\\rVert \\le B"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "||x||<=1",
+              "tex": "\\lVert x\\rVert \\le 1"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "|y|<=Y",
+              "tex": "|y|\\le Y"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "B>=2Y",
+              "tex": "B\\ge 2Y"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "lambda=1",
+              "tex": "\\lambda =1"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "Y=1",
+              "tex": "Y=1"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "(x1,y1)=(1,1)",
+              "tex": "(x1,y1)=(1,1)"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "A=2",
+              "tex": "A=2"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "b=1",
+              "tex": "b=1"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "|x|<=1",
+              "tex": "|x|\\le 1"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "w",
+              "tex": "w"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "f_t(x)",
+              "tex": "f_{t}(x)"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "Y",
+              "tex": "Y"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "B",
+              "tex": "B"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "O(BY/sqrt(m)+B²/m)",
+              "tex": "O(BY/\\operatorname{sqrt}(m)+B^{2}/m)"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "B=Y sqrt(d)",
+              "tex": "B=Y \\operatorname{sqrt}(d)"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "m/d",
+              "tex": "\\frac{m}{d}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "1/9",
+              "tex": "\\frac{1}{9}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "1/12",
+              "tex": "\\frac{1}{12}"
+            }
+          ]
         }
       ]
     },
@@ -256,13 +603,244 @@
           "title": "ODLP removes genuine direct neighbors that also have an indirect causal route",
           "source_heading": "## Issue 2015__accepted__v16-statnikov15a__I01 — ODLP removes genuine direct neighbors that also have an indirect causal route",
           "markdown": "\n\n**Exact location.** PDF 12 (printed 3230), §4.2, the all-and-only correctness assertion immediately preceding Theorem 1; PDF 13 (3231), Figure 3, steps 8, 9.d and 11. PDF 14 (3232) and Appendix G, PDF 42–43 (3260–3261), expressly allow an “other” cause/effect to be both direct and indirect, but exclude it from the returned local pathway. The target is defined as all true parents and children on PDF 4 (3222).\n\n**Claim.** Under TIE near-faithfulness, causal Markov, local causal sufficiency, an acyclic data-generative graph, and correct statistical decisions, ODLP returns all and only members of the target’s true local causal pathway. The pathway means the parents/direct causes and children/direct effects in the actual data-generative graph. In an equivalence cluster of effects, step 9.d marks an effect changed by manipulating another effect as an “other effect”; step 11 returns only “direct effects” and “direct causes.” Step 8 applies the corresponding exclusion to causes.\n\n**Error and evidence.** The existence of an indirect route does not remove a simultaneous direct edge. The following exact model satisfies the paper’s assumptions and makes the published algorithm omit a true direct child.\n\nLet `U` be standard Gaussian and define the acyclic structural equations\n\n\\[\nT=U,\\qquad A=T,\\qquad B=T+A.\n\\]\n\nThe true graph has all three active edges `T -> A`, `T -> B`, and `A -> B`. All variables are observed. Its observational covariance, in the order `(T,A,B)`, is\n\n\\[\n\\begin{pmatrix}1&1&2\\\\1&1&2\\\\2&2&4\\end{pmatrix}.\n\\]\n\nEvery pair is marginally dependent. Given any third variable, both remaining variables are deterministic functions of it and hence conditionally independent. In particular,\n\n\\[\nT\\not\\perp A,\\quad T\\not\\perp B,\\quad\nT\\perp A\\mid B,\\quad T\\perp B\\mid A.\n\\]\n\nAll extra independences are therefore exactly information-equivalence relations. These are the only nontrivial conditioning cases with three variables. Thus the distribution is TIE near-faithful under the definition on PDF 5; it has precisely the deterministic equivalence behavior the paper admits there and uses with zero-noise links in Table B1, PDF 31. The example requires no positivity assumption absent from the paper.\n\nThe remaining assumptions hold as follows:\n\n- The displayed equations are an acyclic causal structural model, so the causal Markov condition holds. Each specified edge genuinely changes its child.\n- All common causes and all neighbors are measured, satisfying local causal sufficiency.\n- Population dependence/independence decisions are supplied exactly; no sampling error is involved.\n- The relevant equivalence is between individual variables, so the additional pairwise-equivalence condition stated for iTIE* in Appendix G is also satisfied.\n- `B` is a **direct** effect under the paper’s operational definition: even when `A` is fixed to any value `a`, its equation is `B=T+a`, which still responds to `T`. Fixing `B` does not affect the direct link `A=T`. Hence both `A` and `B` must be returned.\n\nTIE*/iTIE* correctly finds the singleton observational alternatives `{A}` and `{B}`, putting both in one equivalence cluster. The failure occurs afterward, even granting this observational stage perfect output:\n\n1. Manipulating `T` changes both `A` and `B`. Steps 4–5 correctly mark both as effects.\n2. Select `A` in the permitted step 9.b. For the fully randomized surgical intervention `A=V`, with `V` an independent standard Gaussian, `B=T+V` and `Cov(A,B)=1`. Thus `B` changes due to manipulating `A`.\n3. Step 9.d marks `B` as an “other effect.” Step 9.a then marks the remaining `A` as a “direct effect.”\n4. Step 11 returns `{A}`. It omits the true direct child `B`, despite exact interventions and exact decisions.\n\nThis is a terminating permitted execution, not an issue about a tie-breaking convention. There is no vanishing effect or cancellation. The same calculation holds throughout the positive-coefficient family\n\n\\[\nA=aT,\\qquad B=bT+cA,\\qquad a,b,c>0:\n\\]\n\nobservationally all variables are invertible copies, intervention on `A` changes `B` with coefficient `c`, and the omitted direct coefficient `b` remains nonzero. Exact rational controls checked 27 parameter triples.\n\nThe cause-side version is the same underlying error. Let `A=U`, `B=A`, and `T=A+B`. Both `A` and `B` are genuine direct parents of `T`. After interventions identify them as causes, step 8 discards `A` because manipulating it changes another cause, `B`. Yet fixing `B=b` leaves `T=A+b`; `A` remains direct. This mirror instance is grouped into this issue.\n\nThe proof does not resolve the example: Appendix G says correctness of steps 9.b–9.d follows from causation, while expressly acknowledging that “other effects” can also be direct. That is exactly the invalid implication. Theorem 1 uses the word “sound”; if read narrowly as only a no-false-positive property, this subset example does not refute that narrower word. It refutes the paper’s explicit all-and-only recovery claim and the complete local-pathway result for which that theorem is presented.\n\n**Reason for rejection.** The central new contribution is resolving observational information equivalence through experiments to recover the actual local causal pathway under relaxed assumptions. On this admitted TIE model, the method systematically throws away genuine direct edges, so its advertised exact recovery is false even with unlimited data and flawless statistical tests. Requiring the true graph to have no such direct-plus-indirect routes within an equivalence cluster would remove a substantive part of the stated domain; no such assumption is imposed, and the paper explicitly permits this status. Returning all cluster effects instead would incorrectly include purely indirect copies in the motivating chain `T -> A -> B`. A different conditional or joint-intervention procedure requires a new identification rule and guarantee. This is not a correction to notation or a proof constant. It warrants rejection of the paper as written while leaving the faithful ODLP* variant, scalability measurements and reported benchmark numbers unrefuted.\n\n**Discovery method.** While tracing the algorithm into Appendix G, noticed that the text admits that excluded “other” effects can also be direct, although the defined output must include every actual direct child. Constructed the smallest linear TIE model with both routes.\n\n**Verification method.** Read all 49 original pages and inspected the relevant full-size rendered definitions, theorem context, algorithm and proof. Re-derived the structural, observational and surgical-intervention laws exactly, checked all assumptions, traced both orders of the singleton iTIE stage and a terminating ODLP execution, and verified a 27-case rational family plus the mirror cause example. An independent bounded reviewer checked the original definitions and critical pages and agreed with the counterexample. The recovered author P1000 generator was also executed unchanged in Octave on the three-variable model, reproducing its exact observational identities and intervention equation to floating-point precision. This generator control supports the model interpretation; it is not a native execution of the unavailable central ODLP implementation.\n\n**Confidence.** High mathematical confidence; moderately high rejection confidence. The missing direct edge is explicit, every stated hypothesis was checked, and the flaw affects the main exact-recovery promise. The conclusion is limited to that promise: no false-positive claim, historical benchmark failure, or failure of every alternative causal algorithm is asserted.\n",
-          "html": "<p><strong>Exact location.</strong> PDF 12 (printed 3230), §4.2, the all-and-only correctness assertion immediately preceding Theorem 1; PDF 13 (3231), Figure 3, steps 8, 9.d and 11. PDF 14 (3232) and Appendix G, PDF 42–43 (3260–3261), expressly allow an “other” cause/effect to be both direct and indirect, but exclude it from the returned local pathway. The target is defined as all true parents and children on PDF 4 (3222).</p>\n<p><strong>Claim.</strong> Under TIE near-faithfulness, causal Markov, local causal sufficiency, an acyclic data-generative graph, and correct statistical decisions, ODLP returns all and only members of the target’s true local causal pathway. The pathway means the parents/direct causes and children/direct effects in the actual data-generative graph. In an equivalence cluster of effects, step 9.d marks an effect changed by manipulating another effect as an “other effect”; step 11 returns only “direct effects” and “direct causes.” Step 8 applies the corresponding exclusion to causes.</p>\n<p><strong>Error and evidence.</strong> The existence of an indirect route does not remove a simultaneous direct edge. The following exact model satisfies the paper’s assumptions and makes the published algorithm omit a true direct child.</p>\n<p>Let <code>U</code> be standard Gaussian and define the acyclic structural equations</p>\n<div class=\"equation-block\"><div class=\"equation-content\">\\[\nT=U,\\qquad A=T,\\qquad B=T+A.\n\\]</div></div>\n<p>The true graph has all three active edges <code>T -&gt; A</code>, <code>T -&gt; B</code>, and <code>A -&gt; B</code>. All variables are observed. Its observational covariance, in the order <code>(T,A,B)</code>, is</p>\n<div class=\"equation-block\"><div class=\"equation-content\">\\[\n\\begin{pmatrix}1&amp;1&amp;2\\\\1&amp;1&amp;2\\\\2&amp;2&amp;4\\end{pmatrix}.\n\\]</div></div>\n<p>Every pair is marginally dependent. Given any third variable, both remaining variables are deterministic functions of it and hence conditionally independent. In particular,</p>\n<div class=\"equation-block\"><div class=\"equation-content\">\\[\nT\\not\\perp A,\\quad T\\not\\perp B,\\quad\nT\\perp A\\mid B,\\quad T\\perp B\\mid A.\n\\]</div></div>\n<p>All extra independences are therefore exactly information-equivalence relations. These are the only nontrivial conditioning cases with three variables. Thus the distribution is TIE near-faithful under the definition on PDF 5; it has precisely the deterministic equivalence behavior the paper admits there and uses with zero-noise links in Table B1, PDF 31. The example requires no positivity assumption absent from the paper.</p>\n<p>The remaining assumptions hold as follows:</p>\n<ul>\n<li>The displayed equations are an acyclic causal structural model, so the causal Markov condition holds. Each specified edge genuinely changes its child.</li>\n<li>All common causes and all neighbors are measured, satisfying local causal sufficiency.</li>\n<li>Population dependence/independence decisions are supplied exactly; no sampling error is involved.</li>\n<li>The relevant equivalence is between individual variables, so the additional pairwise-equivalence condition stated for iTIE* in Appendix G is also satisfied.</li>\n<li><code>B</code> is a <strong>direct</strong> effect under the paper’s operational definition: even when <code>A</code> is fixed to any value <code>a</code>, its equation is <code>B=T+a</code>, which still responds to <code>T</code>. Fixing <code>B</code> does not affect the direct link <code>A=T</code>. Hence both <code>A</code> and <code>B</code> must be returned.</li>\n</ul>\n<p>TIE*/iTIE* correctly finds the singleton observational alternatives <code>{A}</code> and <code>{B}</code>, putting both in one equivalence cluster. The failure occurs afterward, even granting this observational stage perfect output:</p>\n<ol>\n<li>Manipulating <code>T</code> changes both <code>A</code> and <code>B</code>. Steps 4–5 correctly mark both as effects.</li>\n<li>Select <code>A</code> in the permitted step 9.b. For the fully randomized surgical intervention <code>A=V</code>, with <code>V</code> an independent standard Gaussian, <code>B=T+V</code> and <code>Cov(A,B)=1</code>. Thus <code>B</code> changes due to manipulating <code>A</code>.</li>\n<li>Step 9.d marks <code>B</code> as an “other effect.” Step 9.a then marks the remaining <code>A</code> as a “direct effect.”</li>\n<li>Step 11 returns <code>{A}</code>. It omits the true direct child <code>B</code>, despite exact interventions and exact decisions.</li>\n</ol>\n<p>This is a terminating permitted execution, not an issue about a tie-breaking convention. There is no vanishing effect or cancellation. The same calculation holds throughout the positive-coefficient family</p>\n<div class=\"equation-block\"><div class=\"equation-content\">\\[\nA=aT,\\qquad B=bT+cA,\\qquad a,b,c&gt;0:\n\\]</div></div>\n<p>observationally all variables are invertible copies, intervention on <code>A</code> changes <code>B</code> with coefficient <code>c</code>, and the omitted direct coefficient <code>b</code> remains nonzero. Exact rational controls checked 27 parameter triples.</p>\n<p>The cause-side version is the same underlying error. Let <code>A=U</code>, <code>B=A</code>, and <code>T=A+B</code>. Both <code>A</code> and <code>B</code> are genuine direct parents of <code>T</code>. After interventions identify them as causes, step 8 discards <code>A</code> because manipulating it changes another cause, <code>B</code>. Yet fixing <code>B=b</code> leaves <code>T=A+b</code>; <code>A</code> remains direct. This mirror instance is grouped into this issue.</p>\n<p>The proof does not resolve the example: Appendix G says correctness of steps 9.b–9.d follows from causation, while expressly acknowledging that “other effects” can also be direct. That is exactly the invalid implication. Theorem 1 uses the word “sound”; if read narrowly as only a no-false-positive property, this subset example does not refute that narrower word. It refutes the paper’s explicit all-and-only recovery claim and the complete local-pathway result for which that theorem is presented.</p>\n<p><strong>Reason for rejection.</strong> The central new contribution is resolving observational information equivalence through experiments to recover the actual local causal pathway under relaxed assumptions. On this admitted TIE model, the method systematically throws away genuine direct edges, so its advertised exact recovery is false even with unlimited data and flawless statistical tests. Requiring the true graph to have no such direct-plus-indirect routes within an equivalence cluster would remove a substantive part of the stated domain; no such assumption is imposed, and the paper explicitly permits this status. Returning all cluster effects instead would incorrectly include purely indirect copies in the motivating chain <code>T -&gt; A -&gt; B</code>. A different conditional or joint-intervention procedure requires a new identification rule and guarantee. This is not a correction to notation or a proof constant. It warrants rejection of the paper as written while leaving the faithful ODLP* variant, scalability measurements and reported benchmark numbers unrefuted.</p>\n<p><strong>Discovery method.</strong> While tracing the algorithm into Appendix G, noticed that the text admits that excluded “other” effects can also be direct, although the defined output must include every actual direct child. Constructed the smallest linear TIE model with both routes.</p>\n<p><strong>Verification method.</strong> Read all 49 original pages and inspected the relevant full-size rendered definitions, theorem context, algorithm and proof. Re-derived the structural, observational and surgical-intervention laws exactly, checked all assumptions, traced both orders of the singleton iTIE stage and a terminating ODLP execution, and verified a 27-case rational family plus the mirror cause example. An independent bounded reviewer checked the original definitions and critical pages and agreed with the counterexample. The recovered author P1000 generator was also executed unchanged in Octave on the three-variable model, reproducing its exact observational identities and intervention equation to floating-point precision. This generator control supports the model interpretation; it is not a native execution of the unavailable central ODLP implementation.</p>\n<p><strong>Confidence.</strong> High mathematical confidence; moderately high rejection confidence. The missing direct edge is explicit, every stated hypothesis was checked, and the flaw affects the main exact-recovery promise. The conclusion is limited to that promise: no false-positive claim, historical benchmark failure, or failure of every alternative causal algorithm is asserted.</p>\n",
+          "html": "<p><strong>Exact location.</strong> PDF 12 (printed 3230), §4.2, the all-and-only correctness assertion immediately preceding Theorem 1; PDF 13 (3231), Figure 3, steps 8, 9.d and 11. PDF 14 (3232) and Appendix G, PDF 42–43 (3260–3261), expressly allow an “other” cause/effect to be both direct and indirect, but exclude it from the returned local pathway. The target is defined as all true parents and children on PDF 4 (3222).</p>\n<p><strong>Claim.</strong> Under TIE near-faithfulness, causal Markov, local causal sufficiency, an acyclic data-generative graph, and correct statistical decisions, ODLP returns all and only members of the target’s true local causal pathway. The pathway means the parents/direct causes and children/direct effects in the actual data-generative graph. In an equivalence cluster of effects, step 9.d marks an effect changed by manipulating another effect as an “other effect”; step 11 returns only “direct effects” and “direct causes.” Step 8 applies the corresponding exclusion to causes.</p>\n<p><strong>Error and evidence.</strong> The existence of an indirect route does not remove a simultaneous direct edge. The following exact model satisfies the paper’s assumptions and makes the published algorithm omit a true direct child.</p>\n<p>Let <span class=\"source-math\">\\(U\\)</span> be standard Gaussian and define the acyclic structural equations</p>\n<div class=\"equation-block\"><div class=\"equation-content\">\\[\nT=U,\\qquad A=T,\\qquad B=T+A.\n\\]</div></div>\n<p>The true graph has all three active edges <span class=\"source-math\">\\(T \\to  A\\)</span>, <span class=\"source-math\">\\(T \\to  B\\)</span>, and <span class=\"source-math\">\\(A \\to  B\\)</span>. All variables are observed. Its observational covariance, in the order <span class=\"source-math\">\\((T,A,B)\\)</span>, is</p>\n<div class=\"equation-block\"><div class=\"equation-content\">\\[\n\\begin{pmatrix}1&amp;1&amp;2\\\\1&amp;1&amp;2\\\\2&amp;2&amp;4\\end{pmatrix}.\n\\]</div></div>\n<p>Every pair is marginally dependent. Given any third variable, both remaining variables are deterministic functions of it and hence conditionally independent. In particular,</p>\n<div class=\"equation-block\"><div class=\"equation-content\">\\[\nT\\not\\perp A,\\quad T\\not\\perp B,\\quad\nT\\perp A\\mid B,\\quad T\\perp B\\mid A.\n\\]</div></div>\n<p>All extra independences are therefore exactly information-equivalence relations. These are the only nontrivial conditioning cases with three variables. Thus the distribution is TIE near-faithful under the definition on PDF 5; it has precisely the deterministic equivalence behavior the paper admits there and uses with zero-noise links in Table B1, PDF 31. The example requires no positivity assumption absent from the paper.</p>\n<p>The remaining assumptions hold as follows:</p>\n<ul>\n<li>The displayed equations are an acyclic causal structural model, so the causal Markov condition holds. Each specified edge genuinely changes its child.</li>\n<li>All common causes and all neighbors are measured, satisfying local causal sufficiency.</li>\n<li>Population dependence/independence decisions are supplied exactly; no sampling error is involved.</li>\n<li>The relevant equivalence is between individual variables, so the additional pairwise-equivalence condition stated for iTIE* in Appendix G is also satisfied.</li>\n<li><span class=\"source-math\">\\(B\\)</span> is a <strong>direct</strong> effect under the paper’s operational definition: even when <span class=\"source-math\">\\(A\\)</span> is fixed to any value <span class=\"source-math\">\\(a\\)</span>, its equation is <span class=\"source-math\">\\(B=T+a\\)</span>, which still responds to <span class=\"source-math\">\\(T\\)</span>. Fixing <span class=\"source-math\">\\(B\\)</span> does not affect the direct link <span class=\"source-math\">\\(A=T\\)</span>. Hence both <span class=\"source-math\">\\(A\\)</span> and <span class=\"source-math\">\\(B\\)</span> must be returned.</li>\n</ul>\n<p>TIE*/iTIE* correctly finds the singleton observational alternatives <span class=\"source-math\">\\(\\{A\\}\\)</span> and <span class=\"source-math\">\\(\\{B\\}\\)</span>, putting both in one equivalence cluster. The failure occurs afterward, even granting this observational stage perfect output:</p>\n<ol>\n<li>Manipulating <span class=\"source-math\">\\(T\\)</span> changes both <span class=\"source-math\">\\(A\\)</span> and <span class=\"source-math\">\\(B\\)</span>. Steps 4–5 correctly mark both as effects.</li>\n<li>Select <span class=\"source-math\">\\(A\\)</span> in the permitted step 9.b. For the fully randomized surgical intervention <span class=\"source-math\">\\(A=V\\)</span>, with <span class=\"source-math\">\\(V\\)</span> an independent standard Gaussian, <span class=\"source-math\">\\(B=T+V\\)</span> and <span class=\"source-math\">\\(\\operatorname{Cov}(A,B)=1\\)</span>. Thus <span class=\"source-math\">\\(B\\)</span> changes due to manipulating <span class=\"source-math\">\\(A\\)</span>.</li>\n<li>Step 9.d marks <span class=\"source-math\">\\(B\\)</span> as an “other effect.” Step 9.a then marks the remaining <span class=\"source-math\">\\(A\\)</span> as a “direct effect.”</li>\n<li>Step 11 returns <span class=\"source-math\">\\(\\{A\\}\\)</span>. It omits the true direct child <span class=\"source-math\">\\(B\\)</span>, despite exact interventions and exact decisions.</li>\n</ol>\n<p>This is a terminating permitted execution, not an issue about a tie-breaking convention. There is no vanishing effect or cancellation. The same calculation holds throughout the positive-coefficient family</p>\n<div class=\"equation-block\"><div class=\"equation-content\">\\[\nA=aT,\\qquad B=bT+cA,\\qquad a,b,c&gt;0:\n\\]</div></div>\n<p>observationally all variables are invertible copies, intervention on <span class=\"source-math\">\\(A\\)</span> changes <span class=\"source-math\">\\(B\\)</span> with coefficient <span class=\"source-math\">\\(c\\)</span>, and the omitted direct coefficient <span class=\"source-math\">\\(b\\)</span> remains nonzero. Exact rational controls checked 27 parameter triples.</p>\n<p>The cause-side version is the same underlying error. Let <span class=\"source-math\">\\(A=U\\)</span>, <span class=\"source-math\">\\(B=A\\)</span>, and <span class=\"source-math\">\\(T=A+B\\)</span>. Both <span class=\"source-math\">\\(A\\)</span> and <span class=\"source-math\">\\(B\\)</span> are genuine direct parents of <span class=\"source-math\">\\(T\\)</span>. After interventions identify them as causes, step 8 discards <span class=\"source-math\">\\(A\\)</span> because manipulating it changes another cause, <span class=\"source-math\">\\(B\\)</span>. Yet fixing <span class=\"source-math\">\\(B=b\\)</span> leaves <span class=\"source-math\">\\(T=A+b\\)</span>; <span class=\"source-math\">\\(A\\)</span> remains direct. This mirror instance is grouped into this issue.</p>\n<p>The proof does not resolve the example: Appendix G says correctness of steps 9.b–9.d follows from causation, while expressly acknowledging that “other effects” can also be direct. That is exactly the invalid implication. Theorem 1 uses the word “sound”; if read narrowly as only a no-false-positive property, this subset example does not refute that narrower word. It refutes the paper’s explicit all-and-only recovery claim and the complete local-pathway result for which that theorem is presented.</p>\n<p><strong>Reason for rejection.</strong> The central new contribution is resolving observational information equivalence through experiments to recover the actual local causal pathway under relaxed assumptions. On this admitted TIE model, the method systematically throws away genuine direct edges, so its advertised exact recovery is false even with unlimited data and flawless statistical tests. Requiring the true graph to have no such direct-plus-indirect routes within an equivalence cluster would remove a substantive part of the stated domain; no such assumption is imposed, and the paper explicitly permits this status. Returning all cluster effects instead would incorrectly include purely indirect copies in the motivating chain <span class=\"source-math\">\\(T \\to  A \\to  B\\)</span>. A different conditional or joint-intervention procedure requires a new identification rule and guarantee. This is not a correction to notation or a proof constant. It warrants rejection of the paper as written while leaving the faithful ODLP* variant, scalability measurements and reported benchmark numbers unrefuted.</p>\n<p><strong>Discovery method.</strong> While tracing the algorithm into Appendix G, noticed that the text admits that excluded “other” effects can also be direct, although the defined output must include every actual direct child. Constructed the smallest linear TIE model with both routes.</p>\n<p><strong>Verification method.</strong> Read all 49 original pages and inspected the relevant full-size rendered definitions, theorem context, algorithm and proof. Re-derived the structural, observational and surgical-intervention laws exactly, checked all assumptions, traced both orders of the singleton iTIE stage and a terminating ODLP execution, and verified a 27-case rational family plus the mirror cause example. An independent bounded reviewer checked the original definitions and critical pages and agreed with the counterexample. The recovered author P1000 generator was also executed unchanged in Octave on the three-variable model, reproducing its exact observational identities and intervention equation to floating-point precision. This generator control supports the model interpretation; it is not a native execution of the unavailable central ODLP implementation.</p>\n<p><strong>Confidence.</strong> High mathematical confidence; moderately high rejection confidence. The missing direct edge is explicit, every stated hypothesis was checked, and the flaw affects the main exact-recovery promise. The conclusion is limited to that promise: no false-positive claim, historical benchmark failure, or failure of every alternative causal algorithm is asserted.</p>\n",
           "source_body_sha256": "9dac2875265bd37ae3a86fde67a539e42e52017e250f9e90cc7b755f738d2164",
           "export_text_sha256": "9dac2875265bd37ae3a86fde67a539e42e52017e250f9e90cc7b755f738d2164",
           "private_reference_substitutions": 0,
           "display_equations": 4,
-          "inline_equations": 0,
-          "formatting_normalizations": []
+          "inline_equations": 46,
+          "formatting_normalizations": [
+            {
+              "rule": "literal_inline_notation",
+              "source": "U",
+              "tex": "U"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "T -> A",
+              "tex": "T \\to  A"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "T -> B",
+              "tex": "T \\to  B"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "A -> B",
+              "tex": "A \\to  B"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "(T,A,B)",
+              "tex": "(T,A,B)"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "B",
+              "tex": "B"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "A",
+              "tex": "A"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "a",
+              "tex": "a"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "B=T+a",
+              "tex": "B=T+a"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "T",
+              "tex": "T"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "B",
+              "tex": "B"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "A=T",
+              "tex": "A=T"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "A",
+              "tex": "A"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "B",
+              "tex": "B"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "{A}",
+              "tex": "\\{A\\}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "{B}",
+              "tex": "\\{B\\}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "T",
+              "tex": "T"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "A",
+              "tex": "A"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "B",
+              "tex": "B"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "A",
+              "tex": "A"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "A=V",
+              "tex": "A=V"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "V",
+              "tex": "V"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "B=T+V",
+              "tex": "B=T+V"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "Cov(A,B)=1",
+              "tex": "\\operatorname{Cov}(A,B)=1"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "B",
+              "tex": "B"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "A",
+              "tex": "A"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "B",
+              "tex": "B"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "A",
+              "tex": "A"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "{A}",
+              "tex": "\\{A\\}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "B",
+              "tex": "B"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "A",
+              "tex": "A"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "B",
+              "tex": "B"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "c",
+              "tex": "c"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "b",
+              "tex": "b"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "A=U",
+              "tex": "A=U"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "B=A",
+              "tex": "B=A"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "T=A+B",
+              "tex": "T=A+B"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "A",
+              "tex": "A"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "B",
+              "tex": "B"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "T",
+              "tex": "T"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "A",
+              "tex": "A"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "B",
+              "tex": "B"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "B=b",
+              "tex": "B=b"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "T=A+b",
+              "tex": "T=A+b"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "A",
+              "tex": "A"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "T -> A -> B",
+              "tex": "T \\to  A \\to  B"
+            }
+          ]
         }
       ]
     },
@@ -277,13 +855,364 @@
           "title": "The countable dominant-prior agent can remain confident and make errors forever",
           "source_heading": "## Issue 2015__accepted__v16-sunehag15a__I01 — The countable dominant-prior agent can remain confident and make errors forever",
           "markdown": "\n\n**Exact location.** Theorem 46(i), PDF 34 (printed 1378); its final proof paragraph, PDF 35 (1379). The hypothesis-generation rule is Definition 44, PDF 32 (1376), and error/confidence counts are defined on PDF 27 and 31. The countable extension is an advertised contribution on PDF 6 and in the conclusion on PDF 36.\n\n**Claim.** For the stated `gamma=0` setting, suppose an enumerated countable class `M` contains environments each dominating the true environment in the sense of absolute continuity. Start with a finite working class, add the next environment according to the growing confidence budget, never exclude environments, and choose the optimistic action. If, for **every history** `h`, some `nu_h in M` is optimistic relative to the truth, Theorem 46(i) asserts that almost surely there is a finite constant `C` such that, for all `t`,\n\n\\[\nm(h_t,\\varepsilon)\\le n(h_t,\\varepsilon)+C.\n\\]\n\nHere `m` counts actual errors greater than `epsilon`; `n` counts disagreement greater than `epsilon` between available environments for the selected optimistic action. The theorem does **not** require the true environment itself to belong to `M`. Its preceding paragraph expressly distinguishes this dominant-prior setting from that different assumption.\n\n**Error and evidence.** Pointwise optimism in the entire countable class need never reach the finite working class at the history where it is needed. The following exact example satisfies all premises, even uniform measure domination, but has `n=0` and `m=t`.\n\nUse two actions `g,b`, a singleton observation alphabet, fixed reward alphabet `{0,1/2,1}`, discount `gamma=0`, accuracy `epsilon=1/4`, initial class `{nu_1}`, and budget `N(t)=t+1`. Let the true environment `mu` return reward `1` for `g` and `1/2` for `b`, at every history.\n\nFor each integer `k>=1`, put\n\n\\[\ns_k=\\lfloor k/2\\rfloor,\\qquad r_k=\\frac1{k+4}.\n\\]\n\nDefine a stochastic environment `rho_k` as follows. During its first `s_k` decisions it agrees with `mu`. Afterward it still returns `1/2` for `b`, while `g` gives an independent Bernoulli reward with success probability `r_k` and values in `{0,1}`. Define the actual a priori environment as a mixture over **complete environment measures**,\n\n\\[\n\\nu_k=\\tfrac14\\mu+\\tfrac34\\rho_k,\n\\qquad M=(\\nu_1,\\nu_2,\\ldots).\n\\]\n\nThis is a single latent mixture choice, not a fresh component choice at every time. Conditional predictions use ordinary posterior mixture weights. On a history to which both components assign probability zero, define the continuation to equal `mu`; conditional kernels on such histories may be specified arbitrarily. This makes each environment defined at every history as required.\n\nAll assumptions can be checked explicitly:\n\n- **Domination for every policy.** For every policy `pi` and measurable event `E`,\n\n  \\[\n  \\nu_k(E\\mid\\pi)=\\tfrac14\\mu(E\\mid\\pi)+\\tfrac34\\rho_k(E\\mid\\pi)\n  \\ge\\tfrac14\\mu(E\\mid\\pi).\n  \\]\n\n  Thus `mu` is absolutely continuous with respect to every `nu_k`, with the same positive domination constant `1/4`. This is stronger than Theorem 46 requires.\n- **Optimism at every history.** For a history of length `t`, choose `k>=2(t+1)`. Both components agree with `mu` through that history and the next decision. If the history is possible under `mu`, this model predicts reward `1` for `g`. Otherwise both likelihoods are zero and the specified continuation is `mu`. Consequently\n\n  \\[\n  \\max_a V^a_{\\nu_k}(h)=1=\\max_a V^a_\\mu(h)\n  \\]\n\n  for every history, including histories off the true path.\n- **Distinct conditional environments.** No automatic identification of equivalent models accelerates the enumeration in Definition 44. After any all-`b` history, take more `b` actions until a time past both `s_k` and `s_l`, then take `g`. The respective success probabilities are\n\n  \\[\n  \\tfrac14+\\frac3{4(k+4)}\n  \\quad\\hbox{and}\\quad\n  \\tfrac14+\\frac3{4(l+4)},\n  \\]\n\n  which differ for `k!=l`. The preceding `b` observations leave the mixture weights unchanged. Thus the complete conditional kernels remain distinct, even when their immediate predictions currently coincide.\n- **True membership is not assumed.** `mu` is deliberately not an element of `M`, as permitted by this theorem. Every `nu_k` has an expired period in which its `g` prediction differs from `mu`.\n\nNow trace the actual agent. Before decision `t`, the available indices are at most `t`: at most one next candidate is added per previous observation. Hence every available `k` has already passed `s_k`. On the all-`b` history both mixture likelihoods equal one, so their posterior weights remain `1/4,3/4`, giving\n\n\\[\nV^g_{\\nu_k}=\\tfrac14+\\frac3{4(k+4)}\\le\\tfrac25\n<\\tfrac12=V^b_{\\nu_k}.\n\\]\n\nThe unique optimistic action is therefore `b`. All available environments predict exactly `1/2` for this action, so its inter-model disagreement is zero. A new environment is added because zero confidence count is below the budget. The added model has also expired by its first available decision, and the induction continues forever.\n\nThere is a minor initialization ambiguity in Definition 44: its displayed union starts with prior positive-time histories and omits the initial class at the first update. Taken literally, `nu_1` is added again once; counting the initial class as already introduced instead adds `nu_2`. Both conventions obey the index bound above, and both yield the same perpetual `b` choice. Exact controls implemented each convention.\n\nThe true value gap is always `1-1/2=1/2>epsilon`. Thus, with true probability one,\n\n\\[\nn(h_t,1/4)=0,\\qquad m(h_t,1/4)=t,\n\\]\n\ncontradicting Theorem 46(i) for every finite `C`. The full class is nevertheless exhausted in the limit, so conclusion (ii) does not imply (i).\n\nThe proof’s last paragraph assumes there is only a finite initial period before an optimistic environment is always present in the working class. Countable exhaustion introduces every **fixed** index eventually. It does not supply a finite bound on the indices of the history-dependent optimism witnesses. In this example the useful witness continually lies ahead of the working class, although all domination constants are uniform.\n\n**Reason for rejection.** Extending the learning guarantee to arbitrary countable classes of dominant stochastic priors is a stated contribution, distinct from the finite and true-member cases. The proposed confidence-budget mechanism has no claimed error control on this admitted example: it remains perfectly confident while making a fixed-size error at every step. This directly invalidates its central guarantee that errors are accounted for by observable model disagreement plus a finite initial constant. Adding `mu in M`, or a finite uniform set of optimistic witnesses together with suitable accuracy slack, would impose substantive extra assumptions absent from this extension. Assuming true membership specifically changes the expressly distinguished dominant-prior setting. A different introduction/exploration strategy would require a new guarantee. This warrants rejection as written while preserving the paper’s finite-class results, deterministic-law improvement and deterministic countable result.\n\n**Discovery method.** Noticed that the countable proof passed from eventual introduction of each model to eventual availability of a witness whose index may depend on the current history. Built time-dependent dominant priors whose optimistic periods expire before introduction.\n\n**Verification method.** Read all 46 original pages and rechecked rendered Definition 44, Theorem 46 and its proof. Verified the measure-mixture domination, complete off-support kernel definition, distinct conditional models and exact optimistic execution. Fraction-based controls checked both initialization conventions for 100 decisions, 55,987 finite histories for pointwise optimism and cylinder domination, and 9,135 conditional-model pair certificates. The induction above proves the infinite failure; finite checks supplement it. An independent bounded reviewer re-read the original quantifiers and renders and identified the conditional-identity issue, which the distinct Bernoulli parameters resolve. Cited merging and finite-concentration arguments were checked separately; neither supplies the missing countable uniformity.\n\n**Confidence.** High mathematical confidence; moderately high rejection confidence. The counterexample has finite alphabets, uniform domination, no tie in action choice and a fixed error gap. It refutes the exact countable-stochastic error comparison; it does not allege failure of every other theorem, empirical result or alternative optimistic agent.\n",
-          "html": "<p><strong>Exact location.</strong> Theorem 46(i), PDF 34 (printed 1378); its final proof paragraph, PDF 35 (1379). The hypothesis-generation rule is Definition 44, PDF 32 (1376), and error/confidence counts are defined on PDF 27 and 31. The countable extension is an advertised contribution on PDF 6 and in the conclusion on PDF 36.</p>\n<p><strong>Claim.</strong> For the stated <code>gamma=0</code> setting, suppose an enumerated countable class <code>M</code> contains environments each dominating the true environment in the sense of absolute continuity. Start with a finite working class, add the next environment according to the growing confidence budget, never exclude environments, and choose the optimistic action. If, for <strong>every history</strong> <code>h</code>, some <code>nu_h in M</code> is optimistic relative to the truth, Theorem 46(i) asserts that almost surely there is a finite constant <code>C</code> such that, for all <code>t</code>,</p>\n<div class=\"equation-block\"><div class=\"equation-content\">\\[\nm(h_t,\\varepsilon)\\le n(h_t,\\varepsilon)+C.\n\\]</div></div>\n<p>Here <code>m</code> counts actual errors greater than <code>epsilon</code>; <code>n</code> counts disagreement greater than <code>epsilon</code> between available environments for the selected optimistic action. The theorem does <strong>not</strong> require the true environment itself to belong to <code>M</code>. Its preceding paragraph expressly distinguishes this dominant-prior setting from that different assumption.</p>\n<p><strong>Error and evidence.</strong> Pointwise optimism in the entire countable class need never reach the finite working class at the history where it is needed. The following exact example satisfies all premises, even uniform measure domination, but has <code>n=0</code> and <code>m=t</code>.</p>\n<p>Use two actions <code>g,b</code>, a singleton observation alphabet, fixed reward alphabet <code>{0,1/2,1}</code>, discount <code>gamma=0</code>, accuracy <code>epsilon=1/4</code>, initial class <code>{nu_1}</code>, and budget <code>N(t)=t+1</code>. Let the true environment <code>mu</code> return reward <code>1</code> for <code>g</code> and <code>1/2</code> for <code>b</code>, at every history.</p>\n<p>For each integer <code>k&gt;=1</code>, put</p>\n<div class=\"equation-block\"><div class=\"equation-content\">\\[\ns_k=\\lfloor k/2\\rfloor,\\qquad r_k=\\frac1{k+4}.\n\\]</div></div>\n<p>Define a stochastic environment <code>rho_k</code> as follows. During its first <code>s_k</code> decisions it agrees with <code>mu</code>. Afterward it still returns <code>1/2</code> for <code>b</code>, while <code>g</code> gives an independent Bernoulli reward with success probability <code>r_k</code> and values in <code>{0,1}</code>. Define the actual a priori environment as a mixture over <strong>complete environment measures</strong>,</p>\n<div class=\"equation-block\"><div class=\"equation-content\">\\[\n\\nu_k=\\tfrac14\\mu+\\tfrac34\\rho_k,\n\\qquad M=(\\nu_1,\\nu_2,\\ldots).\n\\]</div></div>\n<p>This is a single latent mixture choice, not a fresh component choice at every time. Conditional predictions use ordinary posterior mixture weights. On a history to which both components assign probability zero, define the continuation to equal <code>mu</code>; conditional kernels on such histories may be specified arbitrarily. This makes each environment defined at every history as required.</p>\n<p>All assumptions can be checked explicitly:</p>\n<ul>\n<li>\n<p><strong>Domination for every policy.</strong> For every policy <code>pi</code> and measurable event <code>E</code>,</p>\n<div class=\"equation-block\"><div class=\"equation-content\">\\[\n  \\nu_k(E\\mid\\pi)=\\tfrac14\\mu(E\\mid\\pi)+\\tfrac34\\rho_k(E\\mid\\pi)\n  \\ge\\tfrac14\\mu(E\\mid\\pi).\n  \\]</div></div>\n<p>Thus <code>mu</code> is absolutely continuous with respect to every <code>nu_k</code>, with the same positive domination constant <code>1/4</code>. This is stronger than Theorem 46 requires.</p>\n</li>\n<li>\n<p><strong>Optimism at every history.</strong> For a history of length <code>t</code>, choose <code>k&gt;=2(t+1)</code>. Both components agree with <code>mu</code> through that history and the next decision. If the history is possible under <code>mu</code>, this model predicts reward <code>1</code> for <code>g</code>. Otherwise both likelihoods are zero and the specified continuation is <code>mu</code>. Consequently</p>\n<div class=\"equation-block\"><div class=\"equation-content\">\\[\n  \\max_a V^a_{\\nu_k}(h)=1=\\max_a V^a_\\mu(h)\n  \\]</div></div>\n<p>for every history, including histories off the true path.</p>\n</li>\n<li>\n<p><strong>Distinct conditional environments.</strong> No automatic identification of equivalent models accelerates the enumeration in Definition 44. After any all-<code>b</code> history, take more <code>b</code> actions until a time past both <code>s_k</code> and <code>s_l</code>, then take <code>g</code>. The respective success probabilities are</p>\n<div class=\"equation-block\"><div class=\"equation-content\">\\[\n  \\tfrac14+\\frac3{4(k+4)}\n  \\quad\\hbox{and}\\quad\n  \\tfrac14+\\frac3{4(l+4)},\n  \\]</div></div>\n<p>which differ for <code>k!=l</code>. The preceding <code>b</code> observations leave the mixture weights unchanged. Thus the complete conditional kernels remain distinct, even when their immediate predictions currently coincide.</p>\n</li>\n<li>\n<p><strong>True membership is not assumed.</strong> <code>mu</code> is deliberately not an element of <code>M</code>, as permitted by this theorem. Every <code>nu_k</code> has an expired period in which its <code>g</code> prediction differs from <code>mu</code>.</p>\n</li>\n</ul>\n<p>Now trace the actual agent. Before decision <code>t</code>, the available indices are at most <code>t</code>: at most one next candidate is added per previous observation. Hence every available <code>k</code> has already passed <code>s_k</code>. On the all-<code>b</code> history both mixture likelihoods equal one, so their posterior weights remain <code>1/4,3/4</code>, giving</p>\n<div class=\"equation-block\"><div class=\"equation-content\">\\[\nV^g_{\\nu_k}=\\tfrac14+\\frac3{4(k+4)}\\le\\tfrac25\n&lt;\\tfrac12=V^b_{\\nu_k}.\n\\]</div></div>\n<p>The unique optimistic action is therefore <code>b</code>. All available environments predict exactly <code>1/2</code> for this action, so its inter-model disagreement is zero. A new environment is added because zero confidence count is below the budget. The added model has also expired by its first available decision, and the induction continues forever.</p>\n<p>There is a minor initialization ambiguity in Definition 44: its displayed union starts with prior positive-time histories and omits the initial class at the first update. Taken literally, <code>nu_1</code> is added again once; counting the initial class as already introduced instead adds <code>nu_2</code>. Both conventions obey the index bound above, and both yield the same perpetual <code>b</code> choice. Exact controls implemented each convention.</p>\n<p>The true value gap is always <code>1-1/2=1/2&gt;epsilon</code>. Thus, with true probability one,</p>\n<div class=\"equation-block\"><div class=\"equation-content\">\\[\nn(h_t,1/4)=0,\\qquad m(h_t,1/4)=t,\n\\]</div></div>\n<p>contradicting Theorem 46(i) for every finite <code>C</code>. The full class is nevertheless exhausted in the limit, so conclusion (ii) does not imply (i).</p>\n<p>The proof’s last paragraph assumes there is only a finite initial period before an optimistic environment is always present in the working class. Countable exhaustion introduces every <strong>fixed</strong> index eventually. It does not supply a finite bound on the indices of the history-dependent optimism witnesses. In this example the useful witness continually lies ahead of the working class, although all domination constants are uniform.</p>\n<p><strong>Reason for rejection.</strong> Extending the learning guarantee to arbitrary countable classes of dominant stochastic priors is a stated contribution, distinct from the finite and true-member cases. The proposed confidence-budget mechanism has no claimed error control on this admitted example: it remains perfectly confident while making a fixed-size error at every step. This directly invalidates its central guarantee that errors are accounted for by observable model disagreement plus a finite initial constant. Adding <code>mu in M</code>, or a finite uniform set of optimistic witnesses together with suitable accuracy slack, would impose substantive extra assumptions absent from this extension. Assuming true membership specifically changes the expressly distinguished dominant-prior setting. A different introduction/exploration strategy would require a new guarantee. This warrants rejection as written while preserving the paper’s finite-class results, deterministic-law improvement and deterministic countable result.</p>\n<p><strong>Discovery method.</strong> Noticed that the countable proof passed from eventual introduction of each model to eventual availability of a witness whose index may depend on the current history. Built time-dependent dominant priors whose optimistic periods expire before introduction.</p>\n<p><strong>Verification method.</strong> Read all 46 original pages and rechecked rendered Definition 44, Theorem 46 and its proof. Verified the measure-mixture domination, complete off-support kernel definition, distinct conditional models and exact optimistic execution. Fraction-based controls checked both initialization conventions for 100 decisions, 55,987 finite histories for pointwise optimism and cylinder domination, and 9,135 conditional-model pair certificates. The induction above proves the infinite failure; finite checks supplement it. An independent bounded reviewer re-read the original quantifiers and renders and identified the conditional-identity issue, which the distinct Bernoulli parameters resolve. Cited merging and finite-concentration arguments were checked separately; neither supplies the missing countable uniformity.</p>\n<p><strong>Confidence.</strong> High mathematical confidence; moderately high rejection confidence. The counterexample has finite alphabets, uniform domination, no tie in action choice and a fixed error gap. It refutes the exact countable-stochastic error comparison; it does not allege failure of every other theorem, empirical result or alternative optimistic agent.</p>\n",
+          "html": "<p><strong>Exact location.</strong> Theorem 46(i), PDF 34 (printed 1378); its final proof paragraph, PDF 35 (1379). The hypothesis-generation rule is Definition 44, PDF 32 (1376), and error/confidence counts are defined on PDF 27 and 31. The countable extension is an advertised contribution on PDF 6 and in the conclusion on PDF 36.</p>\n<p><strong>Claim.</strong> For the stated <span class=\"source-math\">\\(\\gamma =0\\)</span> setting, suppose an enumerated countable class <span class=\"source-math\">\\(M\\)</span> contains environments each dominating the true environment in the sense of absolute continuity. Start with a finite working class, add the next environment according to the growing confidence budget, never exclude environments, and choose the optimistic action. If, for <strong>every history</strong> <span class=\"source-math\">\\(h\\)</span>, some <code>nu_h in M</code> is optimistic relative to the truth, Theorem 46(i) asserts that almost surely there is a finite constant <span class=\"source-math\">\\(C\\)</span> such that, for all <span class=\"source-math\">\\(t\\)</span>,</p>\n<div class=\"equation-block\"><div class=\"equation-content\">\\[\nm(h_t,\\varepsilon)\\le n(h_t,\\varepsilon)+C.\n\\]</div></div>\n<p>Here <span class=\"source-math\">\\(m\\)</span> counts actual errors greater than <span class=\"source-math\">\\(\\epsilon\\)</span>; <span class=\"source-math\">\\(n\\)</span> counts disagreement greater than <span class=\"source-math\">\\(\\epsilon\\)</span> between available environments for the selected optimistic action. The theorem does <strong>not</strong> require the true environment itself to belong to <span class=\"source-math\">\\(M\\)</span>. Its preceding paragraph expressly distinguishes this dominant-prior setting from that different assumption.</p>\n<p><strong>Error and evidence.</strong> Pointwise optimism in the entire countable class need never reach the finite working class at the history where it is needed. The following exact example satisfies all premises, even uniform measure domination, but has <span class=\"source-math\">\\(n=0\\)</span> and <span class=\"source-math\">\\(m=t\\)</span>.</p>\n<p>Use two actions <span class=\"source-math\">\\(g,b\\)</span>, a singleton observation alphabet, fixed reward alphabet <span class=\"source-math\">\\(\\{0,1/2,1\\}\\)</span>, discount <span class=\"source-math\">\\(\\gamma =0\\)</span>, accuracy <span class=\"source-math\">\\(\\epsilon =1/4\\)</span>, initial class <span class=\"source-math\">\\(\\{\\nu _{1}\\}\\)</span>, and budget <span class=\"source-math\">\\(N(t)=t+1\\)</span>. Let the true environment <span class=\"source-math\">\\(\\mu\\)</span> return reward <span class=\"source-math\">\\(1\\)</span> for <span class=\"source-math\">\\(g\\)</span> and <span class=\"source-math\">\\(\\frac{1}{2}\\)</span> for <span class=\"source-math\">\\(b\\)</span>, at every history.</p>\n<p>For each integer <span class=\"source-math\">\\(k\\ge 1\\)</span>, put</p>\n<div class=\"equation-block\"><div class=\"equation-content\">\\[\ns_k=\\lfloor k/2\\rfloor,\\qquad r_k=\\frac1{k+4}.\n\\]</div></div>\n<p>Define a stochastic environment <span class=\"source-math\">\\(\\rho _{k}\\)</span> as follows. During its first <span class=\"source-math\">\\(s_{k}\\)</span> decisions it agrees with <span class=\"source-math\">\\(\\mu\\)</span>. Afterward it still returns <span class=\"source-math\">\\(\\frac{1}{2}\\)</span> for <span class=\"source-math\">\\(b\\)</span>, while <span class=\"source-math\">\\(g\\)</span> gives an independent Bernoulli reward with success probability <span class=\"source-math\">\\(r_{k}\\)</span> and values in <span class=\"source-math\">\\(\\{0,1\\}\\)</span>. Define the actual a priori environment as a mixture over <strong>complete environment measures</strong>,</p>\n<div class=\"equation-block\"><div class=\"equation-content\">\\[\n\\nu_k=\\tfrac14\\mu+\\tfrac34\\rho_k,\n\\qquad M=(\\nu_1,\\nu_2,\\ldots).\n\\]</div></div>\n<p>This is a single latent mixture choice, not a fresh component choice at every time. Conditional predictions use ordinary posterior mixture weights. On a history to which both components assign probability zero, define the continuation to equal <span class=\"source-math\">\\(\\mu\\)</span>; conditional kernels on such histories may be specified arbitrarily. This makes each environment defined at every history as required.</p>\n<p>All assumptions can be checked explicitly:</p>\n<ul>\n<li>\n<p><strong>Domination for every policy.</strong> For every policy <span class=\"source-math\">\\(\\pi\\)</span> and measurable event <span class=\"source-math\">\\(E\\)</span>,</p>\n<div class=\"equation-block\"><div class=\"equation-content\">\\[\n  \\nu_k(E\\mid\\pi)=\\tfrac14\\mu(E\\mid\\pi)+\\tfrac34\\rho_k(E\\mid\\pi)\n  \\ge\\tfrac14\\mu(E\\mid\\pi).\n  \\]</div></div>\n<p>Thus <span class=\"source-math\">\\(\\mu\\)</span> is absolutely continuous with respect to every <span class=\"source-math\">\\(\\nu _{k}\\)</span>, with the same positive domination constant <span class=\"source-math\">\\(\\frac{1}{4}\\)</span>. This is stronger than Theorem 46 requires.</p>\n</li>\n<li>\n<p><strong>Optimism at every history.</strong> For a history of length <span class=\"source-math\">\\(t\\)</span>, choose <span class=\"source-math\">\\(k\\ge 2(t+1)\\)</span>. Both components agree with <span class=\"source-math\">\\(\\mu\\)</span> through that history and the next decision. If the history is possible under <span class=\"source-math\">\\(\\mu\\)</span>, this model predicts reward <span class=\"source-math\">\\(1\\)</span> for <span class=\"source-math\">\\(g\\)</span>. Otherwise both likelihoods are zero and the specified continuation is <span class=\"source-math\">\\(\\mu\\)</span>. Consequently</p>\n<div class=\"equation-block\"><div class=\"equation-content\">\\[\n  \\max_a V^a_{\\nu_k}(h)=1=\\max_a V^a_\\mu(h)\n  \\]</div></div>\n<p>for every history, including histories off the true path.</p>\n</li>\n<li>\n<p><strong>Distinct conditional environments.</strong> No automatic identification of equivalent models accelerates the enumeration in Definition 44. After any all-<span class=\"source-math\">\\(b\\)</span> history, take more <span class=\"source-math\">\\(b\\)</span> actions until a time past both <span class=\"source-math\">\\(s_{k}\\)</span> and <span class=\"source-math\">\\(s_{l}\\)</span>, then take <span class=\"source-math\">\\(g\\)</span>. The respective success probabilities are</p>\n<div class=\"equation-block\"><div class=\"equation-content\">\\[\n  \\tfrac14+\\frac3{4(k+4)}\n  \\quad\\hbox{and}\\quad\n  \\tfrac14+\\frac3{4(l+4)},\n  \\]</div></div>\n<p>which differ for <span class=\"source-math\">\\(k\\ne l\\)</span>. The preceding <span class=\"source-math\">\\(b\\)</span> observations leave the mixture weights unchanged. Thus the complete conditional kernels remain distinct, even when their immediate predictions currently coincide.</p>\n</li>\n<li>\n<p><strong>True membership is not assumed.</strong> <span class=\"source-math\">\\(\\mu\\)</span> is deliberately not an element of <span class=\"source-math\">\\(M\\)</span>, as permitted by this theorem. Every <span class=\"source-math\">\\(\\nu _{k}\\)</span> has an expired period in which its <span class=\"source-math\">\\(g\\)</span> prediction differs from <span class=\"source-math\">\\(\\mu\\)</span>.</p>\n</li>\n</ul>\n<p>Now trace the actual agent. Before decision <span class=\"source-math\">\\(t\\)</span>, the available indices are at most <span class=\"source-math\">\\(t\\)</span>: at most one next candidate is added per previous observation. Hence every available <span class=\"source-math\">\\(k\\)</span> has already passed <span class=\"source-math\">\\(s_{k}\\)</span>. On the all-<span class=\"source-math\">\\(b\\)</span> history both mixture likelihoods equal one, so their posterior weights remain <span class=\"source-math\">\\(1/4,3/4\\)</span>, giving</p>\n<div class=\"equation-block\"><div class=\"equation-content\">\\[\nV^g_{\\nu_k}=\\tfrac14+\\frac3{4(k+4)}\\le\\tfrac25\n&lt;\\tfrac12=V^b_{\\nu_k}.\n\\]</div></div>\n<p>The unique optimistic action is therefore <span class=\"source-math\">\\(b\\)</span>. All available environments predict exactly <span class=\"source-math\">\\(\\frac{1}{2}\\)</span> for this action, so its inter-model disagreement is zero. A new environment is added because zero confidence count is below the budget. The added model has also expired by its first available decision, and the induction continues forever.</p>\n<p>There is a minor initialization ambiguity in Definition 44: its displayed union starts with prior positive-time histories and omits the initial class at the first update. Taken literally, <span class=\"source-math\">\\(\\nu _{1}\\)</span> is added again once; counting the initial class as already introduced instead adds <span class=\"source-math\">\\(\\nu _{2}\\)</span>. Both conventions obey the index bound above, and both yield the same perpetual <span class=\"source-math\">\\(b\\)</span> choice. Exact controls implemented each convention.</p>\n<p>The true value gap is always <span class=\"source-math\">\\(1-1/2=1/2&gt;\\epsilon\\)</span>. Thus, with true probability one,</p>\n<div class=\"equation-block\"><div class=\"equation-content\">\\[\nn(h_t,1/4)=0,\\qquad m(h_t,1/4)=t,\n\\]</div></div>\n<p>contradicting Theorem 46(i) for every finite <span class=\"source-math\">\\(C\\)</span>. The full class is nevertheless exhausted in the limit, so conclusion (ii) does not imply (i).</p>\n<p>The proof’s last paragraph assumes there is only a finite initial period before an optimistic environment is always present in the working class. Countable exhaustion introduces every <strong>fixed</strong> index eventually. It does not supply a finite bound on the indices of the history-dependent optimism witnesses. In this example the useful witness continually lies ahead of the working class, although all domination constants are uniform.</p>\n<p><strong>Reason for rejection.</strong> Extending the learning guarantee to arbitrary countable classes of dominant stochastic priors is a stated contribution, distinct from the finite and true-member cases. The proposed confidence-budget mechanism has no claimed error control on this admitted example: it remains perfectly confident while making a fixed-size error at every step. This directly invalidates its central guarantee that errors are accounted for by observable model disagreement plus a finite initial constant. Adding <code>mu in M</code>, or a finite uniform set of optimistic witnesses together with suitable accuracy slack, would impose substantive extra assumptions absent from this extension. Assuming true membership specifically changes the expressly distinguished dominant-prior setting. A different introduction/exploration strategy would require a new guarantee. This warrants rejection as written while preserving the paper’s finite-class results, deterministic-law improvement and deterministic countable result.</p>\n<p><strong>Discovery method.</strong> Noticed that the countable proof passed from eventual introduction of each model to eventual availability of a witness whose index may depend on the current history. Built time-dependent dominant priors whose optimistic periods expire before introduction.</p>\n<p><strong>Verification method.</strong> Read all 46 original pages and rechecked rendered Definition 44, Theorem 46 and its proof. Verified the measure-mixture domination, complete off-support kernel definition, distinct conditional models and exact optimistic execution. Fraction-based controls checked both initialization conventions for 100 decisions, 55,987 finite histories for pointwise optimism and cylinder domination, and 9,135 conditional-model pair certificates. The induction above proves the infinite failure; finite checks supplement it. An independent bounded reviewer re-read the original quantifiers and renders and identified the conditional-identity issue, which the distinct Bernoulli parameters resolve. Cited merging and finite-concentration arguments were checked separately; neither supplies the missing countable uniformity.</p>\n<p><strong>Confidence.</strong> High mathematical confidence; moderately high rejection confidence. The counterexample has finite alphabets, uniform domination, no tie in action choice and a fixed error gap. It refutes the exact countable-stochastic error comparison; it does not allege failure of every other theorem, empirical result or alternative optimistic agent.</p>\n",
           "source_body_sha256": "25cfa57b8669ed047228af504098d59f1e2b4e52e7944472d1c39ce2d6f8cacc",
           "export_text_sha256": "25cfa57b8669ed047228af504098d59f1e2b4e52e7944472d1c39ce2d6f8cacc",
           "private_reference_substitutions": 0,
           "display_equations": 8,
-          "inline_equations": 0,
-          "formatting_normalizations": []
+          "inline_equations": 70,
+          "formatting_normalizations": [
+            {
+              "rule": "literal_inline_notation",
+              "source": "gamma=0",
+              "tex": "\\gamma =0"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "M",
+              "tex": "M"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "h",
+              "tex": "h"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "C",
+              "tex": "C"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "t",
+              "tex": "t"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "m",
+              "tex": "m"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "epsilon",
+              "tex": "\\epsilon"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "n",
+              "tex": "n"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "epsilon",
+              "tex": "\\epsilon"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "M",
+              "tex": "M"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "n=0",
+              "tex": "n=0"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "m=t",
+              "tex": "m=t"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "g,b",
+              "tex": "g,b"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "{0,1/2,1}",
+              "tex": "\\{0,1/2,1\\}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "gamma=0",
+              "tex": "\\gamma =0"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "epsilon=1/4",
+              "tex": "\\epsilon =1/4"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "{nu_1}",
+              "tex": "\\{\\nu _{1}\\}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "N(t)=t+1",
+              "tex": "N(t)=t+1"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "mu",
+              "tex": "\\mu"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "1",
+              "tex": "1"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "g",
+              "tex": "g"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "1/2",
+              "tex": "\\frac{1}{2}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "b",
+              "tex": "b"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "k>=1",
+              "tex": "k\\ge 1"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "rho_k",
+              "tex": "\\rho _{k}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "s_k",
+              "tex": "s_{k}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "mu",
+              "tex": "\\mu"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "1/2",
+              "tex": "\\frac{1}{2}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "b",
+              "tex": "b"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "g",
+              "tex": "g"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "r_k",
+              "tex": "r_{k}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "{0,1}",
+              "tex": "\\{0,1\\}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "mu",
+              "tex": "\\mu"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "pi",
+              "tex": "\\pi"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "E",
+              "tex": "E"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "mu",
+              "tex": "\\mu"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "nu_k",
+              "tex": "\\nu _{k}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "1/4",
+              "tex": "\\frac{1}{4}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "t",
+              "tex": "t"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "k>=2(t+1)",
+              "tex": "k\\ge 2(t+1)"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "mu",
+              "tex": "\\mu"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "mu",
+              "tex": "\\mu"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "1",
+              "tex": "1"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "g",
+              "tex": "g"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "mu",
+              "tex": "\\mu"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "b",
+              "tex": "b"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "b",
+              "tex": "b"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "s_k",
+              "tex": "s_{k}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "s_l",
+              "tex": "s_{l}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "g",
+              "tex": "g"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "k!=l",
+              "tex": "k\\ne l"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "b",
+              "tex": "b"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "mu",
+              "tex": "\\mu"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "M",
+              "tex": "M"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "nu_k",
+              "tex": "\\nu _{k}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "g",
+              "tex": "g"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "mu",
+              "tex": "\\mu"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "t",
+              "tex": "t"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "t",
+              "tex": "t"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "k",
+              "tex": "k"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "s_k",
+              "tex": "s_{k}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "b",
+              "tex": "b"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "1/4,3/4",
+              "tex": "1/4,3/4"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "b",
+              "tex": "b"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "1/2",
+              "tex": "\\frac{1}{2}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "nu_1",
+              "tex": "\\nu _{1}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "nu_2",
+              "tex": "\\nu _{2}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "b",
+              "tex": "b"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "1-1/2=1/2>epsilon",
+              "tex": "1-1/2=1/2>\\epsilon"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "C",
+              "tex": "C"
+            }
+          ]
         }
       ]
     },

@@ -50,7 +50,7 @@
   function sourceVolume(volume) {
     if (!reportLoads.has(volume)) {
       const url = data.full_reports.volumes[String(volume)];
-      reportLoads.set(volume, fetch(`${url}?v=4`).then(response => { if (!response.ok) throw new Error(`HTTP ${response.status}`); return response.json(); }).catch(error => { reportLoads.delete(volume); throw error; }));
+      reportLoads.set(volume, fetch(`${url}?v=5`).then(response => { if (!response.ok) throw new Error(`HTTP ${response.status}`); return response.json(); }).catch(error => { reportLoads.delete(volume); throw error; }));
     }
     return reportLoads.get(volume);
   }
@@ -109,6 +109,13 @@
   function typeset(container) {
     if (window.MathJax?.startup?.promise) {
       window.MathJax.startup.promise = window.MathJax.startup.promise.then(() => window.MathJax.typesetPromise([container])).then(() => {
+        container.querySelectorAll('.source-math').forEach(span => {
+          const available = span.parentElement?.clientWidth;
+          if (available && span.getBoundingClientRect().width > available - 4) {
+            span.classList.add('wide-inline-math'); span.tabIndex = 0;
+            span.setAttribute('role', 'region'); span.setAttribute('aria-label', 'Equation; scroll horizontally to read all of it');
+          }
+        });
         container.querySelectorAll('.equation-block').forEach(box => {
           if (box.scrollWidth > box.clientWidth + 2) {
             box.tabIndex = 0; box.setAttribute('role', 'region'); box.setAttribute('aria-label', 'Equation; scroll horizontally to read all of it');
@@ -162,7 +169,7 @@
   }
   async function load() {
     try {
-      const response = await fetch('./data/jmlr.json?v=4'); if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const response = await fetch('./data/jmlr.json?v=5'); if (!response.ok) throw new Error(`HTTP ${response.status}`);
       data = await response.json();
       $('total-papers').textContent = data.snapshot.papers_with_findings.toLocaleString();
       $('total-findings').textContent = data.snapshot.findings.toLocaleString();

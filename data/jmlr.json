@@ -9401,7 +9401,7 @@
   "attribution": "Full finding text: GPT audit source reports, with source wording preserved. Volume-card summaries are editorial. Private file references are explicitly marked as omitted.",
   "scope": "Flagged JMLR papers in a frozen, ongoing GPT audit snapshot.",
   "full_reports": {
-    "edition": 1,
+    "edition": 2,
     "source": "GPT audit Markdown reports",
     "wording": "Source wording preserved; private references explicitly substituted. Layout and equation rendering formatted for the site.",
     "volumes": {

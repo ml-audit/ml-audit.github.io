@@ -75,26 +75,438 @@
           "title": "The claimed sampling impossibility ignores the dependence of the subgroup and global class probabilities",
           "source_heading": "## Issue 2002__accepted__v3-scheffer02a-01 — The claimed sampling impossibility ignores the dependence of the subgroup and global class probabilities",
           "markdown": "\n\n**Exact locations.** Section 4.5 and Theorem 12, PDF page 17 / printed page 849; its proof and equations (81)–(82), PDF page 18 / printed page 850. The governing definition of `p0` is the first paragraph of PDF page 7 / printed page 839. The additive approximation problem is Definition 2, PDF page 3 / printed page 835, and Theorem 4, PDF page 6 / printed page 838. The impossibility is advertised in the abstract and introduction, PDF pages 1–2, and repeated as a guide to utility selection in Section 6, PDF page 21 / printed page 853.\n\n**Claim and assumptions.** Theorem 12 says there is no algorithm satisfying Theorem 4 for\n\n```text\nf(h) = g/(1-g) (p-p0)^2.\n```\n\nHere `g` is the fraction of the database in a subgroup, `p` is the binary target probability within it, and `p0` is the target probability in the whole database. Thus `p0` is not an independently supplied control baseline. Theorem 4 asks for an additive `epsilon` approximation to the best `n` hypotheses, with probability at least `1-delta`. The hypothesis set is finite. Definition 3 permits an estimated utility with a valid confidence bound; it does not restrict algorithms to one particular plug-in estimator.\n\n**Error.** If `q` is the target probability outside the subgroup, the law of total probability imposes\n\n```text\np0 = g p + (1-g) q,\nf(h) = g(1-g) (p-q)^2 <= 1/4.\n```\n\nThe proof considers divergence of `g/(1-g)` while ignoring the corresponding shrinking of `p-p0`. Its assertion that this utility is unbounded is false on the defined problem domain. For example, take a database of `N` items, with `N-1` positive items all in the subgroup and one negative item outside. Then the coefficient is `N-1`, but the actual utility is `(N-1)/N^2`, tending to zero.\n\nBoundedness alone would not establish estimability of every possible functional. The following construction gives the required algorithm and finite uniform sample bound.\n\nLet the four joint probabilities of subgroup membership `B` and binary label `Y` be\n\n```text\na = Pr(B=1,Y=1), b = Pr(B=1,Y=0),\nc = Pr(B=0,Y=1), d = Pr(B=0,Y=0),\nt = a+c = p0.\n```\n\nThe exact same utility is\n\n```text\nF(a,b,c,d) = t(1-t) - ab/(a+b) - cd/(c+d).\n```\n\nSet terms `0/0` to zero. This is the continuous extension at empty or full subgroups. It equals total Bernoulli variance minus the expected within-group variance. Both variance terms have a variational representation as the minimum expected squared loss over predictions in `[0,1]`. Since these losses are bounded by one, each minimum is 1-Lipschitz in the L1 distance between the four cell probabilities. Therefore\n\n```text\n|F(P)-F(Q)| <= 2 ||P-Q||_1 <= 8 max_j |P_j-Q_j|.\n```\n\nDraw `m` database items independently with replacement. For every hypothesis, form the four empirical cell probabilities and evaluate this formula. A union bound over the four cells and all hypotheses, using Hoeffding, gives\n\n```text\nPr(max_h |Fhat_h-F_h| > 8 sqrt(ln(8 |H|/delta)/(2m))) <= delta.\n```\n\nConsequently,\n\n```text\nm >= ceil(128 epsilon^(-2) ln(8 |H|/delta))\n```\n\nmakes every score accurate to `epsilon/2` simultaneously with probability at least `1-delta`. Return the `n` highest empirical scores. For every excluded hypothesis `h` and returned hypothesis `r`,\n\n```text\nF(h) <= Fhat(h)+epsilon/2 <= Fhat(r)+epsilon/2 <= F(r)+epsilon.\n```\n\nThis is exactly the guarantee Theorem 12 says no algorithm can satisfy. The bound is independent of database size. It applies to databases larger than the bound; smaller databases can be scanned exactly. This is not a counterargument that relies only on scanning the full database.\n\nThe estimator reestimates `p0` through the empirical label frequency. It estimates the same true utility even if the true global `p0` is supplied. Definition 3 allows this, and Theorem 12 rules out all algorithms. The singular behavior of a particular fixed-`p0` plug-in estimator cannot prove that no other estimator exists. Relative error near a zero utility is a separate question; Theorem 12 concerns the stated additive guarantee.\n\n**Reproducible evidence and verification.** `checks.py` exhaustively checks the identities and the bound with exact rational arithmetic on all 5,456 contingency tables of size 30, including boundary tables; the maximum is exactly `1/4`. It also checks 40,000 pairs of probability vectors against the Lipschitz bound, and runs the constructive algorithm 100 times on a finite 20,000-item database with four hypotheses, using 18,459 queries per run. The analytic proof, rather than those runs, establishes the uniform guarantee. Full derivation: impossibility-counterproof.txt [unpublished artifact reference omitted]. Scripts/results: checks.py [unpublished artifact reference omitted], checks-results.json [unpublished artifact reference omitted]. Original rendered definitions/theorem: `page-07.png`, `page-17.png`, `page-18.png` in the same evidence directory. An independent second reviewer inspected those original pages and separately derived the same constructive bound.\n\n**Why rejection is warranted.** The impossible-versus-estimable distinction is an explicit main contribution in the abstract, not an incidental proof step. Its conclusion is reversed for the stated popular utility family: sampling is possible with a distribution-free finite sample bound. Correcting it requires withdrawing the negative theorem and its recommendation about which utility functions admit sampling. This does not claim that the measured speedups for other utility families disappear.\n\n**Discovery method:** traced the claimed singularity against the original subgroup probability definitions, then rewrote the utility as a four-cell variance functional. **Verification method:** independent symbolic construction of a valid confidence bound and top-`n` algorithm, exact rational enumeration, boundary examples, and independently reproduced numerical checks. **Confidence: high.** The counteralgorithm operates under the stated model and directly satisfies the supposedly impossible guarantee.\n\n",
-          "html": "<p><strong>Exact locations.</strong> Section 4.5 and Theorem 12, PDF page 17 / printed page 849; its proof and equations (81)–(82), PDF page 18 / printed page 850. The governing definition of <code>p0</code> is the first paragraph of PDF page 7 / printed page 839. The additive approximation problem is Definition 2, PDF page 3 / printed page 835, and Theorem 4, PDF page 6 / printed page 838. The impossibility is advertised in the abstract and introduction, PDF pages 1–2, and repeated as a guide to utility selection in Section 6, PDF page 21 / printed page 853.</p>\n<p><strong>Claim and assumptions.</strong> Theorem 12 says there is no algorithm satisfying Theorem 4 for</p>\n<pre><code class=\"language-text\">f(h) = g/(1-g) (p-p0)^2.\n</code></pre>\n<p>Here <code>g</code> is the fraction of the database in a subgroup, <code>p</code> is the binary target probability within it, and <code>p0</code> is the target probability in the whole database. Thus <code>p0</code> is not an independently supplied control baseline. Theorem 4 asks for an additive <code>epsilon</code> approximation to the best <code>n</code> hypotheses, with probability at least <code>1-delta</code>. The hypothesis set is finite. Definition 3 permits an estimated utility with a valid confidence bound; it does not restrict algorithms to one particular plug-in estimator.</p>\n<p><strong>Error.</strong> If <code>q</code> is the target probability outside the subgroup, the law of total probability imposes</p>\n<pre><code class=\"language-text\">p0 = g p + (1-g) q,\nf(h) = g(1-g) (p-q)^2 &lt;= 1/4.\n</code></pre>\n<p>The proof considers divergence of <code>g/(1-g)</code> while ignoring the corresponding shrinking of <code>p-p0</code>. Its assertion that this utility is unbounded is false on the defined problem domain. For example, take a database of <code>N</code> items, with <code>N-1</code> positive items all in the subgroup and one negative item outside. Then the coefficient is <code>N-1</code>, but the actual utility is <code>(N-1)/N^2</code>, tending to zero.</p>\n<p>Boundedness alone would not establish estimability of every possible functional. The following construction gives the required algorithm and finite uniform sample bound.</p>\n<p>Let the four joint probabilities of subgroup membership <code>B</code> and binary label <code>Y</code> be</p>\n<pre><code class=\"language-text\">a = Pr(B=1,Y=1), b = Pr(B=1,Y=0),\nc = Pr(B=0,Y=1), d = Pr(B=0,Y=0),\nt = a+c = p0.\n</code></pre>\n<p>The exact same utility is</p>\n<pre><code class=\"language-text\">F(a,b,c,d) = t(1-t) - ab/(a+b) - cd/(c+d).\n</code></pre>\n<p>Set terms <code>0/0</code> to zero. This is the continuous extension at empty or full subgroups. It equals total Bernoulli variance minus the expected within-group variance. Both variance terms have a variational representation as the minimum expected squared loss over predictions in <code>[0,1]</code>. Since these losses are bounded by one, each minimum is 1-Lipschitz in the L1 distance between the four cell probabilities. Therefore</p>\n<pre><code class=\"language-text\">|F(P)-F(Q)| &lt;= 2 ||P-Q||_1 &lt;= 8 max_j |P_j-Q_j|.\n</code></pre>\n<p>Draw <code>m</code> database items independently with replacement. For every hypothesis, form the four empirical cell probabilities and evaluate this formula. A union bound over the four cells and all hypotheses, using Hoeffding, gives</p>\n<pre><code class=\"language-text\">Pr(max_h |Fhat_h-F_h| &gt; 8 sqrt(ln(8 |H|/delta)/(2m))) &lt;= delta.\n</code></pre>\n<p>Consequently,</p>\n<pre><code class=\"language-text\">m &gt;= ceil(128 epsilon^(-2) ln(8 |H|/delta))\n</code></pre>\n<p>makes every score accurate to <code>epsilon/2</code> simultaneously with probability at least <code>1-delta</code>. Return the <code>n</code> highest empirical scores. For every excluded hypothesis <code>h</code> and returned hypothesis <code>r</code>,</p>\n<pre><code class=\"language-text\">F(h) &lt;= Fhat(h)+epsilon/2 &lt;= Fhat(r)+epsilon/2 &lt;= F(r)+epsilon.\n</code></pre>\n<p>This is exactly the guarantee Theorem 12 says no algorithm can satisfy. The bound is independent of database size. It applies to databases larger than the bound; smaller databases can be scanned exactly. This is not a counterargument that relies only on scanning the full database.</p>\n<p>The estimator reestimates <code>p0</code> through the empirical label frequency. It estimates the same true utility even if the true global <code>p0</code> is supplied. Definition 3 allows this, and Theorem 12 rules out all algorithms. The singular behavior of a particular fixed-<code>p0</code> plug-in estimator cannot prove that no other estimator exists. Relative error near a zero utility is a separate question; Theorem 12 concerns the stated additive guarantee.</p>\n<p><strong>Reproducible evidence and verification.</strong> <code>checks.py</code> exhaustively checks the identities and the bound with exact rational arithmetic on all 5,456 contingency tables of size 30, including boundary tables; the maximum is exactly <code>1/4</code>. It also checks 40,000 pairs of probability vectors against the Lipschitz bound, and runs the constructive algorithm 100 times on a finite 20,000-item database with four hypotheses, using 18,459 queries per run. The analytic proof, rather than those runs, establishes the uniform guarantee. Full derivation: impossibility-counterproof.txt [unpublished artifact reference omitted]. Scripts/results: checks.py [unpublished artifact reference omitted], checks-results.json [unpublished artifact reference omitted]. Original rendered definitions/theorem: <code>page-07.png</code>, <code>page-17.png</code>, <code>page-18.png</code> in the same evidence directory. An independent second reviewer inspected those original pages and separately derived the same constructive bound.</p>\n<p><strong>Why rejection is warranted.</strong> The impossible-versus-estimable distinction is an explicit main contribution in the abstract, not an incidental proof step. Its conclusion is reversed for the stated popular utility family: sampling is possible with a distribution-free finite sample bound. Correcting it requires withdrawing the negative theorem and its recommendation about which utility functions admit sampling. This does not claim that the measured speedups for other utility families disappear.</p>\n<p><strong>Discovery method:</strong> traced the claimed singularity against the original subgroup probability definitions, then rewrote the utility as a four-cell variance functional. <strong>Verification method:</strong> independent symbolic construction of a valid confidence bound and top-<code>n</code> algorithm, exact rational enumeration, boundary examples, and independently reproduced numerical checks. <strong>Confidence: high.</strong> The counteralgorithm operates under the stated model and directly satisfies the supposedly impossible guarantee.</p>\n",
+          "html": "<p><strong>Exact locations.</strong> Section 4.5 and Theorem 12, PDF page 17 / printed page 849; its proof and equations (81)–(82), PDF page 18 / printed page 850. The governing definition of <span class=\"source-math\">\\(p0\\)</span> is the first paragraph of PDF page 7 / printed page 839. The additive approximation problem is Definition 2, PDF page 3 / printed page 835, and Theorem 4, PDF page 6 / printed page 838. The impossibility is advertised in the abstract and introduction, PDF pages 1–2, and repeated as a guide to utility selection in Section 6, PDF page 21 / printed page 853.</p>\n<p><strong>Claim and assumptions.</strong> Theorem 12 says there is no algorithm satisfying Theorem 4 for</p>\n<pre><code class=\"language-text\">f(h) = g/(1-g) (p-p0)^2.\n</code></pre>\n<p>Here <span class=\"source-math\">\\(g\\)</span> is the fraction of the database in a subgroup, <span class=\"source-math\">\\(p\\)</span> is the binary target probability within it, and <span class=\"source-math\">\\(p0\\)</span> is the target probability in the whole database. Thus <span class=\"source-math\">\\(p0\\)</span> is not an independently supplied control baseline. Theorem 4 asks for an additive <span class=\"source-math\">\\(\\epsilon\\)</span> approximation to the best <span class=\"source-math\">\\(n\\)</span> hypotheses, with probability at least <span class=\"source-math\">\\(1-\\delta\\)</span>. The hypothesis set is finite. Definition 3 permits an estimated utility with a valid confidence bound; it does not restrict algorithms to one particular plug-in estimator.</p>\n<p><strong>Error.</strong> If <span class=\"source-math\">\\(q\\)</span> is the target probability outside the subgroup, the law of total probability imposes</p>\n<pre><code class=\"language-text\">p0 = g p + (1-g) q,\nf(h) = g(1-g) (p-q)^2 &lt;= 1/4.\n</code></pre>\n<p>The proof considers divergence of <span class=\"source-math\">\\(g/(1-g)\\)</span> while ignoring the corresponding shrinking of <span class=\"source-math\">\\(p-p0\\)</span>. Its assertion that this utility is unbounded is false on the defined problem domain. For example, take a database of <span class=\"source-math\">\\(N\\)</span> items, with <span class=\"source-math\">\\(N-1\\)</span> positive items all in the subgroup and one negative item outside. Then the coefficient is <span class=\"source-math\">\\(N-1\\)</span>, but the actual utility is <span class=\"source-math\">\\((N-1)/N^{2}\\)</span>, tending to zero.</p>\n<p>Boundedness alone would not establish estimability of every possible functional. The following construction gives the required algorithm and finite uniform sample bound.</p>\n<p>Let the four joint probabilities of subgroup membership <span class=\"source-math\">\\(B\\)</span> and binary label <span class=\"source-math\">\\(Y\\)</span> be</p>\n<pre><code class=\"language-text\">a = Pr(B=1,Y=1), b = Pr(B=1,Y=0),\nc = Pr(B=0,Y=1), d = Pr(B=0,Y=0),\nt = a+c = p0.\n</code></pre>\n<p>The exact same utility is</p>\n<pre><code class=\"language-text\">F(a,b,c,d) = t(1-t) - ab/(a+b) - cd/(c+d).\n</code></pre>\n<p>Set terms <span class=\"source-math\">\\(\\frac{0}{0}\\)</span> to zero. This is the continuous extension at empty or full subgroups. It equals total Bernoulli variance minus the expected within-group variance. Both variance terms have a variational representation as the minimum expected squared loss over predictions in <span class=\"source-math\">\\([0,1]\\)</span>. Since these losses are bounded by one, each minimum is 1-Lipschitz in the L1 distance between the four cell probabilities. Therefore</p>\n<pre><code class=\"language-text\">|F(P)-F(Q)| &lt;= 2 ||P-Q||_1 &lt;= 8 max_j |P_j-Q_j|.\n</code></pre>\n<p>Draw <span class=\"source-math\">\\(m\\)</span> database items independently with replacement. For every hypothesis, form the four empirical cell probabilities and evaluate this formula. A union bound over the four cells and all hypotheses, using Hoeffding, gives</p>\n<pre><code class=\"language-text\">Pr(max_h |Fhat_h-F_h| &gt; 8 sqrt(ln(8 |H|/delta)/(2m))) &lt;= delta.\n</code></pre>\n<p>Consequently,</p>\n<pre><code class=\"language-text\">m &gt;= ceil(128 epsilon^(-2) ln(8 |H|/delta))\n</code></pre>\n<p>makes every score accurate to <span class=\"source-math\">\\(\\epsilon /2\\)</span> simultaneously with probability at least <span class=\"source-math\">\\(1-\\delta\\)</span>. Return the <span class=\"source-math\">\\(n\\)</span> highest empirical scores. For every excluded hypothesis <span class=\"source-math\">\\(h\\)</span> and returned hypothesis <span class=\"source-math\">\\(r\\)</span>,</p>\n<pre><code class=\"language-text\">F(h) &lt;= Fhat(h)+epsilon/2 &lt;= Fhat(r)+epsilon/2 &lt;= F(r)+epsilon.\n</code></pre>\n<p>This is exactly the guarantee Theorem 12 says no algorithm can satisfy. The bound is independent of database size. It applies to databases larger than the bound; smaller databases can be scanned exactly. This is not a counterargument that relies only on scanning the full database.</p>\n<p>The estimator reestimates <span class=\"source-math\">\\(p0\\)</span> through the empirical label frequency. It estimates the same true utility even if the true global <span class=\"source-math\">\\(p0\\)</span> is supplied. Definition 3 allows this, and Theorem 12 rules out all algorithms. The singular behavior of a particular fixed-<span class=\"source-math\">\\(p0\\)</span> plug-in estimator cannot prove that no other estimator exists. Relative error near a zero utility is a separate question; Theorem 12 concerns the stated additive guarantee.</p>\n<p><strong>Reproducible evidence and verification.</strong> <code>checks.py</code> exhaustively checks the identities and the bound with exact rational arithmetic on all 5,456 contingency tables of size 30, including boundary tables; the maximum is exactly <span class=\"source-math\">\\(\\frac{1}{4}\\)</span>. It also checks 40,000 pairs of probability vectors against the Lipschitz bound, and runs the constructive algorithm 100 times on a finite 20,000-item database with four hypotheses, using 18,459 queries per run. The analytic proof, rather than those runs, establishes the uniform guarantee. Full derivation: impossibility-counterproof.txt [unpublished artifact reference omitted]. Scripts/results: checks.py [unpublished artifact reference omitted], checks-results.json [unpublished artifact reference omitted]. Original rendered definitions/theorem: <code>page-07.png</code>, <code>page-17.png</code>, <code>page-18.png</code> in the same evidence directory. An independent second reviewer inspected those original pages and separately derived the same constructive bound.</p>\n<p><strong>Why rejection is warranted.</strong> The impossible-versus-estimable distinction is an explicit main contribution in the abstract, not an incidental proof step. Its conclusion is reversed for the stated popular utility family: sampling is possible with a distribution-free finite sample bound. Correcting it requires withdrawing the negative theorem and its recommendation about which utility functions admit sampling. This does not claim that the measured speedups for other utility families disappear.</p>\n<p><strong>Discovery method:</strong> traced the claimed singularity against the original subgroup probability definitions, then rewrote the utility as a four-cell variance functional. <strong>Verification method:</strong> independent symbolic construction of a valid confidence bound and top-<span class=\"source-math\">\\(n\\)</span> algorithm, exact rational enumeration, boundary examples, and independently reproduced numerical checks. <strong>Confidence: high.</strong> The counteralgorithm operates under the stated model and directly satisfies the supposedly impossible guarantee.</p>\n",
           "source_body_sha256": "0623f09cd54c5bf4d992f3a2b128ef3cfeffa183962d065040f493ac55e2dfd5",
           "export_text_sha256": "ef248f4973b58b03151203bd83dc5300f0547f9a615af9c56f9f7dffed7d6965",
           "private_reference_substitutions": 3,
           "display_equations": 0,
-          "inline_equations": 0,
-          "formatting_normalizations": []
+          "inline_equations": 30,
+          "formatting_normalizations": [
+            {
+              "rule": "literal_inline_notation",
+              "source": "p0",
+              "tex": "p0"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "g",
+              "tex": "g"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "p",
+              "tex": "p"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "p0",
+              "tex": "p0"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "p0",
+              "tex": "p0"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "epsilon",
+              "tex": "\\epsilon"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "n",
+              "tex": "n"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "1-delta",
+              "tex": "1-\\delta"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "q",
+              "tex": "q"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "g/(1-g)",
+              "tex": "g/(1-g)"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "p-p0",
+              "tex": "p-p0"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "N",
+              "tex": "N"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "N-1",
+              "tex": "N-1"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "N-1",
+              "tex": "N-1"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "(N-1)/N^2",
+              "tex": "(N-1)/N^{2}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "B",
+              "tex": "B"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "Y",
+              "tex": "Y"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "0/0",
+              "tex": "\\frac{0}{0}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "[0,1]",
+              "tex": "[0,1]"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "m",
+              "tex": "m"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "epsilon/2",
+              "tex": "\\epsilon /2"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "1-delta",
+              "tex": "1-\\delta"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "n",
+              "tex": "n"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "h",
+              "tex": "h"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "r",
+              "tex": "r"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "p0",
+              "tex": "p0"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "p0",
+              "tex": "p0"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "p0",
+              "tex": "p0"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "1/4",
+              "tex": "\\frac{1}{4}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "n",
+              "tex": "n"
+            }
+          ]
         },
         {
           "id": "2002__accepted__v3-scheffer02a-02",
           "title": "The generic algorithm can accumulate approximation error across accepted hypotheses",
           "source_heading": "## Issue 2002__accepted__v3-scheffer02a-02 — The generic algorithm can accumulate approximation error across accepted hypotheses",
           "markdown": "\n\n**Exact locations.** Table 1, step 3(e)i, PDF page 5 / printed page 837; Theorem 4, PDF page 6 / printed page 838. Appendix A invariant `(I3)`, PDF page 22 / printed page 854; Case (1), “Show (I3),” PDF page 24 / printed page 856; final acceptance proof, PDF page 27 / printed page 859.\n\n**Claim and assumptions.** The algorithm claims the additive `epsilon` guarantee of Theorem 4 for any estimated utilities with valid confidence bounds as defined in Definition 3. Unbiasedness is not required. A returned hypothesis can be accepted when its lower confidence bound is within `epsilon` of the largest upper bound outside the current empirical best set. The requested number of remaining outputs decreases after acceptance.\n\n**Error and exact counterexample.** Approximate acceptances can protect the newly accepted hypothesis while leaving a previously accepted, worse hypothesis without the advertised guarantee. This occurs even when every common and hypothesis-specific confidence interval is correct deterministically at every sample size.\n\nUse four hypotheses in order `g,c,d,a`, request `n=3`, and set `epsilon=1/10`, `delta=1/10`. Let each hypothesis have a constant per-item utility, so its exact empirical mean on every database and every iid query sequence is respectively\n\n```text\nf(g)=0, f(c)=9/100, f(d)=18/100, f(a)=27/100.\n```\n\nThe estimated utility is that empirical mean plus a specified deterministic sample-size bias. The following table gives the estimates and the valid radii for the active hypotheses; each cell is `estimate ; radius`.\n\n| Sample size | g | c | d | a |\n|---|---:|---:|---:|---:|\n| 1 | `0 ; .001` | `0 ; .091` | `.18 ; .301` | `.27 ; .301` |\n| 2 | already output | `.09 ; .001` | `0 ; .181` | `.27 ; .301` |\n| 3 | already output | already output | `.18 ; .001` | `0 ; .271` |\n\nFor sample sizes at least four, all biases are zero and every radius is `.001/(m-3)`. Use common radius `.301` through sample size three and `.001/(m-3)` thereafter. All bounds are strictly positive, nonincreasing in sample size, independent of the confidence argument, and vanish. Every estimation error is within its radius with probability one for every database, every sample size, and every query sequence. All true and estimated utilities are in `[0,1]`. Thus this is a valid instance of Definition 3, not a confidence-interval failure. The estimates are deliberately biased; the example does not assert failure of the natural plug-in estimators in Section 4.\n\nThe worst-case stopping parameter in step 2 is `M=4`. Through the first three iterations the common stopping radius exceeds `epsilon/2`. Process the full for-loop, recomputing the active set, remaining output count, and empirical best set after every acceptance:\n\n1. At sample size 1, the best three are `a,d,g`, with ties placing `g` before `c`. For `g`, the acceptance right-hand side is `.001+.091-.1=-.008`, so it is output. Neither `d` nor `a` is accepted because their large valid radii block acceptance. No hypothesis is discarded.\n2. At sample size 2, the best two are `a,c`. The acceptance right-hand side for `c` is `.001+.181-.1=.082`, below its estimate `.09`, so `c` is output. The others remain.\n3. At sample size 3, `d` is best empirically. Its acceptance right-hand side is `.001+.271-.1=.172`, below `.18`, so `d` is output and the requested output count reaches zero.\n\nThe final output is `{g,c,d}`, excluding `a`. The excluded utility exceeds the minimum returned utility by `.27`, although the requested tolerance is `.1`. The failure probability is one while every confidence event holds. The trace uses a coherent, charitable interpretation of the paper’s inconsistent `H_i/H_(i+1)` and `n_i/n_(i+1)` indexing. It executes the entire same-sample for-loop; it does not rely on the proof’s one-action-per-iteration simplification.\n\n**Where the proof fails.** After accepting a hypothesis, the invariant for previously output hypotheses becomes stronger because `n_i` decreases. The Case (1) proof checks `(I3)` for the newly accepted hypothesis only. It does not establish the strengthened invariant for old outputs. A later approximate acceptance can leave a better hypothesis behind, as the trace shows.\n\nThe loss is not bounded by a universal constant multiple of the requested tolerance. `gss-family.py` constructs the same phenomenon for any requested `n>=2`: use `n+1` constant utility targets `v_j=.9 j epsilon`, with `epsilon=1/(2n)`, and successively suppress one next hypothesis’s estimate while retaining valid radii. The algorithm returns `h_0,...,h_(n-1)`, excluding `h_n`; its error is `.9 n epsilon`. All utilities remain at most `.45`, and all confidence events hold with probability one. Exact rational executions for `n=2,...,50` confirm this family. At `n=50`, the requested tolerance is `.01` and the actual gap is `.45`.\n\n**Reproducible evidence and verification.** Run gss-counterexample.py [unpublished artifact reference omitted] for the complete exact rational four-hypothesis trace; its JSON result [unpublished artifact reference omitted] records every acceptance, discard test, best set, and threshold. Run gss-family.py [unpublished artifact reference omitted] for the unbounded-in-`n` family; results are in gss-family.json [unpublished artifact reference omitted]. Original Table 1 and the faulty invariant step are rendered as `page-05.png` and `page-24.png`. An independent reviewer reran the four-hypothesis script and inspected those original pages and Definition 3.\n\n**Why rejection is warranted.** Theorem 4 is the central guarantee of the generic algorithm. This example satisfies the explicit confidence-bound assumptions yet violates that guarantee with certainty. A correction must change acceptance or approximation budgeting, impose substantive additional estimator restrictions, and supply a new invariant/proof. For example, reserving approximation for final selection changes the early acceptance rule; dividing tolerance across stages changes the dependence of sample requirements on `n`. The existing empirical speedup claims do not establish the behavior of such a revised algorithm. This is not a transcription error or a fixed missing constant. Its demonstrated scope is the advertised generic theorem, not a claimed rerun failure of the original subgroup implementation.\n\n**Discovery method:** traced the quantified loop invariant when the remaining output count decreases and constructed successive acceptances that undermine an earlier output. **Verification method:** exact rational execution of the full algorithm with confidence events true for every sequence, plus a parameterized family and independent reproduction. **Confidence: high.** The only nonstandard feature is the explicitly disclosed deterministic bias, which the stated generic assumptions permit.\n\nOther observations were screened separately, including the fourth-root versus `epsilon^-2` sample-bound arithmetic, finite-sample failure of empirical-normal confidence intervals, adaptive use of confidence levels, and local equation slips. Original source code, the proprietary juice database, split seeds, and raw experimental runs were not recovered. No missing code, failed rerun, or unmeasured reversal of Figure 1 or Figure 2 is asserted as a finding.\n",
-          "html": "<p><strong>Exact locations.</strong> Table 1, step 3(e)i, PDF page 5 / printed page 837; Theorem 4, PDF page 6 / printed page 838. Appendix A invariant <code>(I3)</code>, PDF page 22 / printed page 854; Case (1), “Show (I3),” PDF page 24 / printed page 856; final acceptance proof, PDF page 27 / printed page 859.</p>\n<p><strong>Claim and assumptions.</strong> The algorithm claims the additive <code>epsilon</code> guarantee of Theorem 4 for any estimated utilities with valid confidence bounds as defined in Definition 3. Unbiasedness is not required. A returned hypothesis can be accepted when its lower confidence bound is within <code>epsilon</code> of the largest upper bound outside the current empirical best set. The requested number of remaining outputs decreases after acceptance.</p>\n<p><strong>Error and exact counterexample.</strong> Approximate acceptances can protect the newly accepted hypothesis while leaving a previously accepted, worse hypothesis without the advertised guarantee. This occurs even when every common and hypothesis-specific confidence interval is correct deterministically at every sample size.</p>\n<p>Use four hypotheses in order <code>g,c,d,a</code>, request <code>n=3</code>, and set <code>epsilon=1/10</code>, <code>delta=1/10</code>. Let each hypothesis have a constant per-item utility, so its exact empirical mean on every database and every iid query sequence is respectively</p>\n<pre><code class=\"language-text\">f(g)=0, f(c)=9/100, f(d)=18/100, f(a)=27/100.\n</code></pre>\n<p>The estimated utility is that empirical mean plus a specified deterministic sample-size bias. The following table gives the estimates and the valid radii for the active hypotheses; each cell is <code>estimate ; radius</code>.</p>\n<div class=\"evidence-table-wrap\"><table class=\"evidence-table\">\n<thead>\n<tr>\n<th>Sample size</th>\n<th style=\"text-align:right\">g</th>\n<th style=\"text-align:right\">c</th>\n<th style=\"text-align:right\">d</th>\n<th style=\"text-align:right\">a</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>1</td>\n<td style=\"text-align:right\"><code>0 ; .001</code></td>\n<td style=\"text-align:right\"><code>0 ; .091</code></td>\n<td style=\"text-align:right\"><code>.18 ; .301</code></td>\n<td style=\"text-align:right\"><code>.27 ; .301</code></td>\n</tr>\n<tr>\n<td>2</td>\n<td style=\"text-align:right\">already output</td>\n<td style=\"text-align:right\"><code>.09 ; .001</code></td>\n<td style=\"text-align:right\"><code>0 ; .181</code></td>\n<td style=\"text-align:right\"><code>.27 ; .301</code></td>\n</tr>\n<tr>\n<td>3</td>\n<td style=\"text-align:right\">already output</td>\n<td style=\"text-align:right\">already output</td>\n<td style=\"text-align:right\"><code>.18 ; .001</code></td>\n<td style=\"text-align:right\"><code>0 ; .271</code></td>\n</tr>\n</tbody>\n</table></div>\n<p>For sample sizes at least four, all biases are zero and every radius is <code>.001/(m-3)</code>. Use common radius <code>.301</code> through sample size three and <code>.001/(m-3)</code> thereafter. All bounds are strictly positive, nonincreasing in sample size, independent of the confidence argument, and vanish. Every estimation error is within its radius with probability one for every database, every sample size, and every query sequence. All true and estimated utilities are in <code>[0,1]</code>. Thus this is a valid instance of Definition 3, not a confidence-interval failure. The estimates are deliberately biased; the example does not assert failure of the natural plug-in estimators in Section 4.</p>\n<p>The worst-case stopping parameter in step 2 is <code>M=4</code>. Through the first three iterations the common stopping radius exceeds <code>epsilon/2</code>. Process the full for-loop, recomputing the active set, remaining output count, and empirical best set after every acceptance:</p>\n<ol>\n<li>At sample size 1, the best three are <code>a,d,g</code>, with ties placing <code>g</code> before <code>c</code>. For <code>g</code>, the acceptance right-hand side is <code>.001+.091-.1=-.008</code>, so it is output. Neither <code>d</code> nor <code>a</code> is accepted because their large valid radii block acceptance. No hypothesis is discarded.</li>\n<li>At sample size 2, the best two are <code>a,c</code>. The acceptance right-hand side for <code>c</code> is <code>.001+.181-.1=.082</code>, below its estimate <code>.09</code>, so <code>c</code> is output. The others remain.</li>\n<li>At sample size 3, <code>d</code> is best empirically. Its acceptance right-hand side is <code>.001+.271-.1=.172</code>, below <code>.18</code>, so <code>d</code> is output and the requested output count reaches zero.</li>\n</ol>\n<p>The final output is <code>{g,c,d}</code>, excluding <code>a</code>. The excluded utility exceeds the minimum returned utility by <code>.27</code>, although the requested tolerance is <code>.1</code>. The failure probability is one while every confidence event holds. The trace uses a coherent, charitable interpretation of the paper’s inconsistent <code>H_i/H_(i+1)</code> and <code>n_i/n_(i+1)</code> indexing. It executes the entire same-sample for-loop; it does not rely on the proof’s one-action-per-iteration simplification.</p>\n<p><strong>Where the proof fails.</strong> After accepting a hypothesis, the invariant for previously output hypotheses becomes stronger because <code>n_i</code> decreases. The Case (1) proof checks <code>(I3)</code> for the newly accepted hypothesis only. It does not establish the strengthened invariant for old outputs. A later approximate acceptance can leave a better hypothesis behind, as the trace shows.</p>\n<p>The loss is not bounded by a universal constant multiple of the requested tolerance. <code>gss-family.py</code> constructs the same phenomenon for any requested <code>n&gt;=2</code>: use <code>n+1</code> constant utility targets <code>v_j=.9 j epsilon</code>, with <code>epsilon=1/(2n)</code>, and successively suppress one next hypothesis’s estimate while retaining valid radii. The algorithm returns <code>h_0,...,h_(n-1)</code>, excluding <code>h_n</code>; its error is <code>.9 n epsilon</code>. All utilities remain at most <code>.45</code>, and all confidence events hold with probability one. Exact rational executions for <code>n=2,...,50</code> confirm this family. At <code>n=50</code>, the requested tolerance is <code>.01</code> and the actual gap is <code>.45</code>.</p>\n<p><strong>Reproducible evidence and verification.</strong> Run gss-counterexample.py [unpublished artifact reference omitted] for the complete exact rational four-hypothesis trace; its JSON result [unpublished artifact reference omitted] records every acceptance, discard test, best set, and threshold. Run gss-family.py [unpublished artifact reference omitted] for the unbounded-in-<code>n</code> family; results are in gss-family.json [unpublished artifact reference omitted]. Original Table 1 and the faulty invariant step are rendered as <code>page-05.png</code> and <code>page-24.png</code>. An independent reviewer reran the four-hypothesis script and inspected those original pages and Definition 3.</p>\n<p><strong>Why rejection is warranted.</strong> Theorem 4 is the central guarantee of the generic algorithm. This example satisfies the explicit confidence-bound assumptions yet violates that guarantee with certainty. A correction must change acceptance or approximation budgeting, impose substantive additional estimator restrictions, and supply a new invariant/proof. For example, reserving approximation for final selection changes the early acceptance rule; dividing tolerance across stages changes the dependence of sample requirements on <code>n</code>. The existing empirical speedup claims do not establish the behavior of such a revised algorithm. This is not a transcription error or a fixed missing constant. Its demonstrated scope is the advertised generic theorem, not a claimed rerun failure of the original subgroup implementation.</p>\n<p><strong>Discovery method:</strong> traced the quantified loop invariant when the remaining output count decreases and constructed successive acceptances that undermine an earlier output. <strong>Verification method:</strong> exact rational execution of the full algorithm with confidence events true for every sequence, plus a parameterized family and independent reproduction. <strong>Confidence: high.</strong> The only nonstandard feature is the explicitly disclosed deterministic bias, which the stated generic assumptions permit.</p>\n<p>Other observations were screened separately, including the fourth-root versus <code>epsilon^-2</code> sample-bound arithmetic, finite-sample failure of empirical-normal confidence intervals, adaptive use of confidence levels, and local equation slips. Original source code, the proprietary juice database, split seeds, and raw experimental runs were not recovered. No missing code, failed rerun, or unmeasured reversal of Figure 1 or Figure 2 is asserted as a finding.</p>\n",
+          "html": "<p><strong>Exact locations.</strong> Table 1, step 3(e)i, PDF page 5 / printed page 837; Theorem 4, PDF page 6 / printed page 838. Appendix A invariant <span class=\"source-math\">\\((I3)\\)</span>, PDF page 22 / printed page 854; Case (1), “Show (I3),” PDF page 24 / printed page 856; final acceptance proof, PDF page 27 / printed page 859.</p>\n<p><strong>Claim and assumptions.</strong> The algorithm claims the additive <span class=\"source-math\">\\(\\epsilon\\)</span> guarantee of Theorem 4 for any estimated utilities with valid confidence bounds as defined in Definition 3. Unbiasedness is not required. A returned hypothesis can be accepted when its lower confidence bound is within <span class=\"source-math\">\\(\\epsilon\\)</span> of the largest upper bound outside the current empirical best set. The requested number of remaining outputs decreases after acceptance.</p>\n<p><strong>Error and exact counterexample.</strong> Approximate acceptances can protect the newly accepted hypothesis while leaving a previously accepted, worse hypothesis without the advertised guarantee. This occurs even when every common and hypothesis-specific confidence interval is correct deterministically at every sample size.</p>\n<p>Use four hypotheses in order <span class=\"source-math\">\\(g,c,d,a\\)</span>, request <span class=\"source-math\">\\(n=3\\)</span>, and set <span class=\"source-math\">\\(\\epsilon =1/10\\)</span>, <span class=\"source-math\">\\(\\delta =1/10\\)</span>. Let each hypothesis have a constant per-item utility, so its exact empirical mean on every database and every iid query sequence is respectively</p>\n<pre><code class=\"language-text\">f(g)=0, f(c)=9/100, f(d)=18/100, f(a)=27/100.\n</code></pre>\n<p>The estimated utility is that empirical mean plus a specified deterministic sample-size bias. The following table gives the estimates and the valid radii for the active hypotheses; each cell is <code>estimate ; radius</code>.</p>\n<div class=\"evidence-table-wrap\"><table class=\"evidence-table\">\n<thead>\n<tr>\n<th>Sample size</th>\n<th style=\"text-align:right\">g</th>\n<th style=\"text-align:right\">c</th>\n<th style=\"text-align:right\">d</th>\n<th style=\"text-align:right\">a</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>1</td>\n<td style=\"text-align:right\"><code>0 ; .001</code></td>\n<td style=\"text-align:right\"><code>0 ; .091</code></td>\n<td style=\"text-align:right\"><code>.18 ; .301</code></td>\n<td style=\"text-align:right\"><code>.27 ; .301</code></td>\n</tr>\n<tr>\n<td>2</td>\n<td style=\"text-align:right\">already output</td>\n<td style=\"text-align:right\"><code>.09 ; .001</code></td>\n<td style=\"text-align:right\"><code>0 ; .181</code></td>\n<td style=\"text-align:right\"><code>.27 ; .301</code></td>\n</tr>\n<tr>\n<td>3</td>\n<td style=\"text-align:right\">already output</td>\n<td style=\"text-align:right\">already output</td>\n<td style=\"text-align:right\"><code>.18 ; .001</code></td>\n<td style=\"text-align:right\"><code>0 ; .271</code></td>\n</tr>\n</tbody>\n</table></div>\n<p>For sample sizes at least four, all biases are zero and every radius is <span class=\"source-math\">\\(.001/(m-3)\\)</span>. Use common radius <span class=\"source-math\">\\(.301\\)</span> through sample size three and <span class=\"source-math\">\\(.001/(m-3)\\)</span> thereafter. All bounds are strictly positive, nonincreasing in sample size, independent of the confidence argument, and vanish. Every estimation error is within its radius with probability one for every database, every sample size, and every query sequence. All true and estimated utilities are in <span class=\"source-math\">\\([0,1]\\)</span>. Thus this is a valid instance of Definition 3, not a confidence-interval failure. The estimates are deliberately biased; the example does not assert failure of the natural plug-in estimators in Section 4.</p>\n<p>The worst-case stopping parameter in step 2 is <span class=\"source-math\">\\(M=4\\)</span>. Through the first three iterations the common stopping radius exceeds <span class=\"source-math\">\\(\\epsilon /2\\)</span>. Process the full for-loop, recomputing the active set, remaining output count, and empirical best set after every acceptance:</p>\n<ol>\n<li>At sample size 1, the best three are <span class=\"source-math\">\\(a,d,g\\)</span>, with ties placing <span class=\"source-math\">\\(g\\)</span> before <span class=\"source-math\">\\(c\\)</span>. For <span class=\"source-math\">\\(g\\)</span>, the acceptance right-hand side is <span class=\"source-math\">\\(.001+.091-.1=-.008\\)</span>, so it is output. Neither <span class=\"source-math\">\\(d\\)</span> nor <span class=\"source-math\">\\(a\\)</span> is accepted because their large valid radii block acceptance. No hypothesis is discarded.</li>\n<li>At sample size 2, the best two are <span class=\"source-math\">\\(a,c\\)</span>. The acceptance right-hand side for <span class=\"source-math\">\\(c\\)</span> is <span class=\"source-math\">\\(.001+.181-.1=.082\\)</span>, below its estimate <span class=\"source-math\">\\(.09\\)</span>, so <span class=\"source-math\">\\(c\\)</span> is output. The others remain.</li>\n<li>At sample size 3, <span class=\"source-math\">\\(d\\)</span> is best empirically. Its acceptance right-hand side is <span class=\"source-math\">\\(.001+.271-.1=.172\\)</span>, below <span class=\"source-math\">\\(.18\\)</span>, so <span class=\"source-math\">\\(d\\)</span> is output and the requested output count reaches zero.</li>\n</ol>\n<p>The final output is <span class=\"source-math\">\\(\\{g,c,d\\}\\)</span>, excluding <span class=\"source-math\">\\(a\\)</span>. The excluded utility exceeds the minimum returned utility by <span class=\"source-math\">\\(.27\\)</span>, although the requested tolerance is <span class=\"source-math\">\\(.1\\)</span>. The failure probability is one while every confidence event holds. The trace uses a coherent, charitable interpretation of the paper’s inconsistent <span class=\"source-math\">\\(H_{i}/H_{i+1}\\)</span> and <span class=\"source-math\">\\(n_{i}/n_{i+1}\\)</span> indexing. It executes the entire same-sample for-loop; it does not rely on the proof’s one-action-per-iteration simplification.</p>\n<p><strong>Where the proof fails.</strong> After accepting a hypothesis, the invariant for previously output hypotheses becomes stronger because <span class=\"source-math\">\\(n_{i}\\)</span> decreases. The Case (1) proof checks <span class=\"source-math\">\\((I3)\\)</span> for the newly accepted hypothesis only. It does not establish the strengthened invariant for old outputs. A later approximate acceptance can leave a better hypothesis behind, as the trace shows.</p>\n<p>The loss is not bounded by a universal constant multiple of the requested tolerance. <code>gss-family.py</code> constructs the same phenomenon for any requested <span class=\"source-math\">\\(n\\ge 2\\)</span>: use <span class=\"source-math\">\\(n+1\\)</span> constant utility targets <span class=\"source-math\">\\(v_{j}=.9 j \\epsilon\\)</span>, with <span class=\"source-math\">\\(\\epsilon =1/(2n)\\)</span>, and successively suppress one next hypothesis’s estimate while retaining valid radii. The algorithm returns <span class=\"source-math\">\\(h_{0},\\ldots ,h_{n-1}\\)</span>, excluding <span class=\"source-math\">\\(h_{n}\\)</span>; its error is <span class=\"source-math\">\\(.9 n \\epsilon\\)</span>. All utilities remain at most <span class=\"source-math\">\\(.45\\)</span>, and all confidence events hold with probability one. Exact rational executions for <span class=\"source-math\">\\(n=2,\\ldots ,50\\)</span> confirm this family. At <span class=\"source-math\">\\(n=50\\)</span>, the requested tolerance is <span class=\"source-math\">\\(.01\\)</span> and the actual gap is <span class=\"source-math\">\\(.45\\)</span>.</p>\n<p><strong>Reproducible evidence and verification.</strong> Run gss-counterexample.py [unpublished artifact reference omitted] for the complete exact rational four-hypothesis trace; its JSON result [unpublished artifact reference omitted] records every acceptance, discard test, best set, and threshold. Run gss-family.py [unpublished artifact reference omitted] for the unbounded-in-<span class=\"source-math\">\\(n\\)</span> family; results are in gss-family.json [unpublished artifact reference omitted]. Original Table 1 and the faulty invariant step are rendered as <code>page-05.png</code> and <code>page-24.png</code>. An independent reviewer reran the four-hypothesis script and inspected those original pages and Definition 3.</p>\n<p><strong>Why rejection is warranted.</strong> Theorem 4 is the central guarantee of the generic algorithm. This example satisfies the explicit confidence-bound assumptions yet violates that guarantee with certainty. A correction must change acceptance or approximation budgeting, impose substantive additional estimator restrictions, and supply a new invariant/proof. For example, reserving approximation for final selection changes the early acceptance rule; dividing tolerance across stages changes the dependence of sample requirements on <span class=\"source-math\">\\(n\\)</span>. The existing empirical speedup claims do not establish the behavior of such a revised algorithm. This is not a transcription error or a fixed missing constant. Its demonstrated scope is the advertised generic theorem, not a claimed rerun failure of the original subgroup implementation.</p>\n<p><strong>Discovery method:</strong> traced the quantified loop invariant when the remaining output count decreases and constructed successive acceptances that undermine an earlier output. <strong>Verification method:</strong> exact rational execution of the full algorithm with confidence events true for every sequence, plus a parameterized family and independent reproduction. <strong>Confidence: high.</strong> The only nonstandard feature is the explicitly disclosed deterministic bias, which the stated generic assumptions permit.</p>\n<p>Other observations were screened separately, including the fourth-root versus <span class=\"source-math\">\\(\\epsilon ^{-2}\\)</span> sample-bound arithmetic, finite-sample failure of empirical-normal confidence intervals, adaptive use of confidence levels, and local equation slips. Original source code, the proprietary juice database, split seeds, and raw experimental runs were not recovered. No missing code, failed rerun, or unmeasured reversal of Figure 1 or Figure 2 is asserted as a finding.</p>\n",
           "source_body_sha256": "52c54374305bc6a53dfb33cc37ca741bf8e4cc90177fce74ef037a3af7eb5a80",
           "export_text_sha256": "6e181dcb891a5b69a1954ad6d886faa33e85ee0ffa031dfd4f21cdc9847451b0",
           "private_reference_substitutions": 4,
           "display_equations": 0,
-          "inline_equations": 0,
-          "formatting_normalizations": []
+          "inline_equations": 52,
+          "formatting_normalizations": [
+            {
+              "rule": "literal_inline_notation",
+              "source": "(I3)",
+              "tex": "(I3)"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "epsilon",
+              "tex": "\\epsilon"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "epsilon",
+              "tex": "\\epsilon"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "g,c,d,a",
+              "tex": "g,c,d,a"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "n=3",
+              "tex": "n=3"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "epsilon=1/10",
+              "tex": "\\epsilon =1/10"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "delta=1/10",
+              "tex": "\\delta =1/10"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": ".001/(m-3)",
+              "tex": ".001/(m-3)"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": ".301",
+              "tex": ".301"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": ".001/(m-3)",
+              "tex": ".001/(m-3)"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "[0,1]",
+              "tex": "[0,1]"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "M=4",
+              "tex": "M=4"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "epsilon/2",
+              "tex": "\\epsilon /2"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "a,d,g",
+              "tex": "a,d,g"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "g",
+              "tex": "g"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "c",
+              "tex": "c"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "g",
+              "tex": "g"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": ".001+.091-.1=-.008",
+              "tex": ".001+.091-.1=-.008"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "d",
+              "tex": "d"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "a",
+              "tex": "a"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "a,c",
+              "tex": "a,c"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "c",
+              "tex": "c"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": ".001+.181-.1=.082",
+              "tex": ".001+.181-.1=.082"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": ".09",
+              "tex": ".09"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "c",
+              "tex": "c"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "d",
+              "tex": "d"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": ".001+.271-.1=.172",
+              "tex": ".001+.271-.1=.172"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": ".18",
+              "tex": ".18"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "d",
+              "tex": "d"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "{g,c,d}",
+              "tex": "\\{g,c,d\\}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "a",
+              "tex": "a"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": ".27",
+              "tex": ".27"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": ".1",
+              "tex": ".1"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "H_i/H_(i+1)",
+              "tex": "H_{i}/H_{i+1}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "n_i/n_(i+1)",
+              "tex": "n_{i}/n_{i+1}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "n_i",
+              "tex": "n_{i}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "(I3)",
+              "tex": "(I3)"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "n>=2",
+              "tex": "n\\ge 2"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "n+1",
+              "tex": "n+1"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "v_j=.9 j epsilon",
+              "tex": "v_{j}=.9 j \\epsilon"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "epsilon=1/(2n)",
+              "tex": "\\epsilon =1/(2n)"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "h_0,...,h_(n-1)",
+              "tex": "h_{0},\\ldots ,h_{n-1}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "h_n",
+              "tex": "h_{n}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": ".9 n epsilon",
+              "tex": ".9 n \\epsilon"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": ".45",
+              "tex": ".45"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "n=2,...,50",
+              "tex": "n=2,\\ldots ,50"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "n=50",
+              "tex": "n=50"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": ".01",
+              "tex": ".01"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": ".45",
+              "tex": ".45"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "n",
+              "tex": "n"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "n",
+              "tex": "n"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "epsilon^-2",
+              "tex": "\\epsilon ^{-2}"
+            }
+          ]
         }
       ]
     }

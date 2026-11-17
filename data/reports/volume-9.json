@@ -117,13 +117,369 @@
           "title": "",
           "source_heading": "## Issue 2008__accepted__v9-koo08a__I01",
           "markdown": "\n\n**Exact location.** PDF page 4 (printed 1346), the claim immediately after Equation (4) and Assumption (A1); PDF page 5 (1347), Remark 1 and Theorems 1–2; PDF pages 15–16 (1357–1358), Lemma 3; PDF page 22 (1364), the quadratic expansion in Section 6.2. The abstract and introduction identify the Bahadur representation and coefficient asymptotic normality as the main contribution; PDF pages 6 and 10–13 discuss their inference implications.\n\n**Affected claim and assumptions.** Under (A1)–(A4), iid observations, fixed feature dimension and `λ_n = o(n^{-1/2})`, Theorems 1–2 assert a root-n linear representation and a Gaussian coefficient limit with covariance `H^{-1} G H^{-1}`. The paper claims that continuous class densities with finite second moments make the weighted Radon matrix `H` a continuous Hessian. They do not. The following nonseparable two-feature distribution satisfies every stated assumption and has a finite positive-definite printed `H`, but contradicts the asserted Gaussian limit.\n\n**Error.** Continuity and integrability of a joint density do not give the necessary control of its hyperplane integrals. Probability concentrated near a margin can escape to large transverse coordinates. The resulting population hinge risk can have a leading power strictly smaller than two even though the density at every point on the margin, and the paper's matrix evaluated there, are regular.\n\n### Explicit admissible distribution\n\nWrite `φ, Φ` for the standard normal density and CDF. Let `μ` be the unique root in `(0,1)` of\n\n```\nμ Φ(1−μ) = φ(1−μ).\n```\n\nIt exists because the difference changes sign between 0 and 1, and its derivative there is `Φ(1−μ) − φ(1−μ) > 0`. Numerically `μ = 0.518941612965…`.\n\nLet `U` have the triangular density `h(u) = 4(1−4|u|)_+`, supported on `[-1/4,1/4]`. Let `S` have density `2(1−s)` on `(0,1)` and let `E` be a fair independent sign. Define a distribution `Q` by\n\n```\nZ = 1 + S,       T = E S^(−1/4) + U.\n```\n\nLet `B = N((μ,0), I₂)`. Draw `(Z,T)` from the equal mixture of `B` and `Q`, draw a separate fair label `Y`, and set `X = Y(Z,T)`. Thus the positive-class density is `f = (b+q)/2` and the negative-class density is `g(x)=f(−x)`. All variables and distributions are fixed as n increases. For concreteness choose `λ_n=1/n`.\n\nAll four assumptions can be checked directly:\n\n- **(A1):** For `s=z−1` the joint density of `Q` is `(1−s)[h(t−s^(−1/4))+h(t+s^(−1/4))]` on `0<s<1`, and zero otherwise. It is continuous, including at `s=0`: near each finite point `(1,t)`, its support has escaped to infinity and the density is identically zero. At `s=1` its prefactor vanishes. It is bounded. Its exact moments are `E_Q Z=4/3`, `E_Q Z²=11/6`, `E_Q T=0`, and `E_Q T²=257/96`; hence both class densities have finite second moments.\n- **(A2):** The Gaussian mixture component bounds both densities away from zero on any fixed compact ball. It also ensures nonseparability.\n- **(A3):** The priors are equal and the class means are opposite, with first coordinate `(μ+4/3)/2 > 0`. Thus the means differ as required.\n- **(A4):** The optimum is `β*=(0,1,0)`. On the two margins `X₁=±1`, choose the same transverse interval `X₂∈[-1/4,1/4]` and the identity rotation. The Gaussian component gives the required strictly positive lower bounds.\n\nFor completeness, `β*` is indeed the unique optimum. The base Gaussian hinge gradient vanishes there: the intercept score is zero by label symmetry; the first-feature score is `μΦ(1−μ)−φ(1−μ)=0`; the transverse score is zero by symmetry. Convexity and the Gaussian component's positive local Hessian give uniqueness. The `Q` component has zero hinge loss there since `Z>1`, so adding it preserves that unique optimum.\n\n### The printed finite covariance predicts a nondegenerate limit\n\nThe `Q` density is zero at every point of the optimal margins. Its contribution to the printed Dirac/Radon matrix and score covariance is consequently zero. Direct Gaussian calculation gives\n\n```\nH(β*) = [φ(1−μ)/2] I₃,\nG(β*) = [Φ(1−μ)/2] diag(1, 1−μ, 1).\n```\n\nBoth are finite and positive definite. In particular Theorem 2 predicts that `sqrt(n) β_hat₂` has a normal limit with strictly positive variance\n\n```\n2 Φ(1−μ) / φ(1−μ)² = 10.8455862597… .\n```\n\nThis example therefore cannot be dismissed by assuming that the displayed inverse exists: it does exist.\n\n### Population risk contradicts the quadratic expansion\n\nFor `β(v)=(0,1,v)` and small positive v, only the negative sign of E contributes `Q` loss, giving\n\n```\nL_Q(β(v)) = ∫₀¹ (1−s) E_U[(v s^(−1/4) − s − vU)_+] ds.\n```\n\nSubstitute `s=v^(4/5)t` and divide by `v^(8/5)`. Dominated convergence yields\n\n```\nL_Q(β(v)) / |v|^(8/5)\n  → ∫₀¹ (t^(−1/4) − t) dt = 5/6.\n```\n\nThe domination is by a constant times `1+t^(−1/4)` on `(0,2)`; the integrand vanishes beyond 2 for small v. Symmetry handles negative v. Including the mixture weight, total population excess risk therefore has leading term `(5/12)|v|^(8/5)`, while the Gaussian contribution is `O(v²)`. The finite matrix `H(β*)` is not the Hessian asserted by Lemma 3, and Section 6.2's main quadratic approximation is false.\n\n### The actual estimator cannot have the claimed limit\n\nThis is an estimator contradiction, not only a failed proof. Fix any `M>0, ε>0`. Write `β=β*+θ/sqrt(n)` with `||θ||≤M` and `|θ₂|≥ε`. For `Q` observations with E opposite the sign of θ₂ and\n\n```\nS ∈ [r_n/2, r_n],   r_n=(ε/4)^(4/5)n^(−2/5),\n```\n\nthe transverse term has magnitude at least `4S`. All changes from the intercept, first coefficient and bounded U are at most `(3+1/4)M/sqrt(n)`, eventually no larger than S. Thus hinge loss is at least `2S`, compared with zero at `β*`. On this interval the S density is at least 1 and the adverse sign has probability 1/2. The Gaussian population risk cannot decrease from its optimum, so uniformly over the specified parameter set,\n\n```\nn[L(β)−L(β*)] ≥ 3n r_n²/16 → ∞,\n```\n\nat order `n^(1/5)`.\n\nMeanwhile centered empirical criterion increments over each such root-n compact set are uniformly `O_P(1)`. For `g_θ=hinge(β*+θ/sqrt(n))−hinge(β*)`, symmetrization and contraction of the 1-Lipschitz hinge give the explicit bound\n\n```\nE sup_{||θ||≤M} |Σ_i(g_θ(X_i,Y_i)−E g_θ)|\n  ≤ 4M sqrt(E||X_tilde||²) < ∞.\n```\n\nThe scaled regularization difference is uniformly `o(1)` because `sqrt(n) λ_n → 0`. Since the empirical minimizer's objective cannot exceed its value at `β*`, it follows that\n\n```\nP(||sqrt(n)(β_hat−β*)||≤M, |sqrt(n)β_hat₂|≥ε) → 0.\n```\n\nIf Theorem 2 were true, the scaled coefficients would be tight; increasing M would then force `sqrt(n)β_hat₂ → 0` in probability. That contradicts its asserted positive-variance Gaussian limit. This proof does not assume or claim a particular alternative convergence rate for the estimator.\n\n**Reproducible evidence.** Full derivation [unpublished artifact reference omitted], executable checks [unpublished artifact reference omitted], results [unpublished artifact reference omitted], and independent root calculations [unpublished artifact reference omitted]. Running `python core-check.py` in the checks directory reproduces the moment identities, finite matrices, claimed variance, neighboring Radon divergence and scaled-risk quadratures tending to `5/6`. Numerical checks support the analytic proof; the asymptotic contradiction does not depend on simulation or unknown remainder constants.\n\n**Reason for rejection.** The general Bahadur representation and coefficient asymptotic normality are the paper's expressly advertised main contribution. This own-assumption example defeats that contribution and its proposed coefficient-uncertainty interpretation with a finite invertible printed covariance, beyond a sign or numerical coefficient correction. A valid repair needs a new local regularity premise controlling weighted hyperplane integrals, or an explicitly assumed genuine quadratic population expansion. Such a premise excludes admissible distributions and materially narrows the theorem's domain. For example, continuous densities bounded by `C exp(−c||x||²)` do supply the necessary local domination, preserving the Gaussian examples and the regular-case statistical principle. Those examples, their conditional asymptotic formulas, and the unproved future proposal to estimate covariance are not being claimed false by this issue.\n\n**Discovery method.** Audited the proof's passage from joint continuity/second moments to weighted Radon continuity; constructed probability that escapes along a margin's transverse direction, then traced the resulting nonquadratic risk through the empirical minimization rather than stopping at an auxiliary lemma.\n\n**Verification method.** Re-read all 26 original pages and all proofs, inspected original rendered assumptions/theorems and quadratic-expansion pages, derived all four assumptions and H/G analytically, bounded empirical fluctuations uniformly by symmetrization/contraction, and checked the formulas by independent numerical integration. Root independently read the targeted original pages and verified the moment, matrix and cusp calculations. The official PDF is byte-identical; recovered author preprint and October 2008 slides retain the same assumptions, and targeted searches found no correction resolving this issue.\n\n**Confidence: High.** The failure is an exact distribution-level contradiction to the central theorem, with every stated assumption checked and independent targeted verification. The Gaussian-case survival and the necessary new regularity premise are explicitly separated. Theorem 1's separate influence-sign typo, an unequal-prior condition defect in Lemma 4, and a simulation-covariance inconsistency are screened in the full review and do not form additional findings.\n",
-          "html": "<p><strong>Exact location.</strong> PDF page 4 (printed 1346), the claim immediately after Equation (4) and Assumption (A1); PDF page 5 (1347), Remark 1 and Theorems 1–2; PDF pages 15–16 (1357–1358), Lemma 3; PDF page 22 (1364), the quadratic expansion in Section 6.2. The abstract and introduction identify the Bahadur representation and coefficient asymptotic normality as the main contribution; PDF pages 6 and 10–13 discuss their inference implications.</p>\n<p><strong>Affected claim and assumptions.</strong> Under (A1)–(A4), iid observations, fixed feature dimension and <code>λ_n = o(n^{-1/2})</code>, Theorems 1–2 assert a root-n linear representation and a Gaussian coefficient limit with covariance <code>H^{-1} G H^{-1}</code>. The paper claims that continuous class densities with finite second moments make the weighted Radon matrix <code>H</code> a continuous Hessian. They do not. The following nonseparable two-feature distribution satisfies every stated assumption and has a finite positive-definite printed <code>H</code>, but contradicts the asserted Gaussian limit.</p>\n<p><strong>Error.</strong> Continuity and integrability of a joint density do not give the necessary control of its hyperplane integrals. Probability concentrated near a margin can escape to large transverse coordinates. The resulting population hinge risk can have a leading power strictly smaller than two even though the density at every point on the margin, and the paper's matrix evaluated there, are regular.</p>\n<h4>Explicit admissible distribution</h4>\n<p>Write <code>φ, Φ</code> for the standard normal density and CDF. Let <code>μ</code> be the unique root in <code>(0,1)</code> of</p>\n<pre><code>μ Φ(1−μ) = φ(1−μ).\n</code></pre>\n<p>It exists because the difference changes sign between 0 and 1, and its derivative there is <code>Φ(1−μ) − φ(1−μ) &gt; 0</code>. Numerically <code>μ = 0.518941612965…</code>.</p>\n<p>Let <code>U</code> have the triangular density <code>h(u) = 4(1−4|u|)_+</code>, supported on <code>[-1/4,1/4]</code>. Let <code>S</code> have density <code>2(1−s)</code> on <code>(0,1)</code> and let <code>E</code> be a fair independent sign. Define a distribution <code>Q</code> by</p>\n<pre><code>Z = 1 + S,       T = E S^(−1/4) + U.\n</code></pre>\n<p>Let <code>B = N((μ,0), I₂)</code>. Draw <code>(Z,T)</code> from the equal mixture of <code>B</code> and <code>Q</code>, draw a separate fair label <code>Y</code>, and set <code>X = Y(Z,T)</code>. Thus the positive-class density is <code>f = (b+q)/2</code> and the negative-class density is <code>g(x)=f(−x)</code>. All variables and distributions are fixed as n increases. For concreteness choose <code>λ_n=1/n</code>.</p>\n<p>All four assumptions can be checked directly:</p>\n<ul>\n<li><strong>(A1):</strong> For <code>s=z−1</code> the joint density of <code>Q</code> is <code>(1−s)[h(t−s^(−1/4))+h(t+s^(−1/4))]</code> on <code>0&lt;s&lt;1</code>, and zero otherwise. It is continuous, including at <code>s=0</code>: near each finite point <code>(1,t)</code>, its support has escaped to infinity and the density is identically zero. At <code>s=1</code> its prefactor vanishes. It is bounded. Its exact moments are <code>E_Q Z=4/3</code>, <code>E_Q Z²=11/6</code>, <code>E_Q T=0</code>, and <code>E_Q T²=257/96</code>; hence both class densities have finite second moments.</li>\n<li><strong>(A2):</strong> The Gaussian mixture component bounds both densities away from zero on any fixed compact ball. It also ensures nonseparability.</li>\n<li><strong>(A3):</strong> The priors are equal and the class means are opposite, with first coordinate <code>(μ+4/3)/2 &gt; 0</code>. Thus the means differ as required.</li>\n<li><strong>(A4):</strong> The optimum is <code>β*=(0,1,0)</code>. On the two margins <code>X₁=±1</code>, choose the same transverse interval <code>X₂∈[-1/4,1/4]</code> and the identity rotation. The Gaussian component gives the required strictly positive lower bounds.</li>\n</ul>\n<p>For completeness, <code>β*</code> is indeed the unique optimum. The base Gaussian hinge gradient vanishes there: the intercept score is zero by label symmetry; the first-feature score is <code>μΦ(1−μ)−φ(1−μ)=0</code>; the transverse score is zero by symmetry. Convexity and the Gaussian component's positive local Hessian give uniqueness. The <code>Q</code> component has zero hinge loss there since <code>Z&gt;1</code>, so adding it preserves that unique optimum.</p>\n<h4>The printed finite covariance predicts a nondegenerate limit</h4>\n<p>The <code>Q</code> density is zero at every point of the optimal margins. Its contribution to the printed Dirac/Radon matrix and score covariance is consequently zero. Direct Gaussian calculation gives</p>\n<pre><code>H(β*) = [φ(1−μ)/2] I₃,\nG(β*) = [Φ(1−μ)/2] diag(1, 1−μ, 1).\n</code></pre>\n<p>Both are finite and positive definite. In particular Theorem 2 predicts that <code>sqrt(n) β_hat₂</code> has a normal limit with strictly positive variance</p>\n<pre><code>2 Φ(1−μ) / φ(1−μ)² = 10.8455862597… .\n</code></pre>\n<p>This example therefore cannot be dismissed by assuming that the displayed inverse exists: it does exist.</p>\n<h4>Population risk contradicts the quadratic expansion</h4>\n<p>For <code>β(v)=(0,1,v)</code> and small positive v, only the negative sign of E contributes <code>Q</code> loss, giving</p>\n<pre><code>L_Q(β(v)) = ∫₀¹ (1−s) E_U[(v s^(−1/4) − s − vU)_+] ds.\n</code></pre>\n<p>Substitute <code>s=v^(4/5)t</code> and divide by <code>v^(8/5)</code>. Dominated convergence yields</p>\n<pre><code>L_Q(β(v)) / |v|^(8/5)\n  → ∫₀¹ (t^(−1/4) − t) dt = 5/6.\n</code></pre>\n<p>The domination is by a constant times <code>1+t^(−1/4)</code> on <code>(0,2)</code>; the integrand vanishes beyond 2 for small v. Symmetry handles negative v. Including the mixture weight, total population excess risk therefore has leading term <code>(5/12)|v|^(8/5)</code>, while the Gaussian contribution is <code>O(v²)</code>. The finite matrix <code>H(β*)</code> is not the Hessian asserted by Lemma 3, and Section 6.2's main quadratic approximation is false.</p>\n<h4>The actual estimator cannot have the claimed limit</h4>\n<p>This is an estimator contradiction, not only a failed proof. Fix any <code>M&gt;0, ε&gt;0</code>. Write <code>β=β*+θ/sqrt(n)</code> with <code>||θ||≤M</code> and <code>|θ₂|≥ε</code>. For <code>Q</code> observations with E opposite the sign of θ₂ and</p>\n<pre><code>S ∈ [r_n/2, r_n],   r_n=(ε/4)^(4/5)n^(−2/5),\n</code></pre>\n<p>the transverse term has magnitude at least <code>4S</code>. All changes from the intercept, first coefficient and bounded U are at most <code>(3+1/4)M/sqrt(n)</code>, eventually no larger than S. Thus hinge loss is at least <code>2S</code>, compared with zero at <code>β*</code>. On this interval the S density is at least 1 and the adverse sign has probability 1/2. The Gaussian population risk cannot decrease from its optimum, so uniformly over the specified parameter set,</p>\n<pre><code>n[L(β)−L(β*)] ≥ 3n r_n²/16 → ∞,\n</code></pre>\n<p>at order <code>n^(1/5)</code>.</p>\n<p>Meanwhile centered empirical criterion increments over each such root-n compact set are uniformly <code>O_P(1)</code>. For <code>g_θ=hinge(β*+θ/sqrt(n))−hinge(β*)</code>, symmetrization and contraction of the 1-Lipschitz hinge give the explicit bound</p>\n<pre><code>E sup_{||θ||≤M} |Σ_i(g_θ(X_i,Y_i)−E g_θ)|\n  ≤ 4M sqrt(E||X_tilde||²) &lt; ∞.\n</code></pre>\n<p>The scaled regularization difference is uniformly <code>o(1)</code> because <code>sqrt(n) λ_n → 0</code>. Since the empirical minimizer's objective cannot exceed its value at <code>β*</code>, it follows that</p>\n<pre><code>P(||sqrt(n)(β_hat−β*)||≤M, |sqrt(n)β_hat₂|≥ε) → 0.\n</code></pre>\n<p>If Theorem 2 were true, the scaled coefficients would be tight; increasing M would then force <code>sqrt(n)β_hat₂ → 0</code> in probability. That contradicts its asserted positive-variance Gaussian limit. This proof does not assume or claim a particular alternative convergence rate for the estimator.</p>\n<p><strong>Reproducible evidence.</strong> Full derivation [unpublished artifact reference omitted], executable checks [unpublished artifact reference omitted], results [unpublished artifact reference omitted], and independent root calculations [unpublished artifact reference omitted]. Running <code>python core-check.py</code> in the checks directory reproduces the moment identities, finite matrices, claimed variance, neighboring Radon divergence and scaled-risk quadratures tending to <code>5/6</code>. Numerical checks support the analytic proof; the asymptotic contradiction does not depend on simulation or unknown remainder constants.</p>\n<p><strong>Reason for rejection.</strong> The general Bahadur representation and coefficient asymptotic normality are the paper's expressly advertised main contribution. This own-assumption example defeats that contribution and its proposed coefficient-uncertainty interpretation with a finite invertible printed covariance, beyond a sign or numerical coefficient correction. A valid repair needs a new local regularity premise controlling weighted hyperplane integrals, or an explicitly assumed genuine quadratic population expansion. Such a premise excludes admissible distributions and materially narrows the theorem's domain. For example, continuous densities bounded by <code>C exp(−c||x||²)</code> do supply the necessary local domination, preserving the Gaussian examples and the regular-case statistical principle. Those examples, their conditional asymptotic formulas, and the unproved future proposal to estimate covariance are not being claimed false by this issue.</p>\n<p><strong>Discovery method.</strong> Audited the proof's passage from joint continuity/second moments to weighted Radon continuity; constructed probability that escapes along a margin's transverse direction, then traced the resulting nonquadratic risk through the empirical minimization rather than stopping at an auxiliary lemma.</p>\n<p><strong>Verification method.</strong> Re-read all 26 original pages and all proofs, inspected original rendered assumptions/theorems and quadratic-expansion pages, derived all four assumptions and H/G analytically, bounded empirical fluctuations uniformly by symmetrization/contraction, and checked the formulas by independent numerical integration. Root independently read the targeted original pages and verified the moment, matrix and cusp calculations. The official PDF is byte-identical; recovered author preprint and October 2008 slides retain the same assumptions, and targeted searches found no correction resolving this issue.</p>\n<p><strong>Confidence: High.</strong> The failure is an exact distribution-level contradiction to the central theorem, with every stated assumption checked and independent targeted verification. The Gaussian-case survival and the necessary new regularity premise are explicitly separated. Theorem 1's separate influence-sign typo, an unequal-prior condition defect in Lemma 4, and a simulation-covariance inconsistency are screened in the full review and do not form additional findings.</p>\n",
+          "html": "<p><strong>Exact location.</strong> PDF page 4 (printed 1346), the claim immediately after Equation (4) and Assumption (A1); PDF page 5 (1347), Remark 1 and Theorems 1–2; PDF pages 15–16 (1357–1358), Lemma 3; PDF page 22 (1364), the quadratic expansion in Section 6.2. The abstract and introduction identify the Bahadur representation and coefficient asymptotic normality as the main contribution; PDF pages 6 and 10–13 discuss their inference implications.</p>\n<p><strong>Affected claim and assumptions.</strong> Under (A1)–(A4), iid observations, fixed feature dimension and <span class=\"source-math\">\\(\\lambda _{n} = o(n^{-1/2})\\)</span>, Theorems 1–2 assert a root-n linear representation and a Gaussian coefficient limit with covariance <span class=\"source-math\">\\(H^{-1} G H^{-1}\\)</span>. The paper claims that continuous class densities with finite second moments make the weighted Radon matrix <span class=\"source-math\">\\(H\\)</span> a continuous Hessian. They do not. The following nonseparable two-feature distribution satisfies every stated assumption and has a finite positive-definite printed <span class=\"source-math\">\\(H\\)</span>, but contradicts the asserted Gaussian limit.</p>\n<p><strong>Error.</strong> Continuity and integrability of a joint density do not give the necessary control of its hyperplane integrals. Probability concentrated near a margin can escape to large transverse coordinates. The resulting population hinge risk can have a leading power strictly smaller than two even though the density at every point on the margin, and the paper's matrix evaluated there, are regular.</p>\n<h4>Explicit admissible distribution</h4>\n<p>Write <span class=\"source-math\">\\(\\phi , \\Phi\\)</span> for the standard normal density and CDF. Let <span class=\"source-math\">\\(\\mu\\)</span> be the unique root in <span class=\"source-math\">\\((0,1)\\)</span> of</p>\n<pre><code>μ Φ(1−μ) = φ(1−μ).\n</code></pre>\n<p>It exists because the difference changes sign between 0 and 1, and its derivative there is <span class=\"source-math\">\\(\\Phi (1-\\mu ) - \\phi (1-\\mu ) &gt; 0\\)</span>. Numerically <span class=\"source-math\">\\(\\mu  = 0.518941612965\\ldots\\)</span>.</p>\n<p>Let <span class=\"source-math\">\\(U\\)</span> have the triangular density <code>h(u) = 4(1−4|u|)_+</code>, supported on <span class=\"source-math\">\\([-1/4,1/4]\\)</span>. Let <span class=\"source-math\">\\(S\\)</span> have density <span class=\"source-math\">\\(2(1-s)\\)</span> on <span class=\"source-math\">\\((0,1)\\)</span> and let <span class=\"source-math\">\\(E\\)</span> be a fair independent sign. Define a distribution <span class=\"source-math\">\\(Q\\)</span> by</p>\n<pre><code>Z = 1 + S,       T = E S^(−1/4) + U.\n</code></pre>\n<p>Let <span class=\"source-math\">\\(B = N((\\mu ,0), I_{2})\\)</span>. Draw <span class=\"source-math\">\\((Z,T)\\)</span> from the equal mixture of <span class=\"source-math\">\\(B\\)</span> and <span class=\"source-math\">\\(Q\\)</span>, draw a separate fair label <span class=\"source-math\">\\(Y\\)</span>, and set <span class=\"source-math\">\\(X = Y(Z,T)\\)</span>. Thus the positive-class density is <span class=\"source-math\">\\(f = (b+q)/2\\)</span> and the negative-class density is <span class=\"source-math\">\\(g(x)=f(-x)\\)</span>. All variables and distributions are fixed as n increases. For concreteness choose <span class=\"source-math\">\\(\\lambda _{n}=1/n\\)</span>.</p>\n<p>All four assumptions can be checked directly:</p>\n<ul>\n<li><strong>(A1):</strong> For <span class=\"source-math\">\\(s=z-1\\)</span> the joint density of <span class=\"source-math\">\\(Q\\)</span> is <span class=\"source-math\">\\((1-s)[h(t-s^{-1/4})+h(t+s^{-1/4})]\\)</span> on <span class=\"source-math\">\\(0&lt;s&lt;1\\)</span>, and zero otherwise. It is continuous, including at <span class=\"source-math\">\\(s=0\\)</span>: near each finite point <span class=\"source-math\">\\((1,t)\\)</span>, its support has escaped to infinity and the density is identically zero. At <span class=\"source-math\">\\(s=1\\)</span> its prefactor vanishes. It is bounded. Its exact moments are <span class=\"source-math\">\\(E_{Q} Z=4/3\\)</span>, <span class=\"source-math\">\\(E_{Q} Z^{2}=11/6\\)</span>, <span class=\"source-math\">\\(E_{Q} T=0\\)</span>, and <span class=\"source-math\">\\(E_{Q} T^{2}=257/96\\)</span>; hence both class densities have finite second moments.</li>\n<li><strong>(A2):</strong> The Gaussian mixture component bounds both densities away from zero on any fixed compact ball. It also ensures nonseparability.</li>\n<li><strong>(A3):</strong> The priors are equal and the class means are opposite, with first coordinate <span class=\"source-math\">\\((\\mu +4/3)/2 &gt; 0\\)</span>. Thus the means differ as required.</li>\n<li><strong>(A4):</strong> The optimum is <span class=\"source-math\">\\(\\beta *=(0,1,0)\\)</span>. On the two margins <span class=\"source-math\">\\(X_{1}=\\pm 1\\)</span>, choose the same transverse interval <span class=\"source-math\">\\(X_{2}\\in [-1/4,1/4]\\)</span> and the identity rotation. The Gaussian component gives the required strictly positive lower bounds.</li>\n</ul>\n<p>For completeness, <span class=\"source-math\">\\(\\beta *\\)</span> is indeed the unique optimum. The base Gaussian hinge gradient vanishes there: the intercept score is zero by label symmetry; the first-feature score is <span class=\"source-math\">\\(\\mu \\Phi (1-\\mu )-\\phi (1-\\mu )=0\\)</span>; the transverse score is zero by symmetry. Convexity and the Gaussian component's positive local Hessian give uniqueness. The <span class=\"source-math\">\\(Q\\)</span> component has zero hinge loss there since <span class=\"source-math\">\\(Z&gt;1\\)</span>, so adding it preserves that unique optimum.</p>\n<h4>The printed finite covariance predicts a nondegenerate limit</h4>\n<p>The <span class=\"source-math\">\\(Q\\)</span> density is zero at every point of the optimal margins. Its contribution to the printed Dirac/Radon matrix and score covariance is consequently zero. Direct Gaussian calculation gives</p>\n<pre><code>H(β*) = [φ(1−μ)/2] I₃,\nG(β*) = [Φ(1−μ)/2] diag(1, 1−μ, 1).\n</code></pre>\n<p>Both are finite and positive definite. In particular Theorem 2 predicts that <span class=\"source-math\">\\(\\sqrt{n}\\,\\widehat{\\beta}_2\\)</span> has a normal limit with strictly positive variance</p>\n<pre><code>2 Φ(1−μ) / φ(1−μ)² = 10.8455862597… .\n</code></pre>\n<p>This example therefore cannot be dismissed by assuming that the displayed inverse exists: it does exist.</p>\n<h4>Population risk contradicts the quadratic expansion</h4>\n<p>For <span class=\"source-math\">\\(\\beta (v)=(0,1,v)\\)</span> and small positive v, only the negative sign of E contributes <span class=\"source-math\">\\(Q\\)</span> loss, giving</p>\n<pre><code>L_Q(β(v)) = ∫₀¹ (1−s) E_U[(v s^(−1/4) − s − vU)_+] ds.\n</code></pre>\n<p>Substitute <span class=\"source-math\">\\(s=v^{4/5}t\\)</span> and divide by <span class=\"source-math\">\\(v^{8/5}\\)</span>. Dominated convergence yields</p>\n<pre><code>L_Q(β(v)) / |v|^(8/5)\n  → ∫₀¹ (t^(−1/4) − t) dt = 5/6.\n</code></pre>\n<p>The domination is by a constant times <span class=\"source-math\">\\(1+t^{-1/4}\\)</span> on <span class=\"source-math\">\\((0,2)\\)</span>; the integrand vanishes beyond 2 for small v. Symmetry handles negative v. Including the mixture weight, total population excess risk therefore has leading term <code>(5/12)|v|^(8/5)</code>, while the Gaussian contribution is <span class=\"source-math\">\\(O(v^{2})\\)</span>. The finite matrix <span class=\"source-math\">\\(H(\\beta *)\\)</span> is not the Hessian asserted by Lemma 3, and Section 6.2's main quadratic approximation is false.</p>\n<h4>The actual estimator cannot have the claimed limit</h4>\n<p>This is an estimator contradiction, not only a failed proof. Fix any <span class=\"source-math\">\\(M&gt;0, \\epsilon &gt;0\\)</span>. Write <span class=\"source-math\">\\(\\beta =\\beta *+\\theta /\\operatorname{sqrt}(n)\\)</span> with <span class=\"source-math\">\\(\\lVert \\theta \\rVert \\le M\\)</span> and <span class=\"source-math\">\\(|\\theta _{2}|\\ge \\epsilon\\)</span>. For <span class=\"source-math\">\\(Q\\)</span> observations with E opposite the sign of θ₂ and</p>\n<pre><code>S ∈ [r_n/2, r_n],   r_n=(ε/4)^(4/5)n^(−2/5),\n</code></pre>\n<p>the transverse term has magnitude at least <span class=\"source-math\">\\(4S\\)</span>. All changes from the intercept, first coefficient and bounded U are at most <span class=\"source-math\">\\((3+1/4)M/\\operatorname{sqrt}(n)\\)</span>, eventually no larger than S. Thus hinge loss is at least <span class=\"source-math\">\\(2S\\)</span>, compared with zero at <span class=\"source-math\">\\(\\beta *\\)</span>. On this interval the S density is at least 1 and the adverse sign has probability 1/2. The Gaussian population risk cannot decrease from its optimum, so uniformly over the specified parameter set,</p>\n<pre><code>n[L(β)−L(β*)] ≥ 3n r_n²/16 → ∞,\n</code></pre>\n<p>at order <span class=\"source-math\">\\(n^{1/5}\\)</span>.</p>\n<p>Meanwhile centered empirical criterion increments over each such root-n compact set are uniformly <span class=\"source-math\">\\(O_{P}(1)\\)</span>. For <code>g_θ=hinge(β*+θ/sqrt(n))−hinge(β*)</code>, symmetrization and contraction of the 1-Lipschitz hinge give the explicit bound</p>\n<pre><code>E sup_{||θ||≤M} |Σ_i(g_θ(X_i,Y_i)−E g_θ)|\n  ≤ 4M sqrt(E||X_tilde||²) &lt; ∞.\n</code></pre>\n<p>The scaled regularization difference is uniformly <span class=\"source-math\">\\(o(1)\\)</span> because <span class=\"source-math\">\\(\\operatorname{sqrt}(n) \\lambda _{n} \\to  0\\)</span>. Since the empirical minimizer's objective cannot exceed its value at <span class=\"source-math\">\\(\\beta *\\)</span>, it follows that</p>\n<pre><code>P(||sqrt(n)(β_hat−β*)||≤M, |sqrt(n)β_hat₂|≥ε) → 0.\n</code></pre>\n<p>If Theorem 2 were true, the scaled coefficients would be tight; increasing M would then force <span class=\"source-math\">\\(\\sqrt{n}\\,\\widehat{\\beta}_2\\to0\\)</span> in probability. That contradicts its asserted positive-variance Gaussian limit. This proof does not assume or claim a particular alternative convergence rate for the estimator.</p>\n<p><strong>Reproducible evidence.</strong> Full derivation [unpublished artifact reference omitted], executable checks [unpublished artifact reference omitted], results [unpublished artifact reference omitted], and independent root calculations [unpublished artifact reference omitted]. Running <code>python core-check.py</code> in the checks directory reproduces the moment identities, finite matrices, claimed variance, neighboring Radon divergence and scaled-risk quadratures tending to <span class=\"source-math\">\\(\\frac{5}{6}\\)</span>. Numerical checks support the analytic proof; the asymptotic contradiction does not depend on simulation or unknown remainder constants.</p>\n<p><strong>Reason for rejection.</strong> The general Bahadur representation and coefficient asymptotic normality are the paper's expressly advertised main contribution. This own-assumption example defeats that contribution and its proposed coefficient-uncertainty interpretation with a finite invertible printed covariance, beyond a sign or numerical coefficient correction. A valid repair needs a new local regularity premise controlling weighted hyperplane integrals, or an explicitly assumed genuine quadratic population expansion. Such a premise excludes admissible distributions and materially narrows the theorem's domain. For example, continuous densities bounded by <span class=\"source-math\">\\(C \\exp (-c\\lVert x\\rVert ^{2})\\)</span> do supply the necessary local domination, preserving the Gaussian examples and the regular-case statistical principle. Those examples, their conditional asymptotic formulas, and the unproved future proposal to estimate covariance are not being claimed false by this issue.</p>\n<p><strong>Discovery method.</strong> Audited the proof's passage from joint continuity/second moments to weighted Radon continuity; constructed probability that escapes along a margin's transverse direction, then traced the resulting nonquadratic risk through the empirical minimization rather than stopping at an auxiliary lemma.</p>\n<p><strong>Verification method.</strong> Re-read all 26 original pages and all proofs, inspected original rendered assumptions/theorems and quadratic-expansion pages, derived all four assumptions and H/G analytically, bounded empirical fluctuations uniformly by symmetrization/contraction, and checked the formulas by independent numerical integration. Root independently read the targeted original pages and verified the moment, matrix and cusp calculations. The official PDF is byte-identical; recovered author preprint and October 2008 slides retain the same assumptions, and targeted searches found no correction resolving this issue.</p>\n<p><strong>Confidence: High.</strong> The failure is an exact distribution-level contradiction to the central theorem, with every stated assumption checked and independent targeted verification. The Gaussian-case survival and the necessary new regularity premise are explicitly separated. Theorem 1's separate influence-sign typo, an unequal-prior condition defect in Lemma 4, and a simulation-covariance inconsistency are screened in the full review and do not form additional findings.</p>\n",
           "source_body_sha256": "92deaf265b8923e052b20ce78b048e39019ad0a18b8b527db71ea0762355b8dc",
           "export_text_sha256": "7264212ef6ba53640b450d447917dd5bc729b20ed4a5d39664eb0c1e275944b3",
           "private_reference_substitutions": 4,
           "display_equations": 0,
-          "inline_equations": 0,
-          "formatting_normalizations": []
+          "inline_equations": 71,
+          "formatting_normalizations": [
+            {
+              "rule": "literal_inline_notation",
+              "source": "λ_n = o(n^{-1/2})",
+              "tex": "\\lambda _{n} = o(n^{-1/2})"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "H^{-1} G H^{-1}",
+              "tex": "H^{-1} G H^{-1}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "H",
+              "tex": "H"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "H",
+              "tex": "H"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "φ, Φ",
+              "tex": "\\phi , \\Phi"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "μ",
+              "tex": "\\mu"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "(0,1)",
+              "tex": "(0,1)"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "Φ(1−μ) − φ(1−μ) > 0",
+              "tex": "\\Phi (1-\\mu ) - \\phi (1-\\mu ) > 0"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "μ = 0.518941612965…",
+              "tex": "\\mu  = 0.518941612965\\ldots"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "U",
+              "tex": "U"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "[-1/4,1/4]",
+              "tex": "[-1/4,1/4]"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "S",
+              "tex": "S"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "2(1−s)",
+              "tex": "2(1-s)"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "(0,1)",
+              "tex": "(0,1)"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "E",
+              "tex": "E"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "Q",
+              "tex": "Q"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "B = N((μ,0), I₂)",
+              "tex": "B = N((\\mu ,0), I_{2})"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "(Z,T)",
+              "tex": "(Z,T)"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "B",
+              "tex": "B"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "Q",
+              "tex": "Q"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "Y",
+              "tex": "Y"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "X = Y(Z,T)",
+              "tex": "X = Y(Z,T)"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "f = (b+q)/2",
+              "tex": "f = (b+q)/2"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "g(x)=f(−x)",
+              "tex": "g(x)=f(-x)"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "λ_n=1/n",
+              "tex": "\\lambda _{n}=1/n"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "s=z−1",
+              "tex": "s=z-1"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "Q",
+              "tex": "Q"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "(1−s)[h(t−s^(−1/4))+h(t+s^(−1/4))]",
+              "tex": "(1-s)[h(t-s^{-1/4})+h(t+s^{-1/4})]"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "0<s<1",
+              "tex": "0<s<1"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "s=0",
+              "tex": "s=0"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "(1,t)",
+              "tex": "(1,t)"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "s=1",
+              "tex": "s=1"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "E_Q Z=4/3",
+              "tex": "E_{Q} Z=4/3"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "E_Q Z²=11/6",
+              "tex": "E_{Q} Z^{2}=11/6"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "E_Q T=0",
+              "tex": "E_{Q} T=0"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "E_Q T²=257/96",
+              "tex": "E_{Q} T^{2}=257/96"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "(μ+4/3)/2 > 0",
+              "tex": "(\\mu +4/3)/2 > 0"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "β*=(0,1,0)",
+              "tex": "\\beta *=(0,1,0)"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "X₁=±1",
+              "tex": "X_{1}=\\pm 1"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "X₂∈[-1/4,1/4]",
+              "tex": "X_{2}\\in [-1/4,1/4]"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "β*",
+              "tex": "\\beta *"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "μΦ(1−μ)−φ(1−μ)=0",
+              "tex": "\\mu \\Phi (1-\\mu )-\\phi (1-\\mu )=0"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "Q",
+              "tex": "Q"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "Z>1",
+              "tex": "Z>1"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "Q",
+              "tex": "Q"
+            },
+            {
+              "rule": "reviewed_inline_notation",
+              "source": "sqrt(n) β_hat₂",
+              "tex": "\\sqrt{n}\\,\\widehat{\\beta}_2"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "β(v)=(0,1,v)",
+              "tex": "\\beta (v)=(0,1,v)"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "Q",
+              "tex": "Q"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "s=v^(4/5)t",
+              "tex": "s=v^{4/5}t"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "v^(8/5)",
+              "tex": "v^{8/5}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "1+t^(−1/4)",
+              "tex": "1+t^{-1/4}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "(0,2)",
+              "tex": "(0,2)"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "O(v²)",
+              "tex": "O(v^{2})"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "H(β*)",
+              "tex": "H(\\beta *)"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "M>0, ε>0",
+              "tex": "M>0, \\epsilon >0"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "β=β*+θ/sqrt(n)",
+              "tex": "\\beta =\\beta *+\\theta /\\operatorname{sqrt}(n)"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "||θ||≤M",
+              "tex": "\\lVert \\theta \\rVert \\le M"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "|θ₂|≥ε",
+              "tex": "|\\theta _{2}|\\ge \\epsilon"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "Q",
+              "tex": "Q"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "4S",
+              "tex": "4S"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "(3+1/4)M/sqrt(n)",
+              "tex": "(3+1/4)M/\\operatorname{sqrt}(n)"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "2S",
+              "tex": "2S"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "β*",
+              "tex": "\\beta *"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "n^(1/5)",
+              "tex": "n^{1/5}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "O_P(1)",
+              "tex": "O_{P}(1)"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "o(1)",
+              "tex": "o(1)"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "sqrt(n) λ_n → 0",
+              "tex": "\\operatorname{sqrt}(n) \\lambda _{n} \\to  0"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "β*",
+              "tex": "\\beta *"
+            },
+            {
+              "rule": "reviewed_inline_notation",
+              "source": "sqrt(n)β_hat₂ → 0",
+              "tex": "\\sqrt{n}\\,\\widehat{\\beta}_2\\to0"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "5/6",
+              "tex": "\\frac{5}{6}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "C exp(−c||x||²)",
+              "tex": "C \\exp (-c\\lVert x\\rVert ^{2})"
+            }
+          ]
         }
       ]
     },
@@ -138,13 +494,254 @@
           "title": "Claimed trained-function risk bounds fail with probability one",
           "source_heading": "## Issue 2008__accepted__v9-koo08b-01 — Claimed trained-function risk bounds fail with probability one",
           "markdown": "\n\n**Exact location.** Theorem 1, PDF page 8 (printed 2614), Equation (15); Corollary 1 and MCIC derivation, PDF page 9 (printed 2615), Equations (16)–(17); Theorem 2 on the same page. Unsupported proof applications occur in Appendix A.3, PDF pages 20–21 (printed 2626–2627), leading to Equation (22), and Appendix B.1, PDF page 25 (printed 2631), Equations (30)–(33).\n\n**Claim.** For a regression function trained on the given iid observations, Theorem 1 bounds its expected absolute prediction loss by its empirical loss, observed pairwise output/prediction differences, and a modulus-of-continuity term times `sqrt(log(2/delta)/(2N))`, with probability at least `1−2delta`. Corollary 1 replaces pairwise terms with empirical loss and a data eigenvalue; Equation (17) uses that corollary to derive MCIC. Theorem 2 asserts a corresponding multivariate bound with probability at least `1−delta`. The statements impose no complexity or stability restriction on the learned function class and no sample-size restriction on its finite basis expansion.\n\n**Error and evidence.** The concentration step treats a fitted function as fixed independently of the observations on which its empirical risk is evaluated. An exact counterexample uses a basis fixed before sampling:\n\n1. Let `X=[0,1]`, target `f=0`, and noise identically zero. Let `M=10,000`, `N=100`, and `delta=1/20`. Put `z_j=(j+1/2)/M`, `j=0,...,M−1`, and let the input distribution be uniform on these fixed centers. Discrete input distributions are permitted by the theorem.\n2. Set `r=1/(3M)` and define `b(t)=(1−t²)²` for `|t|≤1`, and zero otherwise. Both its value and its first derivative agree with zero at the two boundaries. The fixed functions `phi_j(x)=b((x−z_j)/r)` are therefore continuously differentiable. Their supports are disjoint because `2r<1/M`.\n3. Use the fixed finite basis `{1,phi_0,...,phi_(M−1)}` in Equation (4). For a sample `S`, let `O(S)` be the distinct observed centers and train\n\n   `g_S(x)=1−sum_(j in O(S)) phi_j(x)`.\n\n   This is a member of the same predetermined finite linear space for every sample. It is an empirical-risk minimizer: every training label and prediction is zero. Everywhere on `X`, `0≤g_S≤1`.\n4. At each unobserved center, `g_S=1`. Consequently its exact expected absolute risk is\n\n   `R(g_S)=(M−|O(S)|)/M ≥ (M−N)/M = 99/100`.\n\n   This holds for **every** ordered sample, including samples with repeated centers.\n5. All empirical losses, all sample pairwise differences, the matrix `H_y`, and the constant `C` in Theorem 1 are zero. The last fact follows because the target and noise are zero and the two points in the displayed definition of `C` are sample points, at which `g_S=0`. Also `omega(g_S,h_0)≤1` for every `h_0`. Choose `h_0` to be the sample fill distance `D`, which satisfies Equation (14).\n\nThus the right side of both Equation (15) and Equation (16) is at most\n\n`sqrt(log(40)/200) = 0.135810151574...`,\n\nwhile the left side is at least `0.99`. Both bounds fail with probability **one**, although their claimed success probability is `0.90`.\n\nThe multivariate statement is refuted by taking `X=[0,1]^2`, placing the input mass at `(z_j,1/2)`, and using `g_S(x_1,x_2)=g_S(x_1)`. The target, noise and sample residual term remain zero; the axis modulus is at most one. Theorem 2 gives the same upper bound, while the exact risk remains at least `0.99`, despite a claimed success probability of `0.95`. This example depends on only one coordinate, so it does not rely on the separate missing dimension factor in that appendix's geometric step.\n\nThe failure also holds with ordinary uniform inputs on the **full interval**, without atoms or gaps in the input support. Fix one disjoint flat-top `C1` bump in each of `M` equal cells, equal to one on the central `1−epsilon` fraction of its cell and tapering to zero with the cubic `1−3t²+2t³` at each boundary. Set `epsilon=1/10,000`. If all 100 observations lie in the flat cores, use the same observed-cell estimator; otherwise return the zero function. Both branches minimize empirical risk. The core event has probability `(1−epsilon)^100≥0.99`; on it the exact risk is at least `1980001/2000000=0.9900005`, while the bound remains at most `0.135810151574...`. The separate `uniform-counter.py` artifact verifies the smoothness, exact bump integrals and probability. Independent uniform coordinates give the same multivariate counterexample.\n\nThe Python artifact `[unpublished artifact reference omitted]` verifies the boundary derivatives and support separation symbolically, computes exact rational risks, and checks 100 fresh samples. The proof above establishes failure for all samples; those controls are supplementary. The construction scales with `M=100N`, so inserting a fixed numerical constant into the displayed bounds cannot repair the missing class dependence.\n\n**Reason for rejection.** The new prediction-risk bounds and their use to derive MCIC are principal contributions, expressly emphasized in the abstract and Sections 3 and 5. The counterexample invalidates both central theorems and the corollary for the trained functions the method is intended to assess. Restoring a guarantee requires substantive uniform complexity or learning-algorithm control, or an independent validation sample; a fixed-function reinterpretation does not justify the published training-sample criterion. This changes the advertised theoretical basis of MCIC, rather than correcting a constant or notation. I would reject the paper as written. Its empirical tables may remain correct, and this finding does not prove that MCIC selects this bad estimator over an available zero predictor or that every practical MCIC variant fails.\n\n**Discovery method.** While tracing the MCIC derivation into Appendix B, noticed that the Hoeffding application omits the dependence of the trained function on the same observations. Constructed a smooth interpolating estimator, then strengthened it to a finite basis fixed before the data so that no adaptive-basis assumption is needed.\n\n**Verification method.** Read the entire paper and both appendices. Rechecked original rendered theorem, constant definition, MCIC derivation and concentration equations. Verified all sampling, domain, differentiability, basis and modulus assumptions, and the exact risk and right-hand sides. Ran the symbolic/rational verification artifact and checked the current official PDF against the inventory hash. Independent targeted review is recorded in the accompanying audit notes.\n\n**Confidence.** High. The risk calculation and bound evaluation are exact apart from an inessential decimal display; the contradiction holds for every sample, with a fixed finite basis and bounded predictions. The scope is the claimed trained-function generalization guarantee, not an unverified historical empirical result.\n",
-          "html": "<p><strong>Exact location.</strong> Theorem 1, PDF page 8 (printed 2614), Equation (15); Corollary 1 and MCIC derivation, PDF page 9 (printed 2615), Equations (16)–(17); Theorem 2 on the same page. Unsupported proof applications occur in Appendix A.3, PDF pages 20–21 (printed 2626–2627), leading to Equation (22), and Appendix B.1, PDF page 25 (printed 2631), Equations (30)–(33).</p>\n<p><strong>Claim.</strong> For a regression function trained on the given iid observations, Theorem 1 bounds its expected absolute prediction loss by its empirical loss, observed pairwise output/prediction differences, and a modulus-of-continuity term times <code>sqrt(log(2/delta)/(2N))</code>, with probability at least <code>1−2delta</code>. Corollary 1 replaces pairwise terms with empirical loss and a data eigenvalue; Equation (17) uses that corollary to derive MCIC. Theorem 2 asserts a corresponding multivariate bound with probability at least <code>1−delta</code>. The statements impose no complexity or stability restriction on the learned function class and no sample-size restriction on its finite basis expansion.</p>\n<p><strong>Error and evidence.</strong> The concentration step treats a fitted function as fixed independently of the observations on which its empirical risk is evaluated. An exact counterexample uses a basis fixed before sampling:</p>\n<ol>\n<li>\n<p>Let <code>X=[0,1]</code>, target <code>f=0</code>, and noise identically zero. Let <code>M=10,000</code>, <code>N=100</code>, and <code>delta=1/20</code>. Put <code>z_j=(j+1/2)/M</code>, <code>j=0,...,M−1</code>, and let the input distribution be uniform on these fixed centers. Discrete input distributions are permitted by the theorem.</p>\n</li>\n<li>\n<p>Set <code>r=1/(3M)</code> and define <code>b(t)=(1−t²)²</code> for <code>|t|≤1</code>, and zero otherwise. Both its value and its first derivative agree with zero at the two boundaries. The fixed functions <code>phi_j(x)=b((x−z_j)/r)</code> are therefore continuously differentiable. Their supports are disjoint because <code>2r&lt;1/M</code>.</p>\n</li>\n<li>\n<p>Use the fixed finite basis <code>{1,phi_0,...,phi_(M−1)}</code> in Equation (4). For a sample <code>S</code>, let <code>O(S)</code> be the distinct observed centers and train</p>\n<p><code>g_S(x)=1−sum_(j in O(S)) phi_j(x)</code>.</p>\n<p>This is a member of the same predetermined finite linear space for every sample. It is an empirical-risk minimizer: every training label and prediction is zero. Everywhere on <code>X</code>, <code>0≤g_S≤1</code>.</p>\n</li>\n<li>\n<p>At each unobserved center, <code>g_S=1</code>. Consequently its exact expected absolute risk is</p>\n<p><code>R(g_S)=(M−|O(S)|)/M ≥ (M−N)/M = 99/100</code>.</p>\n<p>This holds for <strong>every</strong> ordered sample, including samples with repeated centers.</p>\n</li>\n<li>\n<p>All empirical losses, all sample pairwise differences, the matrix <code>H_y</code>, and the constant <code>C</code> in Theorem 1 are zero. The last fact follows because the target and noise are zero and the two points in the displayed definition of <code>C</code> are sample points, at which <code>g_S=0</code>. Also <code>omega(g_S,h_0)≤1</code> for every <code>h_0</code>. Choose <code>h_0</code> to be the sample fill distance <code>D</code>, which satisfies Equation (14).</p>\n</li>\n</ol>\n<p>Thus the right side of both Equation (15) and Equation (16) is at most</p>\n<p><code>sqrt(log(40)/200) = 0.135810151574...</code>,</p>\n<p>while the left side is at least <code>0.99</code>. Both bounds fail with probability <strong>one</strong>, although their claimed success probability is <code>0.90</code>.</p>\n<p>The multivariate statement is refuted by taking <code>X=[0,1]^2</code>, placing the input mass at <code>(z_j,1/2)</code>, and using <code>g_S(x_1,x_2)=g_S(x_1)</code>. The target, noise and sample residual term remain zero; the axis modulus is at most one. Theorem 2 gives the same upper bound, while the exact risk remains at least <code>0.99</code>, despite a claimed success probability of <code>0.95</code>. This example depends on only one coordinate, so it does not rely on the separate missing dimension factor in that appendix's geometric step.</p>\n<p>The failure also holds with ordinary uniform inputs on the <strong>full interval</strong>, without atoms or gaps in the input support. Fix one disjoint flat-top <code>C1</code> bump in each of <code>M</code> equal cells, equal to one on the central <code>1−epsilon</code> fraction of its cell and tapering to zero with the cubic <code>1−3t²+2t³</code> at each boundary. Set <code>epsilon=1/10,000</code>. If all 100 observations lie in the flat cores, use the same observed-cell estimator; otherwise return the zero function. Both branches minimize empirical risk. The core event has probability <code>(1−epsilon)^100≥0.99</code>; on it the exact risk is at least <code>1980001/2000000=0.9900005</code>, while the bound remains at most <code>0.135810151574...</code>. The separate <code>uniform-counter.py</code> artifact verifies the smoothness, exact bump integrals and probability. Independent uniform coordinates give the same multivariate counterexample.</p>\n<p>The Python artifact <code>[unpublished artifact reference omitted]</code> verifies the boundary derivatives and support separation symbolically, computes exact rational risks, and checks 100 fresh samples. The proof above establishes failure for all samples; those controls are supplementary. The construction scales with <code>M=100N</code>, so inserting a fixed numerical constant into the displayed bounds cannot repair the missing class dependence.</p>\n<p><strong>Reason for rejection.</strong> The new prediction-risk bounds and their use to derive MCIC are principal contributions, expressly emphasized in the abstract and Sections 3 and 5. The counterexample invalidates both central theorems and the corollary for the trained functions the method is intended to assess. Restoring a guarantee requires substantive uniform complexity or learning-algorithm control, or an independent validation sample; a fixed-function reinterpretation does not justify the published training-sample criterion. This changes the advertised theoretical basis of MCIC, rather than correcting a constant or notation. I would reject the paper as written. Its empirical tables may remain correct, and this finding does not prove that MCIC selects this bad estimator over an available zero predictor or that every practical MCIC variant fails.</p>\n<p><strong>Discovery method.</strong> While tracing the MCIC derivation into Appendix B, noticed that the Hoeffding application omits the dependence of the trained function on the same observations. Constructed a smooth interpolating estimator, then strengthened it to a finite basis fixed before the data so that no adaptive-basis assumption is needed.</p>\n<p><strong>Verification method.</strong> Read the entire paper and both appendices. Rechecked original rendered theorem, constant definition, MCIC derivation and concentration equations. Verified all sampling, domain, differentiability, basis and modulus assumptions, and the exact risk and right-hand sides. Ran the symbolic/rational verification artifact and checked the current official PDF against the inventory hash. Independent targeted review is recorded in the accompanying audit notes.</p>\n<p><strong>Confidence.</strong> High. The risk calculation and bound evaluation are exact apart from an inessential decimal display; the contradiction holds for every sample, with a fixed finite basis and bounded predictions. The scope is the claimed trained-function generalization guarantee, not an unverified historical empirical result.</p>\n",
+          "html": "<p><strong>Exact location.</strong> Theorem 1, PDF page 8 (printed 2614), Equation (15); Corollary 1 and MCIC derivation, PDF page 9 (printed 2615), Equations (16)–(17); Theorem 2 on the same page. Unsupported proof applications occur in Appendix A.3, PDF pages 20–21 (printed 2626–2627), leading to Equation (22), and Appendix B.1, PDF page 25 (printed 2631), Equations (30)–(33).</p>\n<p><strong>Claim.</strong> For a regression function trained on the given iid observations, Theorem 1 bounds its expected absolute prediction loss by its empirical loss, observed pairwise output/prediction differences, and a modulus-of-continuity term times <span class=\"source-math\">\\(\\operatorname{sqrt}(\\log (2/\\delta )/(2N))\\)</span>, with probability at least <span class=\"source-math\">\\(1-2\\delta\\)</span>. Corollary 1 replaces pairwise terms with empirical loss and a data eigenvalue; Equation (17) uses that corollary to derive MCIC. Theorem 2 asserts a corresponding multivariate bound with probability at least <span class=\"source-math\">\\(1-\\delta\\)</span>. The statements impose no complexity or stability restriction on the learned function class and no sample-size restriction on its finite basis expansion.</p>\n<p><strong>Error and evidence.</strong> The concentration step treats a fitted function as fixed independently of the observations on which its empirical risk is evaluated. An exact counterexample uses a basis fixed before sampling:</p>\n<ol>\n<li>\n<p>Let <span class=\"source-math\">\\(X=[0,1]\\)</span>, target <span class=\"source-math\">\\(f=0\\)</span>, and noise identically zero. Let <span class=\"source-math\">\\(M=10,000\\)</span>, <span class=\"source-math\">\\(N=100\\)</span>, and <span class=\"source-math\">\\(\\delta =1/20\\)</span>. Put <span class=\"source-math\">\\(z_{j}=(j+1/2)/M\\)</span>, <span class=\"source-math\">\\(j=0,\\ldots ,M-1\\)</span>, and let the input distribution be uniform on these fixed centers. Discrete input distributions are permitted by the theorem.</p>\n</li>\n<li>\n<p>Set <span class=\"source-math\">\\(r=1/(3M)\\)</span> and define <span class=\"source-math\">\\(b(t)=(1-t^{2})^{2}\\)</span> for <span class=\"source-math\">\\(|t|\\le 1\\)</span>, and zero otherwise. Both its value and its first derivative agree with zero at the two boundaries. The fixed functions <span class=\"source-math\">\\(\\phi _{j}(x)=b((x-z_{j})/r)\\)</span> are therefore continuously differentiable. Their supports are disjoint because <span class=\"source-math\">\\(2r&lt;1/M\\)</span>.</p>\n</li>\n<li>\n<p>Use the fixed finite basis <span class=\"source-math\">\\(\\{1,\\phi _{0},\\ldots ,\\phi _{M-1}\\}\\)</span> in Equation (4). For a sample <span class=\"source-math\">\\(S\\)</span>, let <span class=\"source-math\">\\(O(S)\\)</span> be the distinct observed centers and train</p>\n<p><span class=\"source-math\">\\(g_{S}(x)=1-\\sum _{j in O(S)} \\phi _{j}(x)\\)</span>.</p>\n<p>This is a member of the same predetermined finite linear space for every sample. It is an empirical-risk minimizer: every training label and prediction is zero. Everywhere on <span class=\"source-math\">\\(X\\)</span>, <span class=\"source-math\">\\(0\\le g_{S}\\le 1\\)</span>.</p>\n</li>\n<li>\n<p>At each unobserved center, <span class=\"source-math\">\\(g_{S}=1\\)</span>. Consequently its exact expected absolute risk is</p>\n<p><span class=\"source-math\">\\(R(g_{S})=(M-|O(S)|)/M \\ge  (M-N)/M = 99/100\\)</span>.</p>\n<p>This holds for <strong>every</strong> ordered sample, including samples with repeated centers.</p>\n</li>\n<li>\n<p>All empirical losses, all sample pairwise differences, the matrix <span class=\"source-math\">\\(H_{y}\\)</span>, and the constant <span class=\"source-math\">\\(C\\)</span> in Theorem 1 are zero. The last fact follows because the target and noise are zero and the two points in the displayed definition of <span class=\"source-math\">\\(C\\)</span> are sample points, at which <span class=\"source-math\">\\(g_{S}=0\\)</span>. Also <span class=\"source-math\">\\(\\omega (g_{S},h_{0})\\le 1\\)</span> for every <span class=\"source-math\">\\(h_{0}\\)</span>. Choose <span class=\"source-math\">\\(h_{0}\\)</span> to be the sample fill distance <span class=\"source-math\">\\(D\\)</span>, which satisfies Equation (14).</p>\n</li>\n</ol>\n<p>Thus the right side of both Equation (15) and Equation (16) is at most</p>\n<p><span class=\"source-math\">\\(\\operatorname{sqrt}(\\log (40)/200) = 0.135810151574\\ldots\\)</span>,</p>\n<p>while the left side is at least <span class=\"source-math\">\\(0.99\\)</span>. Both bounds fail with probability <strong>one</strong>, although their claimed success probability is <span class=\"source-math\">\\(0.90\\)</span>.</p>\n<p>The multivariate statement is refuted by taking <span class=\"source-math\">\\(X=[0,1]^{2}\\)</span>, placing the input mass at <span class=\"source-math\">\\((z_{j},1/2)\\)</span>, and using <span class=\"source-math\">\\(g_{S}(x_{1},x_{2})=g_{S}(x_{1})\\)</span>. The target, noise and sample residual term remain zero; the axis modulus is at most one. Theorem 2 gives the same upper bound, while the exact risk remains at least <span class=\"source-math\">\\(0.99\\)</span>, despite a claimed success probability of <span class=\"source-math\">\\(0.95\\)</span>. This example depends on only one coordinate, so it does not rely on the separate missing dimension factor in that appendix's geometric step.</p>\n<p>The failure also holds with ordinary uniform inputs on the <strong>full interval</strong>, without atoms or gaps in the input support. Fix one disjoint flat-top <span class=\"source-math\">\\(C1\\)</span> bump in each of <span class=\"source-math\">\\(M\\)</span> equal cells, equal to one on the central <span class=\"source-math\">\\(1-\\epsilon\\)</span> fraction of its cell and tapering to zero with the cubic <span class=\"source-math\">\\(1-3t^{2}+2t^{3}\\)</span> at each boundary. Set <span class=\"source-math\">\\(\\epsilon =1/10,000\\)</span>. If all 100 observations lie in the flat cores, use the same observed-cell estimator; otherwise return the zero function. Both branches minimize empirical risk. The core event has probability <span class=\"source-math\">\\((1-\\epsilon )^{100}\\ge 0.99\\)</span>; on it the exact risk is at least <span class=\"source-math\">\\(1980001/2000000=0.9900005\\)</span>, while the bound remains at most <span class=\"source-math\">\\(0.135810151574\\ldots\\)</span>. The separate <code>uniform-counter.py</code> artifact verifies the smoothness, exact bump integrals and probability. Independent uniform coordinates give the same multivariate counterexample.</p>\n<p>The Python artifact <code>[unpublished artifact reference omitted]</code> verifies the boundary derivatives and support separation symbolically, computes exact rational risks, and checks 100 fresh samples. The proof above establishes failure for all samples; those controls are supplementary. The construction scales with <span class=\"source-math\">\\(M=100N\\)</span>, so inserting a fixed numerical constant into the displayed bounds cannot repair the missing class dependence.</p>\n<p><strong>Reason for rejection.</strong> The new prediction-risk bounds and their use to derive MCIC are principal contributions, expressly emphasized in the abstract and Sections 3 and 5. The counterexample invalidates both central theorems and the corollary for the trained functions the method is intended to assess. Restoring a guarantee requires substantive uniform complexity or learning-algorithm control, or an independent validation sample; a fixed-function reinterpretation does not justify the published training-sample criterion. This changes the advertised theoretical basis of MCIC, rather than correcting a constant or notation. I would reject the paper as written. Its empirical tables may remain correct, and this finding does not prove that MCIC selects this bad estimator over an available zero predictor or that every practical MCIC variant fails.</p>\n<p><strong>Discovery method.</strong> While tracing the MCIC derivation into Appendix B, noticed that the Hoeffding application omits the dependence of the trained function on the same observations. Constructed a smooth interpolating estimator, then strengthened it to a finite basis fixed before the data so that no adaptive-basis assumption is needed.</p>\n<p><strong>Verification method.</strong> Read the entire paper and both appendices. Rechecked original rendered theorem, constant definition, MCIC derivation and concentration equations. Verified all sampling, domain, differentiability, basis and modulus assumptions, and the exact risk and right-hand sides. Ran the symbolic/rational verification artifact and checked the current official PDF against the inventory hash. Independent targeted review is recorded in the accompanying audit notes.</p>\n<p><strong>Confidence.</strong> High. The risk calculation and bound evaluation are exact apart from an inessential decimal display; the contradiction holds for every sample, with a fixed finite basis and bounded predictions. The scope is the claimed trained-function generalization guarantee, not an unverified historical empirical result.</p>\n",
           "source_body_sha256": "5edcb2b35b49b9c9a2a31b51a06aee446f1ffba78076d610304407023d7fa358",
           "export_text_sha256": "f7d0ccfc2ebc2cc6b203b498e5d60463172a2038b205b3335c2cb0cc39795cbc",
           "private_reference_substitutions": 1,
           "display_equations": 0,
-          "inline_equations": 0,
-          "formatting_normalizations": []
+          "inline_equations": 48,
+          "formatting_normalizations": [
+            {
+              "rule": "literal_inline_notation",
+              "source": "sqrt(log(2/delta)/(2N))",
+              "tex": "\\operatorname{sqrt}(\\log (2/\\delta )/(2N))"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "1−2delta",
+              "tex": "1-2\\delta"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "1−delta",
+              "tex": "1-\\delta"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "X=[0,1]",
+              "tex": "X=[0,1]"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "f=0",
+              "tex": "f=0"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "M=10,000",
+              "tex": "M=10,000"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "N=100",
+              "tex": "N=100"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "delta=1/20",
+              "tex": "\\delta =1/20"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "z_j=(j+1/2)/M",
+              "tex": "z_{j}=(j+1/2)/M"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "j=0,...,M−1",
+              "tex": "j=0,\\ldots ,M-1"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "r=1/(3M)",
+              "tex": "r=1/(3M)"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "b(t)=(1−t²)²",
+              "tex": "b(t)=(1-t^{2})^{2}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "|t|≤1",
+              "tex": "|t|\\le 1"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "phi_j(x)=b((x−z_j)/r)",
+              "tex": "\\phi _{j}(x)=b((x-z_{j})/r)"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "2r<1/M",
+              "tex": "2r<1/M"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "{1,phi_0,...,phi_(M−1)}",
+              "tex": "\\{1,\\phi _{0},\\ldots ,\\phi _{M-1}\\}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "S",
+              "tex": "S"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "O(S)",
+              "tex": "O(S)"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "g_S(x)=1−sum_(j in O(S)) phi_j(x)",
+              "tex": "g_{S}(x)=1-\\sum _{j in O(S)} \\phi _{j}(x)"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "X",
+              "tex": "X"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "0≤g_S≤1",
+              "tex": "0\\le g_{S}\\le 1"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "g_S=1",
+              "tex": "g_{S}=1"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "R(g_S)=(M−|O(S)|)/M ≥ (M−N)/M = 99/100",
+              "tex": "R(g_{S})=(M-|O(S)|)/M \\ge  (M-N)/M = 99/100"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "H_y",
+              "tex": "H_{y}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "C",
+              "tex": "C"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "C",
+              "tex": "C"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "g_S=0",
+              "tex": "g_{S}=0"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "omega(g_S,h_0)≤1",
+              "tex": "\\omega (g_{S},h_{0})\\le 1"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "h_0",
+              "tex": "h_{0}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "h_0",
+              "tex": "h_{0}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "D",
+              "tex": "D"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "sqrt(log(40)/200) = 0.135810151574...",
+              "tex": "\\operatorname{sqrt}(\\log (40)/200) = 0.135810151574\\ldots"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "0.99",
+              "tex": "0.99"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "0.90",
+              "tex": "0.90"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "X=[0,1]^2",
+              "tex": "X=[0,1]^{2}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "(z_j,1/2)",
+              "tex": "(z_{j},1/2)"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "g_S(x_1,x_2)=g_S(x_1)",
+              "tex": "g_{S}(x_{1},x_{2})=g_{S}(x_{1})"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "0.99",
+              "tex": "0.99"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "0.95",
+              "tex": "0.95"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "C1",
+              "tex": "C1"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "M",
+              "tex": "M"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "1−epsilon",
+              "tex": "1-\\epsilon"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "1−3t²+2t³",
+              "tex": "1-3t^{2}+2t^{3}"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "epsilon=1/10,000",
+              "tex": "\\epsilon =1/10,000"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "(1−epsilon)^100≥0.99",
+              "tex": "(1-\\epsilon )^{100}\\ge 0.99"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "1980001/2000000=0.9900005",
+              "tex": "1980001/2000000=0.9900005"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "0.135810151574...",
+              "tex": "0.135810151574\\ldots"
+            },
+            {
+              "rule": "literal_inline_notation",
+              "source": "M=100N",
+              "tex": "M=100N"
+            }
+          ]
         }
       ]
     },
