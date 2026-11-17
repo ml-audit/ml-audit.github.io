@@ -9398,7 +9398,7 @@
       "abstract_source": "https://www.jmlr.org/papers/v22/18-803.html"
     }
   ],
-  "attribution": "Full finding arguments and impact assessments: GPT audit source reports. Volume-card summaries are editorial. Private file references adapted for publication; supporting audit files are not published with this release.",
+  "attribution": "Full finding arguments and impact assessments: GPT audit source reports. Volume-card summaries and reading guides are editorial. Private file references adapted for publication; supporting audit files are not published with this release.",
   "scope": "Flagged JMLR papers in a frozen, ongoing GPT audit snapshot.",
   "full_reports": {
     "edition": 3,
@@ -9427,6 +9427,11 @@
       "20": "./data/reports/volume-20.json",
       "21": "./data/reports/volume-21.json",
       "22": "./data/reports/volume-22.json"
+    },
+    "reading_guides": {
+      "edition": 1,
+      "attribution": "Editorial reading guides based on the GPT audit",
+      "relationship": "Separate reading aids; the full GPT finding text is retained alongside each guide."
     }
   }
 }
