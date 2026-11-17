@@ -50,7 +50,7 @@
   function sourceVolume(volume) {
     if (!reportLoads.has(volume)) {
       const url = data.full_reports.volumes[String(volume)];
-      reportLoads.set(volume, fetch(`${url}?v=5`).then(response => { if (!response.ok) throw new Error(`HTTP ${response.status}`); return response.json(); }).catch(error => { reportLoads.delete(volume); throw error; }));
+      reportLoads.set(volume, fetch(`${url}?v=6`).then(response => { if (!response.ok) throw new Error(`HTTP ${response.status}`); return response.json(); }).catch(error => { reportLoads.delete(volume); throw error; }));
     }
     return reportLoads.get(volume);
   }
@@ -74,7 +74,7 @@
     header.append(actions); view.append(header);
     const note = incompleteNote(paper); if (note) view.append(note);
     const provenance = element('div', 'full-report-notice');
-    provenance.append(element('strong', '', 'Full GPT audit report'), element('p', '', 'The source wording is preserved below, including the derivations, verification, confidence, and limitations. Only layout and equation rendering are formatted for the website. Private file references are explicitly marked as omitted.'));
+    provenance.append(element('strong', '', 'Full GPT audit report'), element('p', '', 'The audit’s arguments, calculations, verification claims, confidence, and limitations are reproduced below. Mathematical notation is formatted for reading. References to internal audit files are adapted for publication; public paper sources and file availability are listed with each finding.'));
     view.append(provenance);
     const container = element('div'); container.id = 'source-findings'; container.dataset.loaded = 'false'; container.append(element('p', 'loading', 'Loading the full audit report…')); view.append(container);
     async function showSource() {
@@ -87,12 +87,19 @@
         if (source.preface_markdown.trim()) {
           const preface = element('section', 'source-preface');
           preface.append(element('h2', '', 'Review coverage and scope'));
-          const body = element('div', 'source-markdown'); body.innerHTML = source.preface_html; preface.append(body); container.append(preface);
+          const body = element('div', 'source-markdown'); body.innerHTML = source.preface_html; preface.append(body); if (source.preface_audit_files_notice) preface.append(element('p', 'audit-file-availability', source.preface_audit_files_notice)); container.append(preface);
         }
         source.findings.forEach((finding, index) => {
           const article = element('article', 'finding-detail source-finding'); article.id = `finding-${index + 1}`; article.dataset.findingId = finding.id; article.dataset.sourceSha256 = finding.source_body_sha256;
           const heading = element('h2', '', finding.title ? `Finding ${index + 1} · ${finding.title}` : `Finding ${index + 1}`); heading.id = `finding-heading-${index + 1}`; article.setAttribute('aria-labelledby', heading.id); article.append(heading);
           const body = element('div', 'source-markdown source-report-body'); body.innerHTML = finding.html; article.append(body);
+          const sources = element('section', 'finding-sources'); sources.setAttribute('aria-label', `Paper sources for finding ${index + 1}`);
+          sources.append(element('h3', '', 'Paper sources'));
+          const links = element('ul', 'paper-source-links');
+          (finding.public_sources || []).forEach(source => { const li = element('li'); li.append(anchor(source.label, source.url)); links.append(li); });
+          sources.append(links);
+          if (finding.audit_files_notice) sources.append(element('p', 'audit-file-availability', finding.audit_files_notice));
+          article.append(sources);
           const download = element('button', 'download-source', 'Download this finding’s text'); download.type = 'button'; download.addEventListener('click', () => downloadFinding(finding, paper, index)); article.append(download);
           container.append(article);
         });
@@ -169,7 +176,7 @@
   }
   async function load() {
     try {
-      const response = await fetch('./data/jmlr.json?v=5'); if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const response = await fetch('./data/jmlr.json?v=6'); if (!response.ok) throw new Error(`HTTP ${response.status}`);
       data = await response.json();
       $('total-papers').textContent = data.snapshot.papers_with_findings.toLocaleString();
       $('total-findings').textContent = data.snapshot.findings.toLocaleString();
