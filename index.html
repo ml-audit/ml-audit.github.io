@@ -4,13 +4,13 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#173e33">
-  <meta name="description" content="Browse GPT audit findings on machine learning papers, alongside the original abstracts. First release: JMLR.">
+  <meta name="description" content="Browse GPT audit findings on JMLR papers. Open each paper for the recorded claim, evidence, and assessment of its impact.">
   <title>ML-Audit · JMLR paper audit</title>
   <link rel="icon" href="./assets/favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="./assets/styles.css">
+  <link rel="stylesheet" href="./assets/styles.css?v=2">
   <script src="./assets/math-config.js" defer></script>
   <script src="./assets/vendor/mathjax.js" defer></script>
-  <script src="./assets/app.js" defer></script>
+  <script src="./assets/app.js?v=2" defer></script>
 </head>
 <body>
   <a class="skip-link" href="#feed">Skip to papers</a>
@@ -26,17 +26,18 @@
   <div class="page">
     <header class="topbar"><span>THE PAPER AUDIT</span><a href="./data/jmlr.json" download>Download data <span aria-hidden="true">↓</span></a></header>
     <main id="feed" tabindex="-1">
-      <section class="intro" aria-labelledby="page-title">
+      <section class="intro" id="collection-intro" aria-labelledby="page-title">
         <div class="eyebrow"><span class="small-rule"></span> MACHINE LEARNING, EXAMINED</div>
         <h1 id="page-title">Read the paper.<br><em>Examine the claim.</em></h1>
-        <p class="intro-copy">A public collection of findings from a GPT audit of the machine learning literature. Read each paper’s original abstract alongside what the audit flags—and why it matters.</p>
+        <p class="intro-copy">A public collection of findings from a GPT audit of the machine learning literature. Browse what the audit flags, then open a paper to examine the claim, evidence, and why it matters.</p>
         <div class="collection-summary"><span><strong id="total-papers">—</strong> papers flagged</span><span><strong id="total-findings">—</strong> findings</span><span class="source-pill"><span class="status-dot" aria-hidden="true"></span>GPT audit only</span></div>
       </section>
-      <section class="volume-section" aria-labelledby="volume-heading">
+      <section class="volume-section" id="volume-view" aria-labelledby="volume-heading">
         <div class="feed-heading"><div><div class="breadcrumb">JMLR <span aria-hidden="true">/</span> <span id="volume-crumb">Volume 2</span></div><h2 id="volume-heading">Volume 2 <span id="volume-years"></span></h2></div><button class="share-button" id="share-volume" type="button" aria-label="Copy a link to this volume"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7 .1l3-3a5 5 0 0 0-7-7l-2 2M14 11a5 5 0 0 0-7-.1l-3 3a5 5 0 0 0 7 7l2-2"/></svg><span>Copy volume link</span></button></div>
-        <div class="feed-meta"><span id="volume-count">Loading findings…</span><span class="reading-note">Original abstracts · GPT assessments</span></div>
+        <div class="feed-meta"><span id="volume-count">Loading findings…</span><span class="reading-note">GPT audit summaries · Open a paper for details</span></div>
         <div id="papers" aria-live="polite"><p class="loading">Loading the JMLR feed…</p></div>
       </section>
+      <section class="paper-section" id="paper-view" aria-labelledby="detail-title" hidden></section>
       <footer class="page-footer"><p>Findings and assessments of their impact are attributed to the GPT audit. Summaries are editorial explanations of its recorded evidence. This release includes flagged papers; the audit is ongoing.</p><div><span id="snapshot-date"></span><a href="./data/jmlr.json">Curated JSON export <span aria-hidden="true">↗</span></a></div></footer>
     </main>
     <div id="announcement" class="sr-only" role="status"></div>
