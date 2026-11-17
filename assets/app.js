@@ -46,38 +46,18 @@
     try { await navigator.clipboard.writeText(location.href); button.querySelector('span').textContent = 'Link copied'; $('announcement').textContent = `${label} link copied to clipboard.`; }
     catch { $('announcement').textContent = 'Copy this page’s address to share it.'; button.querySelector('span').textContent = 'Use address bar link'; }
   }
-  function appendParagraphs(parent, text) {
-    String(text).split(/\n\s*\n/).filter(Boolean).forEach(part => parent.append(element('p', 'reader-text', part)));
+  const reportLoads = new Map();
+  function sourceVolume(volume) {
+    if (!reportLoads.has(volume)) {
+      const url = data.full_reports.volumes[String(volume)];
+      reportLoads.set(volume, fetch(`${url}?v=4`).then(response => { if (!response.ok) throw new Error(`HTTP ${response.status}`); return response.json(); }).catch(error => { reportLoads.delete(volume); throw error; }));
+    }
+    return reportLoads.get(volume);
   }
-  function appendEvidence(parent, blocks) {
-    blocks.forEach(block => {
-      if (block.type === 'paragraph') appendParagraphs(parent, block.text);
-      else if (block.type === 'equation') {
-        const box = element('div', 'equation-block');
-        box.append(element('div', 'equation-content', `\\[${block.tex}\\]`)); parent.append(box);
-      } else if (block.type === 'list') {
-        const list = element('ul', 'reader-list');
-        block.items.forEach(text => { const item = element('li'); appendParagraphs(item, text); list.append(item); }); parent.append(list);
-      } else if (block.type === 'table') {
-        const box = element('div', 'evidence-table-wrap');
-        const table = element('table', 'evidence-table');
-        table.append(element('caption', 'sr-only', 'Comparison reported by the GPT audit'));
-        const head = element('thead'), row = element('tr');
-        block.headers.forEach(text => { const cell = element('th', '', text); cell.scope = 'col'; row.append(cell); }); head.append(row); table.append(head);
-        const body = element('tbody'); block.rows.forEach(items => { const row = element('tr'); items.forEach(text => row.append(element('td', '', text))); body.append(row); }); table.append(body); box.append(table); parent.append(box);
-      }
-    });
-  }
-  function appendLocations(parent, locations, pdfUrl) {
-    const list = element('ul', 'location-list');
-    locations.forEach(text => {
-      const item = element('li'); let end = 0;
-      for (const match of text.matchAll(/PDF pages?\s+(\d+)(?:[–-]\d+)?/g)) {
-        item.append(document.createTextNode(text.slice(end, match.index)), anchor(match[0], `${pdfUrl}#page=${match[1]}`, 'page-reference'));
-        end = match.index + match[0].length;
-      }
-      item.append(document.createTextNode(text.slice(end))); list.append(item);
-    }); parent.append(list);
+  function downloadFinding(source, paper, index) {
+    const text = `${source.source_heading}\n${source.markdown}`;
+    const url = URL.createObjectURL(new Blob([text], {type:'text/markdown;charset=utf-8'}));
+    const link = anchor('', url); link.download = `${paper.record_id}-finding-${index + 1}.md`; document.body.append(link); link.click(); link.remove(); setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
   function renderPaper(paper) {
     const view = $('paper-view');
@@ -91,23 +71,40 @@
     const actions = element('div', 'detail-actions');
     actions.append(anchor('Original paper ↗', paper.paper_url, 'original-paper'), anchor('PDF ↗', paper.pdf_url, 'original-link'));
     const share = element('button', 'share-button'); share.id = 'share-paper'; share.type = 'button'; share.setAttribute('aria-label', 'Copy a link to this paper’s audit details'); share.append(element('span', '', 'Copy paper link')); share.addEventListener('click', () => copyLink(share, 'Paper')); actions.append(share);
-    header.append(actions); view.append(header, summaryBlock(paper));
-    view.append(element('p', 'detail-provenance', 'These explanations present the GPT audit’s recorded findings in plain English. Claims are paraphrased; the evidence and assessments of impact are attributed to the GPT audit.'));
-    paper.findings.forEach((finding, index) => {
-      const article = element('article', 'finding-detail'); article.id = `finding-${index + 1}`;
-      const heading = element('h2', '', paper.findings.length === 1 ? 'Audit details' : `Finding ${index + 1} of ${paper.findings.length}`); heading.id = `finding-heading-${index + 1}`; article.setAttribute('aria-labelledby', heading.id); article.append(heading);
-      const reader = finding.reader;
-      if (!reader) { article.append(element('p', 'reader-text', 'A readable explanation of this finding is being prepared.')); view.append(article); return; }
-      for (const [key, label] of [['claim', 'What the paper claims'], ['explanation', 'What appears to go wrong'], ['evidence', 'Check the evidence'], ['impact', 'Why it matters'], ['location', 'Where to look in the paper']]) {
-        const section = element('section', `detail-field detail-${key}`); section.append(element('h3', '', label));
-        if (key === 'evidence') appendEvidence(section, reader.evidence);
-        else if (key === 'location') { appendParagraphs(section, 'PDF links use the page number in the file. Printed pages refer to the journal’s page numbering.'); appendLocations(section, reader.locations, paper.pdf_url); }
-        else appendParagraphs(section, reader[key]);
-        article.append(section);
+    header.append(actions); view.append(header);
+    const note = incompleteNote(paper); if (note) view.append(note);
+    const provenance = element('div', 'full-report-notice');
+    provenance.append(element('strong', '', 'Full GPT audit report'), element('p', '', 'The source wording is preserved below, including the derivations, verification, confidence, and limitations. Only layout and equation rendering are formatted for the website. Private file references are explicitly marked as omitted.'));
+    view.append(provenance);
+    const container = element('div'); container.id = 'source-findings'; container.dataset.loaded = 'false'; container.append(element('p', 'loading', 'Loading the full audit report…')); view.append(container);
+    async function showSource() {
+      try {
+        const volume = await sourceVolume(paper.volume);
+        if (!view.contains(container)) return;
+        const source = volume.papers.find(p => p.record_id === paper.record_id);
+        if (!source || source.findings.length !== paper.findings.length || source.findings.some(f => !paper.findings.some(item => item.id === f.id))) throw new Error('Report coverage mismatch');
+        container.replaceChildren();
+        if (source.preface_markdown.trim()) {
+          const preface = element('section', 'source-preface');
+          preface.append(element('h2', '', 'Review coverage and scope'));
+          const body = element('div', 'source-markdown'); body.innerHTML = source.preface_html; preface.append(body); container.append(preface);
+        }
+        source.findings.forEach((finding, index) => {
+          const article = element('article', 'finding-detail source-finding'); article.id = `finding-${index + 1}`; article.dataset.findingId = finding.id; article.dataset.sourceSha256 = finding.source_body_sha256;
+          const heading = element('h2', '', finding.title ? `Finding ${index + 1} · ${finding.title}` : `Finding ${index + 1}`); heading.id = `finding-heading-${index + 1}`; article.setAttribute('aria-labelledby', heading.id); article.append(heading);
+          const body = element('div', 'source-markdown source-report-body'); body.innerHTML = finding.html; article.append(body);
+          const download = element('button', 'download-source', 'Download this finding’s text'); download.type = 'button'; download.addEventListener('click', () => downloadFinding(finding, paper, index)); article.append(download);
+          container.append(article);
+        });
+        container.append(anchor(`← Back to Volume ${paper.volume}`, route(paper.volume), 'back-link bottom-back'));
+        container.dataset.loaded = 'true'; typeset(view);
+      } catch (error) {
+        if (!view.contains(container)) return;
+        const box = element('div', 'error-message'); box.append(element('p', '', 'The full audit report could not be loaded.'));
+        const retry = element('button', '', 'Try again'); retry.type = 'button'; retry.addEventListener('click', showSource); box.append(retry); container.replaceChildren(box);
       }
-      view.append(article);
-    });
-    view.append(anchor(`← Back to Volume ${paper.volume}`, route(paper.volume), 'back-link bottom-back'));
+    }
+    showSource();
   }
   function typeset(container) {
     if (window.MathJax?.startup?.promise) {
@@ -115,7 +112,7 @@
         container.querySelectorAll('.equation-block').forEach(box => {
           if (box.scrollWidth > box.clientWidth + 2) {
             box.tabIndex = 0; box.setAttribute('role', 'region'); box.setAttribute('aria-label', 'Equation; scroll horizontally to read all of it');
-            box.after(element('p', 'equation-hint', 'Scroll to view the full equation →'));
+            if (!box.nextElementSibling?.classList.contains('equation-hint')) box.after(element('p', 'equation-hint', 'Scroll to view the full equation →'));
           }
         });
       });
@@ -145,7 +142,7 @@
     if (detail) {
       if (paper) renderPaper(paper);
       else { const title = element('h1', 'detail-title', 'Paper not found'); title.id = 'detail-title'; view.append(title, element('p', '', 'This paper is not in the published GPT audit findings for this volume.'), anchor(`← Back to Volume ${volume}`, route(volume), 'back-link')); }
-      typeset(view);
+      if (!paper) typeset(view);
       document.title = paper ? `${paper.title} — ML-Audit` : 'Paper not found — ML-Audit';
       $('announcement').textContent = paper ? `${paper.title}. ${plural(paper.findings.length, 'GPT audit finding')}.` : 'Paper not found.';
     } else {
@@ -165,7 +162,7 @@
   }
   async function load() {
     try {
-      const response = await fetch('./data/jmlr.json?v=3'); if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const response = await fetch('./data/jmlr.json?v=4'); if (!response.ok) throw new Error(`HTTP ${response.status}`);
       data = await response.json();
       $('total-papers').textContent = data.snapshot.papers_with_findings.toLocaleString();
       $('total-findings').textContent = data.snapshot.findings.toLocaleString();
