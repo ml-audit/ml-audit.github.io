@@ -46,6 +46,39 @@
     try { await navigator.clipboard.writeText(location.href); button.querySelector('span').textContent = 'Link copied'; $('announcement').textContent = `${label} link copied to clipboard.`; }
     catch { $('announcement').textContent = 'Copy this page’s address to share it.'; button.querySelector('span').textContent = 'Use address bar link'; }
   }
+  function appendParagraphs(parent, text) {
+    String(text).split(/\n\s*\n/).filter(Boolean).forEach(part => parent.append(element('p', 'reader-text', part)));
+  }
+  function appendEvidence(parent, blocks) {
+    blocks.forEach(block => {
+      if (block.type === 'paragraph') appendParagraphs(parent, block.text);
+      else if (block.type === 'equation') {
+        const box = element('div', 'equation-block');
+        box.append(element('div', 'equation-content', `\\[${block.tex}\\]`)); parent.append(box);
+      } else if (block.type === 'list') {
+        const list = element('ul', 'reader-list');
+        block.items.forEach(text => { const item = element('li'); appendParagraphs(item, text); list.append(item); }); parent.append(list);
+      } else if (block.type === 'table') {
+        const box = element('div', 'evidence-table-wrap');
+        const table = element('table', 'evidence-table');
+        table.append(element('caption', 'sr-only', 'Comparison reported by the GPT audit'));
+        const head = element('thead'), row = element('tr');
+        block.headers.forEach(text => { const cell = element('th', '', text); cell.scope = 'col'; row.append(cell); }); head.append(row); table.append(head);
+        const body = element('tbody'); block.rows.forEach(items => { const row = element('tr'); items.forEach(text => row.append(element('td', '', text))); body.append(row); }); table.append(body); box.append(table); parent.append(box);
+      }
+    });
+  }
+  function appendLocations(parent, locations, pdfUrl) {
+    const list = element('ul', 'location-list');
+    locations.forEach(text => {
+      const item = element('li'); let end = 0;
+      for (const match of text.matchAll(/PDF pages?\s+(\d+)(?:[–-]\d+)?/g)) {
+        item.append(document.createTextNode(text.slice(end, match.index)), anchor(match[0], `${pdfUrl}#page=${match[1]}`, 'page-reference'));
+        end = match.index + match[0].length;
+      }
+      item.append(document.createTextNode(text.slice(end))); list.append(item);
+    }); parent.append(list);
+  }
   function renderPaper(paper) {
     const view = $('paper-view');
     view.append(anchor(`← Back to Volume ${paper.volume}`, route(paper.volume), 'back-link'));
@@ -59,13 +92,17 @@
     actions.append(anchor('Original paper ↗', paper.paper_url, 'original-paper'), anchor('PDF ↗', paper.pdf_url, 'original-link'));
     const share = element('button', 'share-button'); share.id = 'share-paper'; share.type = 'button'; share.setAttribute('aria-label', 'Copy a link to this paper’s audit details'); share.append(element('span', '', 'Copy paper link')); share.addEventListener('click', () => copyLink(share, 'Paper')); actions.append(share);
     header.append(actions); view.append(header, summaryBlock(paper));
-    view.append(element('p', 'detail-provenance', 'The claim descriptions, locations, explanations, evidence, and impact assessments below are recorded by the GPT audit. Claim descriptions are the audit’s wording and are not necessarily verbatim quotations from the paper.'));
+    view.append(element('p', 'detail-provenance', 'These explanations present the GPT audit’s recorded findings in plain English. Claims are paraphrased; the evidence and assessments of impact are attributed to the GPT audit.'));
     paper.findings.forEach((finding, index) => {
       const article = element('article', 'finding-detail'); article.id = `finding-${index + 1}`;
       const heading = element('h2', '', paper.findings.length === 1 ? 'Audit details' : `Finding ${index + 1} of ${paper.findings.length}`); heading.id = `finding-heading-${index + 1}`; article.setAttribute('aria-labelledby', heading.id); article.append(heading);
-      for (const [key, label] of [['claim', 'Claim identified by the GPT audit'], ['location', 'Location in the paper'], ['explanation', 'GPT audit explanation'], ['evidence', 'Supporting evidence recorded by the GPT audit'], ['impact', 'Why it matters · GPT audit assessment']]) {
+      const reader = finding.reader;
+      if (!reader) { article.append(element('p', 'reader-text', 'A readable explanation of this finding is being prepared.')); view.append(article); return; }
+      for (const [key, label] of [['claim', 'What the paper claims'], ['explanation', 'What appears to go wrong'], ['evidence', 'Check the evidence'], ['impact', 'Why it matters'], ['location', 'Where to look in the paper']]) {
         const section = element('section', `detail-field detail-${key}`); section.append(element('h3', '', label));
-        section.append(element('p', finding[key] ? 'detail-text' : 'detail-text missing-field', finding[key] || 'Not recorded separately in the GPT audit.'));
+        if (key === 'evidence') appendEvidence(section, reader.evidence);
+        else if (key === 'location') { appendParagraphs(section, 'PDF links use the page number in the file. Printed pages refer to the journal’s page numbering.'); appendLocations(section, reader.locations, paper.pdf_url); }
+        else appendParagraphs(section, reader[key]);
         article.append(section);
       }
       view.append(article);
@@ -74,7 +111,14 @@
   }
   function typeset(container) {
     if (window.MathJax?.startup?.promise) {
-      window.MathJax.startup.promise = window.MathJax.startup.promise.then(() => window.MathJax.typesetPromise([container]));
+      window.MathJax.startup.promise = window.MathJax.startup.promise.then(() => window.MathJax.typesetPromise([container])).then(() => {
+        container.querySelectorAll('.equation-block').forEach(box => {
+          if (box.scrollWidth > box.clientWidth + 2) {
+            box.tabIndex = 0; box.setAttribute('role', 'region'); box.setAttribute('aria-label', 'Equation; scroll horizontally to read all of it');
+            box.after(element('p', 'equation-hint', 'Scroll to view the full equation →'));
+          }
+        });
+      });
     }
   }
   function render(moveFocus = false) {
@@ -121,7 +165,7 @@
   }
   async function load() {
     try {
-      const response = await fetch('./data/jmlr.json?v=2'); if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const response = await fetch('./data/jmlr.json?v=3'); if (!response.ok) throw new Error(`HTTP ${response.status}`);
       data = await response.json();
       $('total-papers').textContent = data.snapshot.papers_with_findings.toLocaleString();
       $('total-findings').textContent = data.snapshot.findings.toLocaleString();
