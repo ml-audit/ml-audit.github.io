@@ -18,7 +18,7 @@
   }
   function summaryBlock(paper) {
     const block = element('div', 'finding-block');
-    block.append(element('p', 'finding-label', paper.findings.length === 1 ? 'WHAT THE AUDIT QUESTIONS' : 'WHAT THE AUDIT QUESTIONS · ' + plural(paper.findings.length, 'finding')));
+    block.append(element('p', 'finding-label', paper.findings.length === 1 ? 'AUDIT FINDING' : 'AUDIT FINDINGS · ' + plural(paper.findings.length, 'finding')));
     if (paper.findings.length === 1) block.append(element('p', 'finding-text', paper.findings[0].summary));
     else {
       const list = element('ol', 'finding-list');
@@ -36,7 +36,7 @@
     const title = element('h3'); title.id = 'title-' + paper.record_id;
     title.append(anchor(paper.title, paperRoute(paper), 'paper-detail-link'));
     const actions = element('div', 'card-actions');
-    actions.append(anchor('Read the audit', paperRoute(paper), 'details-link'), anchor('Original paper ↗', paper.paper_url, 'original-link'));
+    actions.append(anchor('View audit →', paperRoute(paper), 'details-link'), anchor('Original paper ↗', paper.paper_url, 'original-link'));
     card.append(meta, title, summaryBlock(paper), actions); return card;
   }
   async function copyLink(button, label, hash) {
@@ -51,7 +51,7 @@
   }
   function sourceVolume(volume) {
     if (!reportLoads.has(volume)) {
-      reportLoads.set(volume, fetch(data.full_reports.volumes[String(volume)] + '?v=7').then(r => {
+      reportLoads.set(volume, fetch(data.full_reports.volumes[String(volume)] + '?v=8').then(r => {
         if (!r.ok) throw new Error('HTTP ' + r.status); return r.json();
       }).catch(error => { reportLoads.delete(volume); throw error; }));
     }
@@ -94,7 +94,7 @@
     if (target.tagName === 'DETAILS') target.open = true;
     if (target.classList.contains('finding-sources')) target.querySelector('details').open = true;
     target.scrollIntoView({block:'start', behavior:'instant'});
-    if (focus) { target.tabIndex = -1; target.focus({preventScroll:true}); }
+    if (focus) { const heading=target.matches('h1,h2,h3,h4') ? target : target.querySelector('h2,h3,h4,summary'); const focusTarget=heading || target; focusTarget.tabIndex=-1; focusTarget.focus({preventScroll:true}); }
     document.querySelectorAll('.toc-links a').forEach(a => { if (a.hash === location.hash) a.setAttribute('aria-current','location'); else a.removeAttribute('aria-current'); });
     measureEquations(target);
   }
@@ -105,7 +105,7 @@
     const nav = element('nav'); nav.setAttribute('aria-label', 'Paper contents');
     const list = element('ul', 'toc-links');
     const add = (text, id, cls) => { const li = element('li', cls); li.append(anchor(text, sectionRoute(paper, id))); list.append(li); };
-    add('At a glance', 'paper-overview');
+    add('Audit summary', 'paper-overview');
     paper.findings.forEach((f, i) => {
       if (paper.findings.length > 1) add('Finding ' + (i + 1), 'finding-' + (i + 1), 'toc-finding-label');
       sections.forEach(pair => add(pair[1], 'finding-' + (i + 1) + '-' + pair[0]));
@@ -118,7 +118,7 @@
   function overview(paper) {
     const box = element('section', 'paper-overview'); box.id = 'paper-overview';
     box.setAttribute('aria-labelledby', 'overview-heading');
-    const h = element('h2', 'overview-kicker', 'At a glance'); h.id = 'overview-heading'; box.append(h);
+    const h = element('h2', 'overview-kicker', 'Audit summary'); h.id = 'overview-heading'; box.append(h);
     const list = element(paper.findings.length > 1 ? 'ol' : 'div', 'overview-list');
     paper.findings.forEach((f, i) => {
       const item = element(paper.findings.length > 1 ? 'li' : 'div', 'overview-item');
@@ -151,16 +151,16 @@
   function renderFinding(finding, paper, index) {
     const article = element('article','finding-detail source-finding'); article.id = 'finding-' + (index + 1);
     article.dataset.findingId = finding.id; article.dataset.sourceSha256 = finding.source_body_sha256;
-    const heading = element('h2', '', paper.findings.length > 1 ? 'Finding ' + (index + 1) : 'Understanding the finding');
+    article.append(element('p','finding-number','GPT AUDIT · FINDING ' + (index + 1)));
+    const heading = element('h2', '', finding.title || 'Finding ' + (index + 1));
     heading.id = 'finding-heading-' + (index + 1); article.setAttribute('aria-labelledby', heading.id); article.append(heading);
     if (paper.findings.length > 1) article.append(element('p','finding-lead',paper.findings[index].summary));
     const guide = element('div','reading-guide');
-    guide.append(element('p','guide-label','READING GUIDE · EDITED FOR CLARITY FROM THE GPT AUDIT'));
+    guide.append(element('p','guide-label','READING GUIDE · BASED ON THE GPT AUDIT'));
     finding.reading_guide.sections.forEach((section, number) => guide.append(guideSection(section,paper,index,number + 1)));
     article.append(guide);
     const separator = element('header','report-separator'); separator.id = 'finding-' + (index + 1) + '-report';
-    separator.append(element('p','report-kicker','THE COMPLETE TECHNICAL ARGUMENT'),element('h3','','Full GPT audit report'),element('p','','The full report follows, including assumptions, derivations, verification, confidence, and limitations. Internal file references are adapted for publication.'));
-    if (finding.title) separator.append(element('p','original-finding-title',finding.title));
+    separator.append(element('p','report-kicker','DETAILED AUDIT REPORT'),element('h3','','Full GPT audit report'),element('p','','The technical argument follows, including the recorded assumptions, calculations, checks, and limitations.'));
     article.append(separator);
     const body = element('div','source-markdown source-report-body'); body.innerHTML = finding.html; article.append(body);
     const jump = element('nav','report-jump-links'); jump.setAttribute('aria-label','Sections in the full report');
@@ -186,7 +186,7 @@
     const view = $('paper-view'), header = element('header','detail-header');
     const breadcrumb = element('nav','breadcrumb'); breadcrumb.setAttribute('aria-label','Breadcrumb');
     breadcrumb.append(anchor('JMLR',route(paper.volume)), element('span','','/'),anchor('Volume ' + paper.volume,route(paper.volume)),element('span','','/'),element('span','','Paper audit'));
-    header.append(breadcrumb,element('p','detail-meta','JMLR · ' + paper.year + ' · ' + plural(paper.findings.length,'finding')));
+    header.append(breadcrumb,element('p','detail-meta','PUBLISHED PAPER · JMLR ' + paper.volume + ' (' + paper.year + ') · ' + plural(paper.findings.length,'finding')));
     const title = element('h1','detail-title',paper.title); title.id = 'detail-title'; header.append(title);
     const actions = element('div','detail-actions');
     actions.append(anchor('Original paper ↗',paper.paper_url,'original-paper'),anchor('Open PDF ↗',paper.pdf_url,'original-link'));
@@ -205,9 +205,9 @@
         source.findings.forEach((finding,index)=>container.append(renderFinding(finding,paper,index)));
         const coverage = element('details','coverage-details'); coverage.id = 'review-coverage';
         coverage.addEventListener('toggle', () => { if (coverage.open) measureEquations(coverage); });
-        coverage.append(element('summary','','Review coverage & publication notes'));
+        coverage.append(element('summary','','Review coverage & source notes'));
         if (source.preface_markdown.trim()) { const preface = element('div','source-preface'); const body = element('div','source-markdown'); body.innerHTML = source.preface_html; preface.append(body); coverage.append(preface); }
-        coverage.append(element('p','','Reading guides are editorial explanations based on the GPT audit. The complete scientific arguments are retained in the full reports. Supporting audit files are not included in this release.'));
+        coverage.append(element('p','','Reading guides are editorial explanations based on the GPT audit. The detailed reports retain the scientific arguments. Supporting audit files are not included in this release.'));
         if (source.preface_audit_files_notice) coverage.append(element('p','audit-file-availability',source.preface_audit_files_notice));
         container.append(coverage,anchor('← Back to Volume ' + paper.volume,route(paper.volume),'back-link bottom-back'));
         container.dataset.loaded = 'true'; await typeset(view);
@@ -262,12 +262,12 @@
       $('announcement').textContent=paper ? paper.title+'. '+plural(paper.findings.length,'GPT audit finding')+'.' : 'Paper not found.';
     } else {
       $('volume-crumb').textContent='Volume '+volume; $('volume-heading').firstChild.textContent='Volume '+volume+' '; $('volume-years').textContent=years(info.years);
-      $('volume-count').textContent=plural(info.paper_count,'flagged paper')+' · '+plural(info.finding_count,'finding');
+      $('volume-count').textContent=(info.paper_count + (info.paper_count===1 ? ' paper with findings' : ' papers with findings'))+' · '+plural(info.finding_count,'finding');
       $('paper-search').value=searches.get(volume)||''; renderPapers();
       const pagination=$('volume-pagination');pagination.replaceChildren();const index=data.volumes.findIndex(v=>v.volume===volume);
       if(index>0)pagination.append(anchor('← Volume '+data.volumes[index-1].volume,route(data.volumes[index-1].volume),'previous-volume'));
       if(index<data.volumes.length-1)pagination.append(anchor('Volume '+data.volumes[index+1].volume+' →',route(data.volumes[index+1].volume),'next-volume'));
-      document.title='JMLR · Volume '+volume+' — ML-Audit'; $('announcement').textContent='JMLR volume '+volume+'. '+plural(info.paper_count,'flagged paper')+', '+plural(info.finding_count,'finding')+'.';
+      document.title='JMLR · Volume '+volume+' — ML-Audit'; $('announcement').textContent='JMLR volume '+volume+'. '+(info.paper_count + (info.paper_count===1 ? ' paper with findings' : ' papers with findings'))+', '+plural(info.finding_count,'finding')+'.';
       $('share-volume').querySelector('span').textContent='Copy volume link';
     }
     if(moveFocus){const heading=$(detail?'detail-title':'volume-heading');heading.tabIndex=-1;heading.focus({preventScroll:true});}
@@ -275,17 +275,17 @@
   }
   async function load() {
     try {
-      const response=await fetch('./data/jmlr.json?v=7');if(!response.ok)throw new Error('HTTP '+response.status);data=await response.json();
+      const response=await fetch('./data/jmlr.json?v=8');if(!response.ok)throw new Error('HTTP '+response.status);data=await response.json();
       $('total-papers').textContent=data.snapshot.papers_with_findings.toLocaleString();$('total-findings').textContent=data.snapshot.findings.toLocaleString();
       $('snapshot-date').textContent='Audit snapshot · '+new Intl.DateTimeFormat('en-GB',{day:'numeric',month:'short',year:'numeric',timeZone:'Asia/Dubai'}).format(new Date(data.snapshot.captured_at));
       const nav=$('volume-nav'),select=$('mobile-volume');
       data.volumes.forEach(v=>{
         const a=anchor('',route(v.volume),'volume-link');a.dataset.volume=String(v.volume);const label=element('span','volume-number','Volume '+v.volume);label.append(element('small','',years(v.years)));a.append(label,element('span','volume-badge',String(v.paper_count)));nav.append(a);
-        const option=element('option','','Volume '+v.volume+' · '+years(v.years)+' · '+plural(v.paper_count,'paper'));option.value=String(v.volume);select.append(option);
+        const option=element('option','','Volume '+v.volume+' · '+years(v.years));option.value=String(v.volume);select.append(option);
       });render();
     }catch(error){const box=element('div','error-message');box.append(element('p','','The findings could not be loaded. Please try again.'));const retry=element('button','','Try again');retry.type='button';retry.addEventListener('click',()=>location.reload());box.append(retry);$('papers').replaceChildren(box);$('volume-count').textContent='Feed unavailable';}
   }
-  window.addEventListener('hashchange',()=>render(true));
+  window.addEventListener('hashchange',()=>{ document.querySelector('.volume-directory').open=false; render(true); });
   $('mobile-volume').addEventListener('change',event=>{location.hash=route(event.target.value);});
   $('share-volume').addEventListener('click',()=>copyLink($('share-volume'),'Volume',route(currentVolume)));
   $('paper-search').addEventListener('input',event=>{searches.set(currentVolume,event.target.value);renderPapers();});

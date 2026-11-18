@@ -3,47 +3,43 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#173e33">
-  <meta name="description" content="Understand the findings from a GPT audit of JMLR papers. Start with a plain-English reading guide, then explore the complete argument and original paper.">
-  <title>ML-Audit · JMLR paper audit</title>
+  <meta name="theme-color" content="#fbfaf6">
+  <meta name="description" content="Explore GPT audit findings on accepted, published JMLR papers. Read accessible explanations, mathematical evidence, and the detailed technical reports.">
+  <title>ML-Audit · Published JMLR papers</title>
   <link rel="icon" href="./assets/favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="./assets/styles.css?v=7">
+  <link rel="stylesheet" href="./assets/styles.css?v=8">
   <script src="./assets/math-config.js" defer></script>
   <script src="./assets/vendor/mathjax.js" defer></script>
-  <script src="./assets/app.js?v=7" defer></script>
+  <script src="./assets/app.js?v=8" defer></script>
 </head>
 <body>
   <a class="skip-link" href="#feed">Skip to the findings</a>
-  <aside class="sidebar" aria-label="Browse the audit">
-    <a class="brand" href="#/jmlr/volume/1" aria-label="ML-Audit home"><span class="brand-icon" aria-hidden="true">M<span>·</span>A</span><span>ML-Audit<span class="brand-subtitle">JMLR paper audit</span></span></a>
-    <div class="nav-caption">BROWSE BY VENUE</div>
-    <nav aria-label="Venues"><a class="venue active" href="#/jmlr/volume/1" aria-current="page"><span class="venue-mark" aria-hidden="true">J</span><span>JMLR<small>Journal of Machine Learning Research</small></span><span class="venue-dot" aria-hidden="true"></span></a></nav>
-    <div class="volume-label"><label for="mobile-volume">JMLR VOLUMES</label><span>01—27</span></div>
-    <select id="mobile-volume" aria-label="Select JMLR volume"></select>
-    <nav id="volume-nav" class="volume-nav" aria-label="JMLR volumes"></nav>
-    <div class="sidebar-footer"><span class="status-dot" aria-hidden="true"></span> Findings from the GPT audit<a href="https://github.com/ml-audit/ml-audit.github.io">View on GitHub <span aria-hidden="true">↗</span></a></div>
-  </aside>
-  <div class="page">
-    <header class="topbar"><a href="#/jmlr/volume/1" class="topbar-home">The JMLR collection</a><a href="./data/jmlr.json" download>Download data <span aria-hidden="true">↓</span></a></header>
+  <header class="site-header"><div class="header-inner">
+    <a class="brand" href="#/jmlr/volume/1" aria-label="ML-Audit home"><span class="brand-icon" aria-hidden="true">M</span><span>ML-Audit</span></a>
+    <nav class="main-nav" aria-label="Venues"><a class="active" href="#/jmlr/volume/1" aria-current="page">JMLR</a><a href="https://github.com/ml-audit/ml-audit.github.io">GitHub <span aria-hidden="true">↗</span></a></nav>
+  </div></header>
+  <div class="site-shell">
+    <aside class="collection-nav" aria-label="Browse the JMLR collection">
+      <div class="collection-name"><span class="nav-kicker">JOURNAL COLLECTION</span><span>Journal of Machine Learning Research</span></div>
+      <div class="volume-picker"><label for="mobile-volume">Volume</label><select id="mobile-volume" aria-label="Select JMLR volume"></select></div>
+      <details class="volume-directory"><summary>All volumes</summary><nav id="volume-nav" class="volume-nav" aria-label="JMLR volumes"></nav></details>
+    </aside>
     <main id="feed" tabindex="-1">
       <section class="intro" id="collection-intro" aria-labelledby="page-title">
-        <div class="eyebrow"><span class="small-rule"></span> A PUBLIC PAPER AUDIT</div>
-        <h1 id="page-title">Explore the findings.</h1>
-        <p class="intro-copy">Start with a plain-English explanation. Follow the evidence. Read the complete audit and the original paper.</p>
-        <div class="collection-summary"><span><strong id="total-papers">—</strong> papers with findings</span><span><strong id="total-findings">—</strong> findings</span><span class="source-pill"><span class="status-dot" aria-hidden="true"></span>GPT audit</span></div>
+        <p class="eyebrow">PUBLISHED LITERATURE · GPT AUDIT</p>
+        <h1 id="page-title">JMLR paper audits</h1>
+        <p class="intro-copy">Explore GPT audit findings on accepted, published JMLR papers. Follow each explanation through the mathematical evidence to the original paper.</p>
+        <div class="collection-summary"><span><strong id="total-papers">—</strong> papers with findings</span><span><strong id="total-findings">—</strong> findings</span><span>JMLR volumes 1–27</span></div>
       </section>
       <section class="volume-section" id="volume-view" aria-labelledby="volume-heading">
         <div class="feed-heading"><div><div class="breadcrumb">JMLR <span aria-hidden="true">/</span> <span id="volume-crumb">Volume 1</span></div><h2 id="volume-heading">Volume 1 <span id="volume-years"></span></h2></div><button class="share-button" id="share-volume" type="button" aria-label="Copy a link to this volume"><span>Copy volume link</span><span aria-hidden="true">↗</span></button></div>
-        <div class="feed-meta"><span id="volume-count">Loading findings…</span><span class="reading-note">Plain-English summaries · Full reports inside</span></div>
-        <div class="browse-toolbar">
-          <div class="search-field"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg><label class="sr-only" for="paper-search">Search papers and findings in this volume</label><input id="paper-search" type="search" autocomplete="off" placeholder="Search papers in this volume"><button id="clear-search" type="button" hidden>Clear</button></div>
-          <p id="search-status" class="search-status" role="status"></p>
-        </div>
+        <div class="browse-toolbar"><div class="search-field"><label for="paper-search">SEARCH THIS VOLUME</label><div class="search-input-row"><input id="paper-search" type="search" autocomplete="off" placeholder="Paper title or a word from the finding"><button id="clear-search" type="button" hidden>Clear</button></div></div></div>
+        <div class="feed-meta"><span id="volume-count">Loading findings…</span><p id="search-status" class="search-status" role="status"></p></div>
         <div id="papers" aria-live="polite"><p class="loading">Loading the JMLR findings…</p></div>
         <nav id="volume-pagination" class="volume-pagination" aria-label="Previous and next volume"></nav>
       </section>
       <section class="paper-section" id="paper-view" aria-labelledby="detail-title" hidden></section>
-      <footer class="page-footer"><p>Findings and impact assessments come from the GPT audit. Reading guides are edited for clarity; the full technical reports remain available. The audit is ongoing.</p><div><span id="snapshot-date"></span><a href="./data/jmlr.json">Curated data <span aria-hidden="true">↗</span></a></div></footer>
+      <footer class="page-footer"><p>Findings and assessments of their implications come from the GPT audit. Editorial reading guides explain the recorded evidence. The detailed reports retain the technical arguments, with wording adapted for public presentation.</p><p>This collection covers accepted papers published in JMLR. It does not provide an overall correctness rating for a paper.</p><div><span id="snapshot-date"></span><a href="./data/jmlr.json" download>Download curated data ↓</a></div></footer>
     </main>
     <div id="announcement" class="sr-only" role="status"></div>
   </div>
