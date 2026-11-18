@@ -51,7 +51,7 @@
   }
   function sourceVolume(volume) {
     if (!reportLoads.has(volume)) {
-      reportLoads.set(volume, fetch(data.full_reports.volumes[String(volume)] + '?v=8').then(r => {
+      reportLoads.set(volume, fetch(data.full_reports.volumes[String(volume)] + '?v=9').then(r => {
         if (!r.ok) throw new Error('HTTP ' + r.status); return r.json();
       }).catch(error => { reportLoads.delete(volume); throw error; }));
     }
@@ -153,6 +153,7 @@
     article.dataset.findingId = finding.id; article.dataset.sourceSha256 = finding.source_body_sha256;
     article.append(element('p','finding-number','GPT AUDIT · FINDING ' + (index + 1)));
     const heading = element('h2', '', finding.title || 'Finding ' + (index + 1));
+    if(finding.title_html)heading.innerHTML=finding.title_html;
     heading.id = 'finding-heading-' + (index + 1); article.setAttribute('aria-labelledby', heading.id); article.append(heading);
     if (paper.findings.length > 1) article.append(element('p','finding-lead',paper.findings[index].summary));
     const guide = element('div','reading-guide');
@@ -275,7 +276,7 @@
   }
   async function load() {
     try {
-      const response=await fetch('./data/jmlr.json?v=8');if(!response.ok)throw new Error('HTTP '+response.status);data=await response.json();
+      const response=await fetch('./data/jmlr.json?v=9');if(!response.ok)throw new Error('HTTP '+response.status);data=await response.json();
       $('total-papers').textContent=data.snapshot.papers_with_findings.toLocaleString();$('total-findings').textContent=data.snapshot.findings.toLocaleString();
       $('snapshot-date').textContent='Audit snapshot · '+new Intl.DateTimeFormat('en-GB',{day:'numeric',month:'short',year:'numeric',timeZone:'Asia/Dubai'}).format(new Date(data.snapshot.captured_at));
       const nav=$('volume-nav'),select=$('mobile-volume');

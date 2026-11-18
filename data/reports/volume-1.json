@@ -482,6 +482,7 @@
               "rendered_class": "source-section-heading"
             }
           ],
+          "title_html": "The EGU relative-loss premise and resulting central bounds are false",
           "reading_guide": {
             "edition": 1,
             "attribution": "Editorial reading guide based on the GPT audit",
@@ -624,6 +625,7 @@
               "rendered_class": "source-section-heading"
             }
           ],
+          "title_html": "Mercer eigenvalue decay does not imply the claimed uniform covering bound",
           "reading_guide": {
             "edition": 1,
             "attribution": "Editorial reading guide based on the GPT audit",

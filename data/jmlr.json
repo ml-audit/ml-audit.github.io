@@ -9401,7 +9401,7 @@
   "attribution": "Technical findings and impact assessments: GPT audit source reports, with publication-decision wording adapted for this public edition. Volume-card summaries and reading guides are editorial. Private file references adapted for publication; supporting audit files are not published with this release.",
   "scope": "Accepted papers published in JMLR, in a frozen, ongoing GPT audit snapshot.",
   "full_reports": {
-    "edition": 4,
+    "edition": 5,
     "source": "GPT audit Markdown reports, curated public edition",
     "wording": "Technical arguments, calculations and limitations retained. Publication-decision wording adapted to discuss the affected claims. Private file references adapted for publication; official paper sources and supporting-file availability listed.",
     "volumes": {
