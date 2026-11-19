@@ -28,6 +28,17 @@
     const note = incompleteNote(paper); if (note) block.append(note);
     return block;
   }
+  function abstractBlock(paper, detail = false) {
+    const block = element('section', detail ? 'paper-abstract detail-abstract' : 'paper-abstract card-abstract');
+    const heading = element(detail ? 'h2' : 'h4', 'abstract-label', 'Authors’ abstract');
+    if (detail) { block.id = 'paper-abstract'; heading.id = 'abstract-heading'; block.setAttribute('aria-labelledby', heading.id); }
+    const body = element('div', 'abstract-content source-markdown');
+    if (paper.abstract_html) body.innerHTML = paper.abstract_html;
+    else body.append(element('p', '', paper.abstract || 'Abstract not available.'));
+    block.append(heading, body);
+    if (detail) block.append(anchor('Abstract source: original paper', paper.abstract_source, 'abstract-source'));
+    return block;
+  }
   function renderCard(paper, index) {
     const card = element('article', 'paper-card'); card.id = paper.record_id;
     card.setAttribute('aria-labelledby', 'title-' + paper.record_id);
@@ -36,8 +47,8 @@
     const title = element('h3'); title.id = 'title-' + paper.record_id;
     title.append(anchor(paper.title, paperRoute(paper), 'paper-detail-link'));
     const actions = element('div', 'card-actions');
-    actions.append(anchor('View audit →', paperRoute(paper), 'details-link'), anchor('Original paper ↗', paper.paper_url, 'original-link'));
-    card.append(meta, title, summaryBlock(paper), actions); return card;
+    actions.append(anchor('View audit', paperRoute(paper), 'details-link'), anchor('Original paper', paper.paper_url, 'original-link'));
+    card.append(meta, title, abstractBlock(paper), summaryBlock(paper), actions); return card;
   }
   async function copyLink(button, label, hash) {
     try {
@@ -51,7 +62,7 @@
   }
   function sourceVolume(volume) {
     if (!reportLoads.has(volume)) {
-      reportLoads.set(volume, fetch(data.full_reports.volumes[String(volume)] + '?v=9').then(r => {
+      reportLoads.set(volume, fetch(data.full_reports.volumes[String(volume)] + '?v=10').then(r => {
         if (!r.ok) throw new Error('HTTP ' + r.status); return r.json();
       }).catch(error => { reportLoads.delete(volume); throw error; }));
     }
@@ -88,7 +99,8 @@
   function goToSection(focus = true) {
     const id = currentSection(); if (!id) return;
     const target = document.getElementById(id);
-    if (!target || !$('paper-view').contains(target)) return;
+    const scope = $('home-view').hidden ? $('paper-view') : $('home-view');
+    if (!target || !scope.contains(target)) return;
     let parent = target.parentElement;
     while (parent && parent !== $('paper-view')) { if (parent.tagName === 'DETAILS') parent.open = true; parent = parent.parentElement; }
     if (target.tagName === 'DETAILS') target.open = true;
@@ -105,6 +117,7 @@
     const nav = element('nav'); nav.setAttribute('aria-label', 'Paper contents');
     const list = element('ul', 'toc-links');
     const add = (text, id, cls) => { const li = element('li', cls); li.append(anchor(text, sectionRoute(paper, id))); list.append(li); };
+    add('Authors’ abstract', 'paper-abstract');
     add('Audit summary', 'paper-overview');
     paper.findings.forEach((f, i) => {
       if (paper.findings.length > 1) add('Finding ' + (i + 1), 'finding-' + (i + 1), 'toc-finding-label');
@@ -123,12 +136,12 @@
     paper.findings.forEach((f, i) => {
       const item = element(paper.findings.length > 1 ? 'li' : 'div', 'overview-item');
       item.append(element('p', '', f.summary));
-      if (paper.findings.length > 1) item.append(anchor('Read finding ' + (i + 1) + ' ↓', sectionRoute(paper, 'finding-' + (i + 1))));
+      if (paper.findings.length > 1) item.append(anchor('Read finding ' + (i + 1), sectionRoute(paper, 'finding-' + (i + 1))));
       list.append(item);
     });
     box.append(list);
     const actions = element('div', 'overview-actions');
-    actions.append(anchor('Start with the reading guide ↓', sectionRoute(paper, 'finding-1-claim'), 'overview-primary'), anchor('Go to the full GPT report', sectionRoute(paper, 'finding-1-report')));
+    actions.append(anchor('Start with the reading guide', sectionRoute(paper, 'finding-1-claim'), 'overview-primary'), anchor('Go to the full GPT report', sectionRoute(paper, 'finding-1-report')));
     box.append(actions, element('p', 'overview-attribution', 'Editorial summaries of findings recorded by the GPT audit.'));
     return box;
   }
@@ -180,7 +193,7 @@
     sources.append(details); article.append(sources);
     const actions = element('div','finding-actions');
     const download = element('button','download-source','Download full finding text'); download.type = 'button'; download.addEventListener('click',()=>downloadFinding(finding,paper,index));
-    actions.append(download,anchor('Back to the reading guide ↑', sectionRoute(paper, 'finding-' + (index + 1) + '-claim'))); article.append(actions);
+    actions.append(download,anchor('Back to the reading guide', sectionRoute(paper, 'finding-' + (index + 1) + '-claim'))); article.append(actions);
     return article;
   }
   function renderPaper(paper) {
@@ -190,11 +203,11 @@
     header.append(breadcrumb,element('p','detail-meta','PUBLISHED PAPER · JMLR ' + paper.volume + ' (' + paper.year + ') · ' + plural(paper.findings.length,'finding')));
     const title = element('h1','detail-title',paper.title); title.id = 'detail-title'; header.append(title);
     const actions = element('div','detail-actions');
-    actions.append(anchor('Original paper ↗',paper.paper_url,'original-paper'),anchor('Open PDF ↗',paper.pdf_url,'original-link'));
+    actions.append(anchor('Original paper',paper.paper_url,'original-paper'),anchor('Open PDF',paper.pdf_url,'original-link'));
     const share = element('button','share-button'); share.id = 'share-paper'; share.type = 'button'; share.append(element('span','','Copy paper link')); share.addEventListener('click',()=>copyLink(share,'Paper',paperRoute(paper))); actions.append(share);
     header.append(actions); view.append(header);
     const note = incompleteNote(paper); if (note) view.append(note);
-    const layout = element('div','detail-layout'), reading = element('div','detail-reading'); reading.append(overview(paper));
+    const layout = element('div','detail-layout'), reading = element('div','detail-reading'); reading.append(abstractBlock(paper, true), overview(paper));
     const container = element('div'); container.id = 'source-findings'; container.dataset.loaded = 'false'; container.append(element('p','loading','Loading the reading guide and full report…')); reading.append(container);
     layout.append(toc(paper),reading); view.append(layout);
     async function showSource() {
@@ -210,7 +223,7 @@
         if (source.preface_markdown.trim()) { const preface = element('div','source-preface'); const body = element('div','source-markdown'); body.innerHTML = source.preface_html; preface.append(body); coverage.append(preface); }
         coverage.append(element('p','','Reading guides are editorial explanations based on the GPT audit. The detailed reports retain the scientific arguments. Supporting audit files are not included in this release.'));
         if (source.preface_audit_files_notice) coverage.append(element('p','audit-file-availability',source.preface_audit_files_notice));
-        container.append(coverage,anchor('← Back to Volume ' + paper.volume,route(paper.volume),'back-link bottom-back'));
+        container.append(coverage,anchor('Back to Volume ' + paper.volume,route(paper.volume),'back-link bottom-back'));
         container.dataset.loaded = 'true'; await typeset(view);
         if (view.contains(container)) goToSection(false);
       } catch (error) {
@@ -232,7 +245,7 @@
       empty.append(element('span','empty-icon',query ? '⌕' : '–'),element('h3','',query ? 'No papers match your search' : 'No findings published yet'));
       empty.append(element('p','',query ? 'Try a different title or a word from the finding.' : 'There are no published GPT audit findings for JMLR Volume ' + currentVolume + ' in this release.'));
       if (query) { const clear = element('button','details-link','Clear search'); clear.type='button'; clear.addEventListener('click',clearSearch); empty.append(clear); }
-      else { const previous = data.volumes.filter(v=>v.volume<currentVolume && v.paper_count).at(-1); if(previous) empty.append(anchor('Browse Volume ' + previous.volume + ' →',route(previous.volume),'details-link')); }
+      else { const previous = data.volumes.filter(v=>v.volume<currentVolume && v.paper_count).at(-1); if(previous) empty.append(anchor('Browse Volume ' + previous.volume,route(previous.volume),'details-link')); }
       feed.append(empty);
     }
     typeset(feed);
@@ -242,6 +255,23 @@
     if (!data) return;
     const base = location.hash.split('?')[0];
     if (base === activeRoute && currentSection()) { goToSection(moveFocus); return; }
+    const home = !base || base === '#' || base === '#/';
+    $('home-view').hidden = !home; $('collection-nav').hidden = home;
+    for (const [id, selected] of [['home-nav', home], ['jmlr-nav', !home]]) {
+      $(id).classList.toggle('active', selected);
+      if (selected) $(id).setAttribute('aria-current', 'page'); else $(id).removeAttribute('aria-current');
+    }
+    if (home) {
+      activeRoute = base;
+      $('collection-intro').hidden = true; $('volume-view').hidden = true; $('paper-view').hidden = true;
+      if (window.MathJax && window.MathJax.typesetClear) window.MathJax.typesetClear([$('papers'), $('paper-view')]);
+      $('paper-view').replaceChildren();
+      document.title = 'ML-Audit · A closer look at published research';
+      $('announcement').textContent = 'ML-Audit home. Browse JMLR papers and learn how to read an audit.';
+      if (currentSection()) goToSection(moveFocus);
+      else { if (moveFocus) { $('home-title').tabIndex = -1; $('home-title').focus({preventScroll:true}); } window.scrollTo({top:0, behavior:'instant'}); }
+      return;
+    }
     const match = /^#\/jmlr\/volume\/(\d+)(?:\/paper\/([^/]+))?\/?$/.exec(base);
     const volume = match ? Number(match[1]) : 1;
     const info = data.volumes.find(v=>v.volume===volume);
@@ -258,7 +288,7 @@
     view.replaceChildren();
     if(detail) {
       if(paper)renderPaper(paper);
-      else { const title=element('h1','detail-title','Paper not found');title.id='detail-title';view.append(title,element('p','','This paper is not in the published GPT audit findings for this volume.'),anchor('← Back to Volume '+volume,route(volume),'back-link')); }
+      else { const title=element('h1','detail-title','Paper not found');title.id='detail-title';view.append(title,element('p','','This paper is not in the published GPT audit findings for this volume.'),anchor('Back to Volume '+volume,route(volume),'back-link')); }
       document.title=paper ? paper.title+' — ML-Audit' : 'Paper not found — ML-Audit';
       $('announcement').textContent=paper ? paper.title+'. '+plural(paper.findings.length,'GPT audit finding')+'.' : 'Paper not found.';
     } else {
@@ -266,8 +296,8 @@
       $('volume-count').textContent=(info.paper_count + (info.paper_count===1 ? ' paper with findings' : ' papers with findings'))+' · '+plural(info.finding_count,'finding');
       $('paper-search').value=searches.get(volume)||''; renderPapers();
       const pagination=$('volume-pagination');pagination.replaceChildren();const index=data.volumes.findIndex(v=>v.volume===volume);
-      if(index>0)pagination.append(anchor('← Volume '+data.volumes[index-1].volume,route(data.volumes[index-1].volume),'previous-volume'));
-      if(index<data.volumes.length-1)pagination.append(anchor('Volume '+data.volumes[index+1].volume+' →',route(data.volumes[index+1].volume),'next-volume'));
+      if(index>0)pagination.append(anchor('Previous: Volume '+data.volumes[index-1].volume,route(data.volumes[index-1].volume),'previous-volume'));
+      if(index<data.volumes.length-1)pagination.append(anchor('Next: Volume '+data.volumes[index+1].volume,route(data.volumes[index+1].volume),'next-volume'));
       document.title='JMLR · Volume '+volume+' — ML-Audit'; $('announcement').textContent='JMLR volume '+volume+'. '+(info.paper_count + (info.paper_count===1 ? ' paper with findings' : ' papers with findings'))+', '+plural(info.finding_count,'finding')+'.';
       $('share-volume').querySelector('span').textContent='Copy volume link';
     }
@@ -276,7 +306,8 @@
   }
   async function load() {
     try {
-      const response=await fetch('./data/jmlr.json?v=9');if(!response.ok)throw new Error('HTTP '+response.status);data=await response.json();
+      const response=await fetch('./data/jmlr.json?v=10');if(!response.ok)throw new Error('HTTP '+response.status);data=await response.json();
+      document.querySelectorAll('[data-count]').forEach(el => { const key = el.dataset.count; el.textContent = (key === 'papers' ? data.snapshot.papers_with_findings : key === 'findings' ? data.snapshot.findings : data.volumes.length).toLocaleString(); });
       $('total-papers').textContent=data.snapshot.papers_with_findings.toLocaleString();$('total-findings').textContent=data.snapshot.findings.toLocaleString();
       $('snapshot-date').textContent='Audit snapshot · '+new Intl.DateTimeFormat('en-GB',{day:'numeric',month:'short',year:'numeric',timeZone:'Asia/Dubai'}).format(new Date(data.snapshot.captured_at));
       const nav=$('volume-nav'),select=$('mobile-volume');
@@ -284,7 +315,7 @@
         const a=anchor('',route(v.volume),'volume-link');a.dataset.volume=String(v.volume);const label=element('span','volume-number','Volume '+v.volume);label.append(element('small','',years(v.years)));a.append(label,element('span','volume-badge',String(v.paper_count)));nav.append(a);
         const option=element('option','','Volume '+v.volume+' · '+years(v.years));option.value=String(v.volume);select.append(option);
       });render();
-    }catch(error){const box=element('div','error-message');box.append(element('p','','The findings could not be loaded. Please try again.'));const retry=element('button','','Try again');retry.type='button';retry.addEventListener('click',()=>location.reload());box.append(retry);$('papers').replaceChildren(box);$('volume-count').textContent='Feed unavailable';}
+    }catch(error){$('home-data-status').textContent='Collection data could not be loaded. Please reload the page to try again.';const box=element('div','error-message');box.append(element('p','','The findings could not be loaded. Please try again.'));const retry=element('button','','Try again');retry.type='button';retry.addEventListener('click',()=>location.reload());box.append(retry);$('papers').replaceChildren(box);$('volume-count').textContent='Feed unavailable';}
   }
   window.addEventListener('hashchange',()=>{ document.querySelector('.volume-directory').open=false; render(true); });
   $('mobile-volume').addEventListener('change',event=>{location.hash=route(event.target.value);});
