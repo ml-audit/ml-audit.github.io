@@ -4,13 +4,13 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#fbfaf6">
-  <meta name="description" content="Explore GPT audit findings on accepted, published JMLR papers. Read accessible explanations, mathematical evidence, and the detailed technical reports.">
-  <title>ML-Audit · Published JMLR papers</title>
+  <meta name="description" content="Explore potential mistakes in published machine learning papers through GPT audit findings, supporting evidence, and detailed technical reports.">
+  <title>ML-Audit · Potential mistakes in machine learning papers</title>
   <link rel="icon" href="./assets/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="./assets/styles.css?v=10">
   <script src="./assets/math-config.js" defer></script>
   <script src="./assets/vendor/mathjax.js" defer></script>
-  <script src="./assets/app.js?v=10" defer></script>
+  <script src="./assets/app.js?v=11" defer></script>
 </head>
 <body>
   <a class="skip-link" href="#feed">Skip to content</a>
@@ -30,9 +30,9 @@
         <header class="home-hero">
           <p class="eyebrow">ML-AUDIT · PUBLISHED RESEARCH</p>
           <h1 id="home-title">Machine learning papers,<br>examined in detail.</h1>
-          <p class="home-lead">Research is easier to build on when its arguments are easy to inspect. ML-Audit brings together GPT audit findings on accepted papers published in the <em>Journal of Machine Learning Research</em>.</p>
+          <p class="home-lead">ML-Audit uses AI to identify potential mistakes in published machine learning papers. Each finding explains the suspected issue, presents supporting evidence, and shows why it may matter.</p>
           <p>Start with the paper’s original abstract, read a plain-English explanation of a suspected issue, then follow the evidence into the full technical report and the original paper.</p>
-          <div class="home-actions"><a class="primary-link" href="#/jmlr/volume/1">Browse JMLR papers</a><a href="#/?section=how-to-read">How to read an audit</a></div>
+          <div class="home-actions"><a class="primary-link" href="#/jmlr/volume/1">Browse current audits</a><a href="#/?section=how-to-read">How to read an audit</a></div>
         </header>
         <section class="home-purpose" aria-labelledby="home-purpose-heading">
           <h2 id="home-purpose-heading">A starting point for closer reading</h2>
@@ -48,13 +48,13 @@
             <div><p class="eyebrow">PUBLISHED JOURNAL PAPERS</p><h3><a href="#/jmlr/volume/1">JMLR</a></h3><p class="collection-full-name">Journal of Machine Learning Research</p><p>Browse by volume. Each paper brings its original abstract and all published audit findings together, with a detailed page for the evidence and full reports.</p></div>
             <div class="collection-entry"><dl class="home-stat-list"><div><dt>Papers with findings</dt><dd data-count="papers">—</dd></div><div><dt>Audit findings</dt><dd data-count="findings">—</dd></div><div><dt>Volumes</dt><dd data-count="volumes">—</dd></div></dl><a class="primary-link" href="#/jmlr/volume/1">Browse the collection</a></div>
           </article>
-          <p class="home-scope">This release covers accepted, published JMLR papers. It includes papers with recorded findings from the current GPT audit snapshot, rather than every paper in each volume.</p>
+          <p class="home-scope">JMLR is our first collection, with coverage of other machine learning venues planned. This snapshot includes papers with recorded GPT audit findings, rather than every paper in the venue.</p>
           <p id="home-data-status" role="status"></p>
         </section>
         <section class="home-instructions" id="how-to-read" aria-labelledby="home-instructions-heading">
           <h2 id="home-instructions-heading">How to read an audit</h2>
           <ol class="reading-steps">
-            <li><h3>Choose a volume and paper</h3><p>Open JMLR and use the volume selector. Search within a volume by paper title or a word from a finding. Volume and paper links can be copied and shared.</p></li>
+            <li><h3>Choose a collection and paper</h3><p>Choose an available collection, then select a volume and paper. Search within a volume by paper title or a word from a finding. Volume and paper links can be copied and shared.</p></li>
             <li><h3>Get the context, then the concern</h3><p>The <strong>authors’ abstract</strong> describes the paper in its authors’ words. The <strong>audit finding</strong> below it is an editorial summary of the concern recorded by the GPT audit.</p></li>
             <li><h3>Follow the argument</h3><p>Select <strong>View audit</strong> or the paper title. The reading guide explains the claim, what may be wrong, the evidence, and why it may matter. The <strong>full GPT audit report</strong> follows with the detailed technical argument.</p></li>
             <li><h3>Check the original</h3><p>Use <strong>Original paper</strong> or <strong>Open PDF</strong> to compare the finding with the published text. Paper locations and source links help you find the relevant passage. Mathematical expressions are typeset; wide equations can be scrolled on a small screen.</p></li>
@@ -79,7 +79,7 @@
         <nav id="volume-pagination" class="volume-pagination" aria-label="Previous and next volume"></nav>
       </section>
       <section class="paper-section" id="paper-view" aria-labelledby="detail-title" hidden></section>
-      <footer class="page-footer"><p>Findings and assessments of their implications come from the GPT audit. Editorial reading guides explain the recorded evidence. The detailed reports retain the technical arguments, with wording adapted for public presentation.</p><p>This collection covers accepted papers published in JMLR. It does not provide an overall correctness rating for a paper.</p><div><span id="snapshot-date"></span><a href="./data/jmlr.json" download>Download curated data</a></div></footer>
+      <footer class="page-footer"><p>Findings and assessments of their implications come from the GPT audit. Editorial reading guides explain the recorded evidence. The detailed reports retain the technical arguments, with wording adapted for public presentation.</p><p>ML-Audit focuses on accepted, published machine learning papers. The site does not provide an overall correctness rating for a paper.</p><div><span id="snapshot-date"></span><a href="./data/jmlr.json" download>Download curated data</a></div></footer>
     </main>
     <div id="announcement" class="sr-only" role="status"></div>
   </div>

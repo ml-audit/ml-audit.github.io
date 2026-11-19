@@ -266,8 +266,8 @@
       $('collection-intro').hidden = true; $('volume-view').hidden = true; $('paper-view').hidden = true;
       if (window.MathJax && window.MathJax.typesetClear) window.MathJax.typesetClear([$('papers'), $('paper-view')]);
       $('paper-view').replaceChildren();
-      document.title = 'ML-Audit · A closer look at published research';
-      $('announcement').textContent = 'ML-Audit home. Browse JMLR papers and learn how to read an audit.';
+      document.title = 'ML-Audit · Potential mistakes in machine learning papers';
+      $('announcement').textContent = 'ML-Audit home. Explore published machine learning papers and learn how to read an audit.';
       if (currentSection()) goToSection(moveFocus);
       else { if (moveFocus) { $('home-title').tabIndex = -1; $('home-title').focus({preventScroll:true}); } window.scrollTo({top:0, behavior:'instant'}); }
       return;
